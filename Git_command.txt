@@ -10,6 +10,7 @@ usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
            [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]        
            [--config-env=<name>=<envvar>] <command> [<args>]
 
+git pull = gp
 
 
 
