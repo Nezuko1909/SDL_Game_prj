@@ -69,28 +69,28 @@ SDL_Surface* load_key_media(std::string path) {
 bool load_key() {
     bool Success = true;
     //load default surface
-    KeyPressSurfaces[Default_Key] = load_key_media("E:\\C++2\\SDL_TEST\\img_source\\default_key.bmp");
+    KeyPressSurfaces[Default_Key] = load_key_media("img_source/default_key.bmp");
     //check it
     if (KeyPressSurfaces[Default_Key] == NULL) {
         std::cout<<"Failed to load key image\n";
         Success = false;
     }
-    KeyPressSurfaces[Up_Arrow] = load_key_media("E:\\C++2\\SDL_TEST\\img_source\\arr_up.bmp");
+    KeyPressSurfaces[Up_Arrow] = load_key_media("img_source/arr_up.bmp");
     if (KeyPressSurfaces[Up_Arrow] == NULL) {
         std::cout<<"Failed to load key image\n";
         Success = false;
     }
-    KeyPressSurfaces[Down_Arrow] = load_key_media("E:\\C++2\\SDL_TEST\\img_source\\arr_down.bmp");
+    KeyPressSurfaces[Down_Arrow] = load_key_media("img_source/arr_down.bmp");
     if (KeyPressSurfaces[Down_Arrow] == NULL) {
         std::cout<<"Failed to load key image\n";
         Success = false;
     }
-    KeyPressSurfaces[Left_Arrow] = load_key_media("E:\\C++2\\SDL_TEST\\img_source\\arr_left.bmp");
+    KeyPressSurfaces[Left_Arrow] = load_key_media("img_source/arr_left.bmp");
     if (KeyPressSurfaces[Left_Arrow] == NULL) {
         std::cout<<"Failed to load key image\n";
         Success = false;
     }
-    KeyPressSurfaces[Right_Arrow] = load_key_media("E:\\C++2\\SDL_TEST\\img_source\\arr_right.bmp");
+    KeyPressSurfaces[Right_Arrow] = load_key_media("img_source/arr_right.bmp");
     if (KeyPressSurfaces[Right_Arrow] == NULL) {
         std::cout<<"Failed to load key image\n";
         Success = false;
@@ -163,13 +163,13 @@ int main(int argc, char* argv[]) {
     } 
     else {
         
-        if (loadmedia("E:\\C++2\\SDL_TEST\\img_source\\BGR.bmp", Get_BGR)) {
+        if (loadmedia("img_source/BGR.bmp", Get_BGR)) {
             //apply the BGR
             SDL_BlitSurface(Get_BGR, NULL, screenSurface, NULL);
             SDL_UpdateWindowSurface(window);
         }
         
-        if (loadmedia("E:\\C++2\\SDL_TEST\\img_source\\Character.bmp", Character)) {
+        if (loadmedia("img_source/Character.bmp", Character)) {
             //load Char
             SDL_BlitSurface(Character, NULL, screenSurface, NULL);
             SDL_UpdateWindowSurface(window);
