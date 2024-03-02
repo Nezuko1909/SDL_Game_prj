@@ -1,11 +1,4 @@
 #include <iostream>
-#include "src\include\SDL2\SDL.h"
-#include "src/include/SDL2/SDL_image.h"
-#include "src/include/SDL2/SDL_mixer.h"
-#include "src/include/SDL2/SDL_ttf.h"
-#include <time.h>
-#include <windows.h>
-#include <string>
 #include "zgwsu.h"
 
 const int SCREEN_WIDTH = 1280;
@@ -65,7 +58,7 @@ SDL_Surface* load_key_media(std::string path) {
     }
     return Key_carry;
 }
-
+/*
 bool load_key() {
     bool Success = true;
     //load default surface
@@ -141,6 +134,7 @@ void Click_Event() {
     }
     return;
 }
+*/
 void close_window() {
     //deallocate surface
     for (size_t i=0;i<Total_Key;i++) {
@@ -174,12 +168,14 @@ int main(int argc, char* argv[]) {
             SDL_BlitSurface(Character, NULL, screenSurface, NULL);
             SDL_UpdateWindowSurface(window);
         } 
+/*
         if (load_key()) {
             Click_Event();
         }
         else {
             std::cout<<"Failed to load Default Media!\n";
         }
+*/
     }
     //get_window_stay();
     close_window();
