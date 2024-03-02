@@ -1,5 +1,5 @@
 #include <iostream>
-#include "zgwsu.h"
+#include "header/baseFunc.h"
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -38,25 +38,6 @@ bool init() { //create window
         }
     }
     return success;
-}
-
-bool loadmedia(const char path[], SDL_Surface*& Get_media) {
-    //ckeck flags success
-    bool loaded = true;
-     Get_media = SDL_LoadBMP(path);     if (Get_media == NULL) {
-        loaded = false;
-        std::cout<<"Unable to load: "<<path<<"!\nSDL Error:\n"<<SDL_GetError();
-    }
-     return loaded;
-}
-
-SDL_Surface* load_key_media(std::string path) {
-    //load key image
-    SDL_Surface* Key_carry = SDL_LoadBMP(path.c_str());
-    if (Key_carry == NULL) {
-        std::cout<<"Unable to load: "<<path<<"\n"<<SDL_GetError();
-    }
-    return Key_carry;
 }
 /*
 bool load_key() {
@@ -162,23 +143,7 @@ int main(int argc, char* argv[]) {
             SDL_BlitSurface(Get_BGR, NULL, screenSurface, NULL);
             SDL_UpdateWindowSurface(window);
         }
-        
-        if (loadmedia("img_source/Character.bmp", Character)) {
-            //load Char
-            SDL_BlitSurface(Character, NULL, screenSurface, NULL);
-            SDL_UpdateWindowSurface(window);
-        } 
-/*
-        if (load_key()) {
-            Click_Event();
-        }
-        else {
-            std::cout<<"Failed to load Default Media!\n";
-        }
-*/
     }
-    //get_window_stay();
-    close_window();
     return 0;
 }
 
