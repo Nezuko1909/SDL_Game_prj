@@ -10,6 +10,7 @@
 #include <string>
 #include <iostream>
 #include <cmath>
+#include <fstream>
 
 //Base 
 static SDL_Window* g_window = NULL;
@@ -20,11 +21,14 @@ static SDL_Renderer* g_renderer = NULL;
 //screen
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 640;
+
 const int SCREEN_BPP = 32; 
 
 const int COLOR_KEY_R = 0;
 const int COLOR_KEY_G = 255;
 const int COLOR_KEY_B = 30;
+
+const int RENDER_DRAW_COLOR = 255;
 
 //Function
 bool func_texture() {

@@ -30,6 +30,4 @@ SDL_Texture* LoadTexture(const char path[]) {
     return newTexture;
 }
 
-
-
 #endif
