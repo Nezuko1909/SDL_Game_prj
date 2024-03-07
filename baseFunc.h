@@ -11,6 +11,7 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <vector>
 
 //Base 
 static SDL_Window* g_window = NULL;
