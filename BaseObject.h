@@ -1,33 +1,24 @@
-#ifndef Base_Object_Function_H_
+#ifndef BASE_OBJECT_H_
+#define BASE_OBJECT_H_
 
 #include "baseFunc.h"
-#include <iostream>
 
-//load surface
-SDL_Surface* Base_Load_Media(const char path[]) {
-    SDL_Surface* Carry = NULL;
-    Carry = IMG_Load(path);
-    if (Carry == NULL) {
-        std::cout<<"Unable to load:\n"<<path<<"\nSDL Error:\n"<<SDL_GetError();
-        return NULL;
-    }
-    return Carry;
-}
+class BaseObject {
+public: 
+    BaseObject();
+    ~BaseObject();
+    void SetRect(const int &x, const int &y) {rect_.x=x; rect_.y=y; }
+    SDL_Rect GetRect() const {return rect_; }
+    SDL_Texture* GetObject() {return p_Object; }
 
-//load texture
-SDL_Texture* LoadTexture(const char path[]) {
-    SDL_Texture* newTexture = NULL;
-    SDL_Surface* loadedsurface = Base_Load_Media(path);
-    if (loadedsurface == NULL) {
-        std::cout<<"Unable to load image!, SDL_Image Error: \n"<<SDL_GetError();
-    }
-    else {
-        newTexture = SDL_CreateTextureFromSurface(g_renderer, loadedsurface);
-    }
-    if (newTexture == NULL) {
-        std::cout<<"Unable to create Texture from Surface! SDL Error:\n"<<SDL_GetError();
-    }
-    return newTexture;
-}
+    bool LoadImg(std::string path, SDL_Renderer* screen);
+    void Render(SDL_Renderer* des, const SDL_Rect* clip = NULL);
+    void Free_and_close();
+
+protected:
+    SDL_Texture* p_Object;
+    SDL_Rect rect_;
+};
+
 
 #endif

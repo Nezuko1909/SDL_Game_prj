@@ -1,10 +1,7 @@
-#include <iostream>
-#include "baseFunc.h"
-#include "BaseObject.h"
-
-BaseObject Background;
+//#include "baseFunc.h"
 
 //Function
+/*
 bool func_texture() {
     if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
         std::cout<<"Warning: Linear texture filtering not enable!";
@@ -46,44 +43,5 @@ bool init_Data() { //create window
     }
     return success;
 }
-
-bool loadBackGround() {
-    bool ret = Background.LoadImg("img_source/BGR.bmp", g_renderer);
-    if (ret == false) return false;
-    return true;
-}
-
-void stay() {
-    SDL_Event e; 
-    bool quit = false; 
-    while( quit == false ) { 
-        while( SDL_PollEvent( &e ) ) { 
-            if( e.type == SDL_QUIT ) quit = true; 
-        } 
-        SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR);
-        SDL_RenderClear(g_renderer);
-        SDL_RenderCopy(g_renderer, g_texture, NULL, NULL);
-        SDL_RenderPresent(g_renderer);
-    }
-}
-
-void close() {
-    Background.Free_and_close();
-    SDL_DestroyRenderer(g_renderer);
-    g_renderer = NULL;
-    SDL_DestroyWindow(g_window);
-    g_window = NULL;
-    IMG_Quit();
-    SDL_Quit();
-}
-
-int main(int argc, char* argv[]) {
-    if (!init_Data()) {
-        return -1;
-    }
-    else {
-        stay();
-    }
-    return 0;
-}
+*/
 
