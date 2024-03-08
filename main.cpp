@@ -1,8 +1,9 @@
 #include <iostream>
 #include "baseFunc.h"
 #include "BaseObject.h"
+#include "gmap.h"
 
-BaseObject Background;
+class BaseObject Background;
 
 //Function
 bool func_texture() {
@@ -48,23 +49,9 @@ bool init_Data() { //create window
 }
 
 bool loadBackGround() {
-    bool ret = Background.LoadImg("img_source/BGR.bmp",g_screenSurface);
+    bool ret = Background.LoadImg("img_source/BGR.png",g_renderer);
     if (ret == false) return false;
     return true;
-}
-
-void stay() {
-    SDL_Event e; 
-    bool quit = false; 
-    while( quit == false ) { 
-        while( SDL_PollEvent( &e ) ) { 
-            if( e.type == SDL_QUIT ) quit = true; 
-        } 
-        SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR);
-        SDL_RenderClear(g_renderer);
-        SDL_RenderCopy(g_renderer, g_texture, NULL, NULL);
-        SDL_RenderPresent(g_renderer);
-    }
 }
 
 void close() {
@@ -79,11 +66,28 @@ void close() {
 
 int main(int argc, char* argv[]) {
     if (!init_Data()) {
-        return -1;
+        return -1; //error
     }
-    else {
-        stay();
+    if (!loadBackGround()) {
+        return -1; //error
     }
+    Game_map Map1;
+    Map1.LoadMap("texture_src/map1.txt");
+    Map1.LoadTile(g_renderer);
+    bool is_quit = false;
+    while (!is_quit) {
+        while(SDL_PollEvent(&g_event) != 0) {
+            if (g_event.type == SDL_QUIT) {
+                is_quit = true;
+            }
+        }
+        SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR); //255
+        SDL_RenderClear(g_renderer);
+        Background.Render(g_renderer, NULL);
+        Map1.DrawMap(g_renderer);
+        SDL_RenderPresent(g_renderer);
+    }
+    close();
     return 0;
 }
 

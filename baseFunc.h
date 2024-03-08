@@ -30,5 +30,21 @@ const int COLOR_KEY_G = 255;
 const int COLOR_KEY_B = 30;
 
 const int RENDER_DRAW_COLOR = 255;
+//map
+
+#define TILE_SIZE 64
+#define MAX_MAP_X 400
+#define MAX_MAP_Y 10
+#define MAX_TILES 4
+
+struct Map {
+    int start_X_ = 0;
+    int start_y_ = 0;
+    int max_x_ = 0;
+    int max_y_ = 0;
+    int tile[MAX_MAP_X][MAX_MAP_Y];
+    std::string file_name;
+};
+
 
 #endif
