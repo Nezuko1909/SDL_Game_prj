@@ -48,7 +48,7 @@ bool init_Data() { //create window
 }
 
 bool loadBackGround() {
-    bool ret = Background.LoadImg("img_source/BGR.bmp", g_renderer);
+    bool ret = Background.LoadImg("img_source/BGR.bmp",g_screenSurface);
     if (ret == false) return false;
     return true;
 }
