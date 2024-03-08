@@ -14,7 +14,9 @@ typedef struct map {
     int max_y_ = 0;
     int tile[MAX_MAP_X][MAX_MAP_Y];
     char file_path_[21] = "texture_src/map1.txt";
-    std::vector<std::string> tile_path = {"texture_src/0.png","texture_src/1.png","texture_src/2.png","texture_src/3.png","texture_src/4.png"};
+};
+/*
+std::vector<std::string> tile_path = {"texture_src/0.png","texture_src/1.png","texture_src/2.png","texture_src/3.png","texture_src/4.png"};
     SDL_Rect
     
     bool LoadMap() {
@@ -64,9 +66,7 @@ typedef struct map {
             re_map_y++;
         }
     }
-
-};
-
+*/
 
 
 #endif
