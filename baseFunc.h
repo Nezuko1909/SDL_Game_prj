@@ -42,7 +42,7 @@ struct Map {
     int start_y_ = 0;
     int max_x_ = 0;
     int max_y_ = 0;
-    int tile[MAX_MAP_X][MAX_MAP_Y];
+    int tile[MAX_MAP_Y][MAX_MAP_X];
     std::string file_name;
 };
 

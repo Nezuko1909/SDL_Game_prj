@@ -11,8 +11,8 @@ void Game_map::LoadMap(const char name[]) {
     if (!fp.is_open()) {
         std::cout<<name<<" not found\n";
     }
-    for (int i=0;i<MAX_MAP_X;i++) {
-        for (int j=0; j<MAX_MAP_Y; j++) {
+    for (int i=0;i<MAX_MAP_Y;i++) {
+        for (int j=0; j<MAX_MAP_X; j++) {
             fp>>game_map_.tile[i][j];
             int val = game_map_.tile[i][j];
             if (val > 0) {
@@ -35,20 +35,22 @@ void Game_map::LoadMap(const char name[]) {
 void Game_map::LoadTile(SDL_Renderer*& screen) {
     std::vector<std::string> tile_path = {"texture_src/0.png", "texture_src/1.png", "texture_src/2.png", "texture_src/3.png"}; //all resourcepack path
     for (int i = 0; i<MAX_TILES; i++) {
-        tile_mat[i].LoadImg(tile_path[i], screen);
+        if (!tile_mat[i].LoadImg(tile_path[i], screen)) {
+            std::cout<<"Unable to load: "<<tile_path[i]<<"\n";
+        }
     }
 }
 
 void Game_map::DrawMap(SDL_Renderer*& screen) {
     int x1, x2, y1, y2;
-    
+
     int vx=game_map_.start_X_/TILE_SIZE;
     int vy=game_map_.start_y_/TILE_SIZE;
 
-    x1 = (game_map_.start_X_%TILE_SIZE);
+    x1 = (game_map_.start_X_%TILE_SIZE)*-1;
     x2 = x1 + SCREEN_WIDTH + (x1 == 0 ? 0 : TILE_SIZE);
 
-    y1 = (game_map_.start_y_%TILE_SIZE);
+    y1 = (game_map_.start_y_%TILE_SIZE)*-1;
     y2 = y1 + SCREEN_HEIGHT + (y1 == 0 ? 0 : TILE_SIZE);
 
     for (int i=x1; i<=x2; i+=TILE_SIZE) {
