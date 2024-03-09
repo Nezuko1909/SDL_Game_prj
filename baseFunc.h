@@ -5,6 +5,7 @@
 #include "src/include/SDL2/SDL_image.h"
 #include "src/include/SDL2/SDL_mixer.h"
 #include "src/include/SDL2/SDL_ttf.h"
+
 #include <time.h>
 #include <windows.h>
 #include <string>
@@ -35,7 +36,12 @@ const int RENDER_DRAW_COLOR = 255;
 #define TILE_SIZE 64
 #define MAX_MAP_X 400
 #define MAX_MAP_Y 10
-#define MAX_TILES 4
+#define MAX_TILES 7
+
+//define for chracter animation
+#define FRAME_MOVE 8 /*8 frame for move animation, src: root/character_src */
+#define FRAME_IDLE 6 /*6 frame for idle animation, src: root/character_src */
+
 
 struct Map {
     int start_X_ = 0;
@@ -45,6 +51,20 @@ struct Map {
     int tile[MAX_MAP_Y][MAX_MAP_X];
     std::string file_name;
 };
+
+// Input []
+
+struct Input
+{
+    /* data */
+    int left;
+    int right;
+    int up;
+    int down;
+    int jump;
+};
+
+
 
 
 #endif

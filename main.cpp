@@ -2,6 +2,7 @@
 #include "baseFunc.h"
 #include "BaseObject.h"
 #include "gmap.h"
+#include "character.h"
 
 class BaseObject Background;
 
@@ -68,23 +69,32 @@ int main(int argc, char* argv[]) {
     if (!init_Data()) {
         return -1; //error
     }
+
     if (!loadBackGround()) {
         return -1; //error
     }
+
     Game_map Map1;
-    Map1.LoadMap("texture_src/map1.txt");
+    Map1.LoadMap("texture_src/map2.txt");
     Map1.LoadTile(g_renderer);
+
+    Character player_main_character; // Samurai
+    player_main_character.Load_Character_Img("character_src/run_right.png", g_renderer, FRAME_MOVE);
+    player_main_character.set_clips();
+
     bool is_quit = false;
     while (!is_quit) {
         while(SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;
             }
+            player_main_character.HandelInputAction(g_event, g_renderer);
         }
         SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR); //255
         SDL_RenderClear(g_renderer);
         Background.Render(g_renderer, NULL);
         Map1.DrawMap(g_renderer);
+        player_main_character.Show_character(g_renderer);
         SDL_RenderPresent(g_renderer);
     }
     close();
