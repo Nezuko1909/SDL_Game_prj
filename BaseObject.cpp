@@ -28,9 +28,11 @@ bool BaseObject::LoadImg(std::string path, SDL_Renderer* screen) {
     return p_Object != NULL;
 }
 
-void BaseObject::Render(SDL_Renderer* des, const SDL_Rect* clip) {
+void BaseObject::Render(SDL_Renderer* des, const SDL_Rect* clip) { //true. return 0
     SDL_Rect renderquad = {rect_.x, rect_.y, rect_.w, rect_.h };
-    SDL_RenderCopy(des, p_Object, clip, &renderquad);
+    if (SDL_RenderCopy(des, p_Object, clip, &renderquad) != 0) {
+        std::cerr<<"Render Error: "<<SDL_GetError()<<"\n";
+    };
 }
 
 void BaseObject::Free_and_close() {
