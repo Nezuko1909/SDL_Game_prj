@@ -37,10 +37,15 @@ const int RENDER_DRAW_COLOR = 255;
 #define MAX_MAP_X 400
 #define MAX_MAP_Y 10
 #define MAX_TILES 7
+#define BLANK_TILE 0
 
 //define for chracter animation
 #define FRAME_MOVE 8 /*8 frame for move animation, src: root/character_src */
 #define FRAME_IDLE 6 /*6 frame for idle animation, src: root/character_src */
+#define GRAVITY_SPEED 1 /*meter per second^2*/
+#define MAX_FALL_SPEED 10
+#define PLAYER_SPEED 8
+
 
 
 struct Map {
@@ -62,6 +67,7 @@ struct Input
     int up;
     int down;
     int jump;
+    int idle;
 };
 
 

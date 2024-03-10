@@ -10,6 +10,14 @@ Character::Character() { //character == mainObject
     width_frame = 0;
     height_frame = 0;
     character_status = -1;
+    Char_input_type.up = 0;
+    Char_input_type.down = 0;
+    Char_input_type.left = 0;
+    Char_input_type.right = 0;
+    Char_input_type.jump = 0;
+    on_ground = false;
+    map_x_ = 0;
+    map_y_ = 0;
 }
 
 Character::~Character() {
@@ -22,6 +30,7 @@ bool Character::Load_Character_Img(std::string path, SDL_Renderer* screen, int f
         width_frame = rect_.w/frame_count;
         height_frame = rect_.h;
     }
+    else std::cout<<"Unable to load"<<path<<" SDL Error: "<<SDL_GetError()<<"\n";
     return ret;
 }
 
@@ -77,9 +86,9 @@ void Character::Show_character(SDL_Renderer* des) {
     else */
     if (character_status == RUN_LEFT) {
         Load_Character_Img("character_src/run_left.png", des, FRAME_MOVE); 
-    } 
+    }
     else if (character_status == RUN_RIGHT) {
-        Load_Character_Img("character_src/run_right", des, FRAME_MOVE);
+        Load_Character_Img("character_src/run_right.png", des, FRAME_MOVE);
     }
 
     if (Char_input_type.left == 1 || Char_input_type.right == 1) {
@@ -89,7 +98,7 @@ void Character::Show_character(SDL_Renderer* des) {
         wframe = 0;
     }
 
-    if (wframe>=8) {
+    if (wframe>=FRAME_MOVE) {
         wframe = 0;
     }
 
@@ -108,15 +117,17 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
         case SDLK_d: {
             character_status = RUN_RIGHT;
             Char_input_type.right = 1;
+            Char_input_type.left = 0;
         }
             break;
         case SDLK_a: {
             character_status = RUN_LEFT;
             Char_input_type.left = 1;
+            Char_input_type.right = 0;
         }
             break;
         }
-    } 
+    }
     else if (character_event.type == SDL_KEYUP) {
         switch (character_event.key.keysym.sym) {
         case SDLK_d: { 
@@ -131,5 +142,97 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
     }
 }
 
+void Character::CheckMapData(Map& map_data) {
+    int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+    int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
+    x1 = (x_pos + x_val)/TILE_SIZE;
+    x2 = (x_pos + x_val + width_frame - 1)/TILE_SIZE;
 
+    y1 = (y_pos)/TILE_SIZE;
+    y2 = (y_pos + height_min -1)/TILE_SIZE;
+
+    if ((x1 >= 0 && x2 <= MAX_MAP_X) && (y1 >= 0 && y2 < MAX_MAP_Y)) {
+        if (x_val > 0) { //moving to right
+            if (map_data.tile[y1][x2] != BLANK_TILE || map_data.tile[y2][x2] != BLANK_TILE) {
+                x_pos = x2*TILE_SIZE;
+                x_pos -= width_frame + 1;
+                x_val = 0;
+            }
+        }
+        else if (x_val < 0) { //moving to left
+            if (map_data.tile[y1][x1] != BLANK_TILE || map_data.tile[y2][x1] != BLANK_TILE) {
+                x_pos = (x1 + 1)*TILE_SIZE;
+                x_val = 0;
+            } 
+        }
+    }
+    //Vertial
+    int width_min = width_frame < TILE_SIZE ? width_frame : TILE_SIZE;
+    x1 = (x_pos)/TILE_SIZE;
+    x2 = (x_pos + width_min)/TILE_SIZE;
+
+    y1 = (y_pos + y_val)/TILE_SIZE;
+    y2 = (y_pos + y_val + height_frame - 1)/TILE_SIZE;
+
+    if ((x1 >= 0 && x2 < MAX_MAP_X) && (y1 >= 0 && y2 < MAX_MAP_Y)) {
+        if (y_val > 0) {
+            if (map_data.tile[y2][x1] != BLANK_TILE || map_data.tile[y2][x2] != BLANK_TILE) {
+                y_pos = y2*TILE_SIZE;
+                y_pos -= (height_frame + 1);
+                y_val = 0;
+                on_ground = true;
+            }
+        }
+        else if (y_val < 0) {
+            if (map_data.tile[y1][x1] != BLANK_TILE || map_data.tile[y1][x2] != BLANK_TILE) {
+                y_pos = (y1 + 1)*TILE_SIZE;
+                y_val = 0;
+            }
+        }
+    }
+    
+    x_pos += x_val;
+    y_pos += y_val;
+
+    if (x_pos < 0) {
+        x_pos = 0;
+    }
+    else if (x_pos + width_frame > map_data.max_x_) {
+        x_pos = map_data.max_x_ - width_frame - 1;
+    }
+}
+
+void Character::CenterEntityOnMap(Map &map_data) {
+    map_data.start_X_ = x_pos - (SCREEN_WIDTH/2);
+    if (map_data.start_X_ < 0) {
+        map_data.start_X_ = 0;
+    }
+    else if (map_data.start_X_ + SCREEN_WIDTH >= map_data.max_x_) {
+        map_data.start_X_ = map_data.max_x_ - SCREEN_WIDTH;
+    }
+
+    map_data.start_y_ = y_pos - (SCREEN_HEIGHT/2);
+    if (map_data.start_y_ < 0) {
+        map_data.start_y_ = 0;
+    }
+    else if (map_data.start_y_ + SCREEN_HEIGHT >= map_data.max_y_) { /* 9:34 / 16:39 B4P3 */
+        map_data.start_y_ = map_data.start_y_ - SCREEN_HEIGHT;
+    }
+}
+
+void Character::DoPlayer(Map& map_data) {
+    x_val = 0;
+    y_val +=GRAVITY_SPEED;
+    if (y_val > MAX_FALL_SPEED) {
+        y_val = MAX_FALL_SPEED;
+    }
+    if (Char_input_type.left == 1) {
+        x_val -= PLAYER_SPEED;
+    } 
+    else if (Char_input_type.right == 1) {
+        x_val += PLAYER_SPEED;
+    }
+    CheckMapData(map_data);
+    CenterEntityOnMap(map_data);
+}
 

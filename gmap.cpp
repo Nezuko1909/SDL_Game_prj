@@ -6,6 +6,7 @@ game_map_ -> struct Map
 tile_mat -> array type class BaseObject
 name -> map path
 */
+
 void Game_map::LoadMap(const char name[]) {
     std::fstream fp(name); //Name is map path
     if (!fp.is_open()) {

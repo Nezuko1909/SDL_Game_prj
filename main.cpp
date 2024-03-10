@@ -92,9 +92,15 @@ int main(int argc, char* argv[]) {
         }
         SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR); //255
         SDL_RenderClear(g_renderer);
+
         Background.Render(g_renderer, NULL);
+
         Map1.DrawMap(g_renderer);
+
+        Map Get_player_map_data = Map1.GetmapData();
+        player_main_character.DoPlayer(Get_player_map_data);
         player_main_character.Show_character(g_renderer);
+
         SDL_RenderPresent(g_renderer);
     }
     close();
