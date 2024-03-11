@@ -15,6 +15,8 @@
 #include <vector>
 
 //Base 
+#define FRAME_PER_SECOND 25 //fps
+
 static SDL_Window* g_window = NULL;
 static SDL_Surface* g_screenSurface = NULL;
 static SDL_Event g_event; //Event: get key press on keybroad
@@ -34,7 +36,7 @@ const int RENDER_DRAW_COLOR = 255;
 //map
 
 #define TILE_SIZE 64
-#define MAX_MAP_X 400
+#define MAX_MAP_X 20
 #define MAX_MAP_Y 10
 #define MAX_TILES 7
 #define BLANK_TILE 0
@@ -42,9 +44,9 @@ const int RENDER_DRAW_COLOR = 255;
 //define for chracter animation
 #define FRAME_MOVE 8 /*8 frame for move animation, src: root/character_src */
 #define FRAME_IDLE 6 /*6 frame for idle animation, src: root/character_src */
-#define GRAVITY_SPEED 1 /*meter per second^2*/
-#define MAX_FALL_SPEED 10
-#define PLAYER_SPEED 8
+#define GRAVITY_SPEED 9 /*meter per second^2*/
+#define MAX_FALL_SPEED 20
+#define PLAYER_SPEED 20
 
 
 

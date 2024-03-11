@@ -3,6 +3,8 @@
 #include "BaseObject.h"
 #include "gmap.h"
 #include "character.h"
+#include "imp_timer.h"
+
 
 class BaseObject Background;
 
@@ -11,7 +13,7 @@ bool func_texture() {
     if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
         std::cout<<"Warning: Linear texture filtering not enable!";
     }
-    g_renderer=SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED);
+    g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (g_renderer == NULL) {
         std::cout<<"Renderer could not be created! SDL Error:\n"<<SDL_GetError();
         return false;
@@ -66,6 +68,8 @@ void close() {
 }
 
 int main(int argc, char* argv[]) {
+    ImpTimer fps_timer;
+
     if (!init_Data()) {
         return -1; //error
     }
@@ -79,11 +83,12 @@ int main(int argc, char* argv[]) {
     Map1.LoadTile(g_renderer);
 
     Character player_main_character; // Samurai
-    player_main_character.Load_Character_Img("character_src/run_right.png", g_renderer, FRAME_MOVE);
+    player_main_character.Load_Character_Img("character_src/idle.png", g_renderer, FRAME_MOVE);
     player_main_character.set_clips();
 
     bool is_quit = false;
     while (!is_quit) {
+        fps_timer.start();
         while(SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;
@@ -102,6 +107,14 @@ int main(int argc, char* argv[]) {
         player_main_character.Show_character(g_renderer);
 
         SDL_RenderPresent(g_renderer);
+
+        int real_imp_time = fps_timer.get_ticks();
+        int time_one_frame = 1000/FRAME_PER_SECOND; //ms
+        if (real_imp_time < time_one_frame) {
+            int delay_time = time_one_frame - real_imp_time;
+            if (delay_time < 0) delay_time = 0;
+            SDL_Delay(delay_time); //milisecond
+        }
     }
     close();
     return 0;

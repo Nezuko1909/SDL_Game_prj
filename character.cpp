@@ -90,13 +90,11 @@ void Character::Show_character(SDL_Renderer* des) {
     else if (character_status == RUN_RIGHT) {
         Load_Character_Img("character_src/run_right.png", des, FRAME_MOVE);
     }
+    else if (character_status == IDLE_DEFAULT) {
+        Load_Character_Img("character_src/idle.png", des, FRAME_MOVE);
+    }
 
-    if (Char_input_type.left == 1 || Char_input_type.right == 1) {
-        wframe++;
-    }
-    else {
-        wframe = 0;
-    }
+    wframe++;
 
     if (wframe>=FRAME_MOVE) {
         wframe = 0;
@@ -132,10 +130,15 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
         switch (character_event.key.keysym.sym) {
         case SDLK_d: { 
             Char_input_type.right = 0;
+            //Char_input_type.idle = 1;
+            character_status = IDLE_DEFAULT;
+
         }
             break;
         case SDLK_a: {
             Char_input_type.left = 0;
+            //Char_input_type.idle = 1;
+            character_status = IDLE_DEFAULT;
         }
             break;
         }
@@ -178,7 +181,7 @@ void Character::CheckMapData(Map& map_data) {
         if (y_val > 0) {
             if (map_data.tile[y2][x1] != BLANK_TILE || map_data.tile[y2][x2] != BLANK_TILE) {
                 y_pos = y2*TILE_SIZE;
-                y_pos -= (height_frame + 1);
+                y_pos -= (height_frame);
                 y_val = 0;
                 on_ground = true;
             }
@@ -202,27 +205,9 @@ void Character::CheckMapData(Map& map_data) {
     }
 }
 
-void Character::CenterEntityOnMap(Map &map_data) {
-    map_data.start_X_ = x_pos - (SCREEN_WIDTH/2);
-    if (map_data.start_X_ < 0) {
-        map_data.start_X_ = 0;
-    }
-    else if (map_data.start_X_ + SCREEN_WIDTH >= map_data.max_x_) {
-        map_data.start_X_ = map_data.max_x_ - SCREEN_WIDTH;
-    }
-
-    map_data.start_y_ = y_pos - (SCREEN_HEIGHT/2);
-    if (map_data.start_y_ < 0) {
-        map_data.start_y_ = 0;
-    }
-    else if (map_data.start_y_ + SCREEN_HEIGHT >= map_data.max_y_) { /* 9:34 / 16:39 B4P3 */
-        map_data.start_y_ = map_data.start_y_ - SCREEN_HEIGHT;
-    }
-}
-
 void Character::DoPlayer(Map& map_data) {
     x_val = 0;
-    y_val +=GRAVITY_SPEED;
+    y_val += GRAVITY_SPEED;
     if (y_val > MAX_FALL_SPEED) {
         y_val = MAX_FALL_SPEED;
     }
@@ -233,6 +218,5 @@ void Character::DoPlayer(Map& map_data) {
         x_val += PLAYER_SPEED;
     }
     CheckMapData(map_data);
-    CenterEntityOnMap(map_data);
 }
 

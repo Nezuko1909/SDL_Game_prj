@@ -10,7 +10,7 @@ public:
     ~Character();
 
     enum walk_type {
-        RUN_LEFT, RUN_RIGHT,
+        IDLE_DEFAULT, RUN_LEFT, RUN_RIGHT,
     };
 
     virtual bool Load_Character_Img(std::string path, SDL_Renderer* screen, int frame_count);
