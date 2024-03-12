@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
     Map1.LoadTile(g_renderer);
 
     Character player_main_character; // Samurai
-    player_main_character.Load_Character_Img("character_src/idle.png", g_renderer, FRAME_MOVE);
+    player_main_character.Load_Character_Img("character_src/idle_right.png", g_renderer, FRAME_MOVE);
     player_main_character.set_clips();
 
     bool is_quit = false;

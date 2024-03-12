@@ -80,18 +80,23 @@ void Character::set_clips() {
 }
 
 void Character::Show_character(SDL_Renderer* des) {
-    /*if (character_status == IDLE) {
-        LoadImg("character_src/idle.png");
+    if (character_status == JUMP_LEFT) {
+        Load_Character_Img("character_src/jump_left.png", des, FRAME_MOVE);
     }
-    else */
+    if (character_status == JUMP_RIGHT) {
+        Load_Character_Img("character_src/jump_right.png", des, FRAME_MOVE);
+    }
     if (character_status == RUN_LEFT) {
         Load_Character_Img("character_src/run_left.png", des, FRAME_MOVE); 
     }
     else if (character_status == RUN_RIGHT) {
         Load_Character_Img("character_src/run_right.png", des, FRAME_MOVE);
     }
-    else if (character_status == IDLE_DEFAULT) {
-        Load_Character_Img("character_src/idle.png", des, FRAME_MOVE);
+    else if (character_status == IDLE_LEFT) {
+        Load_Character_Img("character_src/idle_left.png", des, FRAME_MOVE);
+    }
+    else if (character_status == IDLE_RIGHT) {
+        Load_Character_Img("character_src/idle_right.png", des, FRAME_MOVE);
     }
 
     wframe++;
@@ -112,34 +117,48 @@ void Character::Show_character(SDL_Renderer* des) {
 void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) {  // character_event == events --ytb--
     if (character_event.type == SDL_KEYDOWN) {
         switch (character_event.key.keysym.sym) {
-        case SDLK_d: {
-            character_status = RUN_RIGHT;
-            Char_input_type.right = 1;
-            Char_input_type.left = 0;
-        }
+            case SDLK_d: {
+                Load_Character_Img("character_src/run_right.png", screen, FRAME_MOVE); 
+                character_status = RUN_RIGHT;
+                Char_input_type.right = 1;
+                Char_input_type.left = 0;
+                Char_input_type.jump = 0;
+            }
             break;
-        case SDLK_a: {
-            character_status = RUN_LEFT;
-            Char_input_type.left = 1;
-            Char_input_type.right = 0;
-        }
+            case SDLK_a: {
+                Load_Character_Img("character_src/run_left.png", screen, FRAME_MOVE); 
+                character_status = RUN_LEFT;
+                Char_input_type.left = 1;
+                Char_input_type.right = 0;
+                Char_input_type.jump = 0;
+            }
+            break;
+            case SDLK_SPACE: {
+                Char_input_type.left == 1 ? character_status = JUMP_LEFT : character_status = JUMP_RIGHT;
+                Char_input_type.jump = 1;
+            }
             break;
         }
     }
     else if (character_event.type == SDL_KEYUP) {
         switch (character_event.key.keysym.sym) {
-        case SDLK_d: { 
-            Char_input_type.right = 0;
-            //Char_input_type.idle = 1;
-            character_status = IDLE_DEFAULT;
+            case SDLK_d: { 
+                Char_input_type.right = 0;
+                //Char_input_type.idle = 1;
+                character_status = IDLE_RIGHT;
 
-        }
+            }
             break;
-        case SDLK_a: {
-            Char_input_type.left = 0;
-            //Char_input_type.idle = 1;
-            character_status = IDLE_DEFAULT;
-        }
+            case SDLK_a: {
+                Char_input_type.left = 0;
+                //Char_input_type.idle = 1;
+                character_status = IDLE_LEFT;
+            }
+            break;
+            case SDLK_SPACE: {
+                Char_input_type.left == 1 ? character_status = IDLE_LEFT : character_status = IDLE_RIGHT;
+                character_status = IDLE_RIGHT;
+            }
             break;
         }
     }
@@ -156,14 +175,14 @@ void Character::CheckMapData(Map& map_data) {
 
     if ((x1 >= 0 && x2 <= MAX_MAP_X) && (y1 >= 0 && y2 < MAX_MAP_Y)) {
         if (x_val > 0) { //moving to right
-            if (map_data.tile[y1][x2] != BLANK_TILE || map_data.tile[y2][x2] != BLANK_TILE) {
+            if ( map_data.tile[y1][x2] == TILE_3 || map_data.tile[y2][x2] == TILE_3 ) {
                 x_pos = x2*TILE_SIZE;
                 x_pos -= width_frame + 1;
                 x_val = 0;
             }
         }
         else if (x_val < 0) { //moving to left
-            if (map_data.tile[y1][x1] != BLANK_TILE || map_data.tile[y2][x1] != BLANK_TILE) {
+            if ( map_data.tile[y1][x1] == TILE_4 || map_data.tile[y2][x1] == TILE_4 ) {
                 x_pos = (x1 + 1)*TILE_SIZE;
                 x_val = 0;
             } 
@@ -179,17 +198,11 @@ void Character::CheckMapData(Map& map_data) {
 
     if ((x1 >= 0 && x2 < MAX_MAP_X) && (y1 >= 0 && y2 < MAX_MAP_Y)) {
         if (y_val > 0) {
-            if (map_data.tile[y2][x1] != BLANK_TILE || map_data.tile[y2][x2] != BLANK_TILE) {
+            if (map_data.tile[y2][x1] == BLANK_TILE || map_data.tile[y2][x2] == BLANK_TILE || map_data.tile[y2][x1] == TILE_3 || map_data.tile[y2][x2] == TILE_3 || map_data.tile[y2][x1] == TILE_4 || map_data.tile[y2][x2] == TILE_4) {
                 y_pos = y2*TILE_SIZE;
-                y_pos -= (height_frame);
+                y_pos -= (height_frame + 1);
                 y_val = 0;
                 on_ground = true;
-            }
-        }
-        else if (y_val < 0) {
-            if (map_data.tile[y1][x1] != BLANK_TILE || map_data.tile[y1][x2] != BLANK_TILE) {
-                y_pos = (y1 + 1)*TILE_SIZE;
-                y_val = 0;
             }
         }
     }
@@ -213,9 +226,16 @@ void Character::DoPlayer(Map& map_data) {
     }
     if (Char_input_type.left == 1) {
         x_val -= PLAYER_SPEED;
-    } 
+    }
     else if (Char_input_type.right == 1) {
         x_val += PLAYER_SPEED;
+    }
+    if (Char_input_type.jump == 1) {
+        if (on_ground == true) {
+            y_val = -PLAYER_JUMP_VAL;
+        }
+        Char_input_type.jump = 0;
+        on_ground = false;
     }
     CheckMapData(map_data);
 }

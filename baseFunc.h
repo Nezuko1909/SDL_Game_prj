@@ -15,7 +15,7 @@
 #include <vector>
 
 //Base 
-#define FRAME_PER_SECOND 25 //fps
+#define FRAME_PER_SECOND 35//fps
 
 static SDL_Window* g_window = NULL;
 static SDL_Surface* g_screenSurface = NULL;
@@ -39,16 +39,17 @@ const int RENDER_DRAW_COLOR = 255;
 #define MAX_MAP_X 20
 #define MAX_MAP_Y 10
 #define MAX_TILES 7
-#define BLANK_TILE 0
+#define BLANK_TILE 2 //BLANK_TILE define to grass_block "2.png"
+#define TILE_4 4 //4.png --> left moving
+#define TILE_3 3 //3.png --> right_moving
 
 //define for chracter animation
 #define FRAME_MOVE 8 /*8 frame for move animation, src: root/character_src */
 #define FRAME_IDLE 6 /*6 frame for idle animation, src: root/character_src */
 #define GRAVITY_SPEED 9 /*meter per second^2*/
-#define MAX_FALL_SPEED 20
+#define MAX_FALL_SPEED 30
 #define PLAYER_SPEED 20
-
-
+#define PLAYER_JUMP_VAL 40
 
 struct Map {
     int start_X_ = 0;
