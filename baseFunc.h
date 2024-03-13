@@ -15,7 +15,7 @@
 #include <vector>
 
 //Base 
-#define FRAME_PER_SECOND 25//fps
+#define FRAME_PER_SECOND 30//fps
 
 static SDL_Window* g_window = NULL;
 static SDL_Surface* g_screenSurface = NULL;
@@ -44,12 +44,14 @@ const int RENDER_DRAW_COLOR = 255;
 #define TILE_3 3 //3.png --> right_moving
 
 //define for chracter animation
+
 #define FRAME_MOVE 8 /*8 frame for move animation, src: root/character_src */
-#define FRAME_IDLE 6 /*6 frame for idle animation, src: root/character_src */
+#define FRAME_ATK_1 15 /*5 frame for atk1 animation, src: root/character_src */
+
 #define GRAVITY_SPEED 9 /*meter per second^2*/
 #define MAX_FALL_SPEED 30
 #define PLAYER_SPEED 20
-#define PLAYER_JUMP_VAL 40
+#define PLAYER_JUMP_VAL 30
 
 struct Map {
     int start_X_ = 0;
@@ -67,8 +69,9 @@ struct Input
     /* data */
     int left;
     int right;
-    int up;
-    int down;
+    int atk1;
+    int atk2;
+    int atk3;
     int jump;
     int idle;
 };

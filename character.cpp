@@ -10,12 +10,14 @@ Character::Character() { //character == mainObject
     width_frame = 0;
     height_frame = 0;
     character_status = -1;
-    Char_input_type.up = 0;
-    Char_input_type.down = 0;
-    Char_input_type.left = 0;
+    character_atk_status = -1;
+    Char_input_type.atk1 = 0;
+    Char_input_type.atk2 = 0;
+    Char_input_type.atk3 = 0;
     Char_input_type.right = 0;
     Char_input_type.jump = 0;
     on_ground = false;
+    is_atk = false;
     map_x_ = 0;
     map_y_ = 0;
 }
@@ -34,83 +36,76 @@ bool Character::Load_Character_Img(std::string path, SDL_Renderer* screen, int f
     return ret;
 }
 
-void Character::set_clips() {
-    if (width_frame > 0 && height_frame > 0) {
-        
-        frame_clip[0].x = 0;
-        frame_clip[0].y = 0;
-        frame_clip[0].w = width_frame;
-        frame_clip[0].h = height_frame;
-
-        frame_clip[1].x = width_frame;
-        frame_clip[1].y = 0;
-        frame_clip[1].w = width_frame;
-        frame_clip[1].h = height_frame;
-
-        frame_clip[2].x = 2*width_frame;
-        frame_clip[2].y = 0;
-        frame_clip[2].w = width_frame;
-        frame_clip[2].h = height_frame;
-
-        frame_clip[3].x = 3*width_frame;
-        frame_clip[3].y = 0;
-        frame_clip[3].w = width_frame;
-        frame_clip[3].h = height_frame;
-
-        frame_clip[4].x = 4*width_frame;
-        frame_clip[4].y = 0;
-        frame_clip[4].w = width_frame;
-        frame_clip[4].h = height_frame;
-
-        frame_clip[5].x = 5*width_frame;
-        frame_clip[5].y = 0;
-        frame_clip[5].w = width_frame;
-        frame_clip[5].h = height_frame;
-
-        frame_clip[6].x = 6*width_frame;
-        frame_clip[6].y = 0;
-        frame_clip[6].w = width_frame;
-        frame_clip[6].h = height_frame;
-
-        frame_clip[7].x = 7*width_frame;
-        frame_clip[7].y = 0;
-        frame_clip[7].w = width_frame;
-        frame_clip[7].h = height_frame;
+void Character::set_clips(int frame) {
+    for (int i = 0; i < frame; i++) {
+        frame_clip[i].x = i*width_frame;
+        frame_clip[i].y = 0;
+        frame_clip[i].w = width_frame;
+        frame_clip[i].h = height_frame;
     }
 }
 
 void Character::Show_character(SDL_Renderer* des) {
+    int attackL = 0; //0-none 1-atk1 2-atk2 3-atk3
     if (character_status == JUMP_LEFT) {
         Load_Character_Img("character_src/jump_left.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
     }
-    if (character_status == JUMP_RIGHT) {
+    else if (character_status == JUMP_RIGHT) {
         Load_Character_Img("character_src/jump_right.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
     }
+
     if (character_status == RUN_LEFT) {
         Load_Character_Img("character_src/run_left.png", des, FRAME_MOVE); 
+        set_clips(FRAME_MOVE);
     }
     else if (character_status == RUN_RIGHT) {
         Load_Character_Img("character_src/run_right.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
     }
     else if (character_status == IDLE_LEFT) {
         Load_Character_Img("character_src/idle_left.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
     }
     else if (character_status == IDLE_RIGHT) {
         Load_Character_Img("character_src/idle_right.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
     }
 
-    wframe++;
-
-    if (wframe>=FRAME_MOVE) {
-        wframe = 0;
+    if (character_status == ATK_1_RIGHT) {
+        Load_Character_Img("character_src/atk1_right.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        attackL = 1;
+    }
+    else if (character_status == ATK_1_LEFT) {
+        Load_Character_Img("character_src/atk1_left.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        attackL = 1;
     }
 
+    if (attackL == 1) {
+        wframe++;
+        if (wframe >= FRAME_ATK_1) {
+            wframe = 0;
+            is_atk = false;
+            attackL = false;
+        }
+    }
+    else {
+        wframe++;
+        if (wframe >= FRAME_MOVE) {
+            wframe = 0;
+        }
+    }
     rect_.x = x_pos;
     rect_.y = y_pos;
 
     SDL_Rect* current_clip = &frame_clip[wframe];
+
     SDL_Rect* renderquad = new SDL_Rect;
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
+
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
 }
 
@@ -129,7 +124,7 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
             break;
             case SDLK_SPACE: {
                 if (Char_input_type.left == 1 || character_status == IDLE_LEFT || character_status == RUN_LEFT) {
-                     character_status = JUMP_LEFT;
+                    character_status = JUMP_LEFT;
                 }
                 else { 
                     character_status = JUMP_RIGHT;
@@ -137,9 +132,21 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 Char_input_type.jump = 1;
             }
             break;
+            case SDLK_j: {  // first_atk_animation
+                if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT) {
+                    character_status = ATK_1_RIGHT;
+                    Char_input_type.atk1 = 1;
+                    is_atk = true;
+                }
+                else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                    character_status = ATK_1_LEFT;
+                    Char_input_type.atk1 = 1;
+                    is_atk = true;
+                }
+            }
         }
     }
-    else if (character_event.type == SDL_KEYUP) {
+    else if (character_event.type == SDL_KEYUP) { 
         switch (character_event.key.keysym.sym) {
             case SDLK_d: { 
                 Char_input_type.right = 0;
@@ -162,6 +169,14 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 }
             }
             break;
+        }
+    }
+    if (is_atk == false) {
+        if (character_status == ATK_1_LEFT) {
+            character_status = IDLE_LEFT;
+        }
+        else if (character_status == ATK_1_RIGHT) {
+            character_status = IDLE_RIGHT;
         }
     }
 }

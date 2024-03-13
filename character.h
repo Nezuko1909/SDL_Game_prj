@@ -9,14 +9,15 @@ public:
     Character();
     ~Character();
 
-    enum walk_type {
-        IDLE_RIGHT, IDLE_LEFT, RUN_LEFT, RUN_RIGHT, JUMP_LEFT, JUMP_RIGHT
+    enum Type_in {
+        IDLE_RIGHT, IDLE_LEFT, RUN_LEFT, RUN_RIGHT, JUMP_LEFT, JUMP_RIGHT, ATK_1_LEFT, ATK_1_RIGHT, ATK_2, ATK_3
     };
 
     virtual bool Load_Character_Img(std::string path, SDL_Renderer* screen, int frame_count);
     void Show_character(SDL_Renderer* des);
     void HandelInputAction(SDL_Event character_event, SDL_Renderer* screen);
-    void set_clips(); //Load Character Animation
+    
+    void set_clips(int frame); //Load Character rect for move
     //map set for char
     void DoPlayer(Map& map_data);
     void CheckMapData(Map& map_data);
@@ -30,12 +31,12 @@ private:
     float y_pos;
     int width_frame;
     int height_frame;
-    SDL_Rect frame_clip[8];
+    SDL_Rect frame_clip[20];
     Input Char_input_type;
     int wframe;
-    int character_status;
+    int character_status, character_atk_status;
     bool on_ground;
-
+    bool is_atk;
     int map_x_;
     int map_y_;
 };

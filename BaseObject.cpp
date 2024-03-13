@@ -9,10 +9,11 @@ BaseObject::BaseObject() {
 }
 
 BaseObject::~BaseObject() {
-
+    Free();
 }
 
 bool BaseObject::LoadImg(std::string path, SDL_Renderer* screen) {
+    Free();
     SDL_Texture* new_texture = NULL;
     SDL_Surface* load_Surface = IMG_Load(path.c_str());
     if (load_Surface != NULL) {
@@ -35,7 +36,7 @@ void BaseObject::Render(SDL_Renderer* des, const SDL_Rect* clip) { //true. retur
     };
 }
 
-void BaseObject::Free_and_close() {
+void BaseObject::Free() {
     if (p_Object != NULL) {
         SDL_DestroyTexture(p_Object);
         p_Object = NULL;

@@ -37,7 +37,7 @@ bool init_Data() { //create window
     }
     else {
         // create window here
-        g_window = SDL_CreateWindow("SDL_Window",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        g_window = SDL_CreateWindow("Sammurai Combat 2D",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         if (g_window == NULL) {
             std::cout<<"Window could not be created| SDL ERROR:\n"<<SDL_GetError();
             success = false;
@@ -58,7 +58,7 @@ bool loadBackGround() {
 }
 
 void close() {
-    Background.Free_and_close();
+    Background.Free();
     SDL_DestroyRenderer(g_renderer);
     g_renderer = NULL;
     SDL_DestroyWindow(g_window);
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 
     Character player_main_character; // Samurai
     player_main_character.Load_Character_Img("character_src/idle_right.png", g_renderer, FRAME_MOVE);
-    player_main_character.set_clips();
+    player_main_character.set_clips(FRAME_MOVE);
 
     bool is_quit = false;
     while (!is_quit) {
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
         Background.Render(g_renderer, NULL);
 
         Map1.DrawMap(g_renderer);
-
+        // > HandleInput > DoPlayer > Show
         Map Get_player_map_data = Map1.GetmapData();
         player_main_character.DoPlayer(Get_player_map_data);
         player_main_character.Show_character(g_renderer);
