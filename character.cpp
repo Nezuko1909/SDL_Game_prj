@@ -114,27 +114,26 @@ void Character::Show_character(SDL_Renderer* des) {
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
 }
 
-void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) {  // character_event == events --ytb--
+void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) {  
     if (character_event.type == SDL_KEYDOWN) {
         switch (character_event.key.keysym.sym) {
-            case SDLK_d: {
-                Load_Character_Img("character_src/run_right.png", screen, FRAME_MOVE); 
+            case SDLK_d: { 
                 character_status = RUN_RIGHT;
                 Char_input_type.right = 1;
-                Char_input_type.left = 0;
-                Char_input_type.jump = 0;
             }
             break;
             case SDLK_a: {
-                Load_Character_Img("character_src/run_left.png", screen, FRAME_MOVE); 
-                character_status = RUN_LEFT;
-                Char_input_type.left = 1;
-                Char_input_type.right = 0;
-                Char_input_type.jump = 0;
+                character_status = RUN_LEFT; // char status -> load Img for status
+                Char_input_type.left = 1; // char input type -> move
             }
             break;
             case SDLK_SPACE: {
-                Char_input_type.left == 1 ? character_status = JUMP_LEFT : character_status = JUMP_RIGHT;
+                if (Char_input_type.left == 1 || character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                     character_status = JUMP_LEFT;
+                }
+                else { 
+                    character_status = JUMP_RIGHT;
+                } 
                 Char_input_type.jump = 1;
             }
             break;
@@ -145,19 +144,22 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
             case SDLK_d: { 
                 Char_input_type.right = 0;
                 //Char_input_type.idle = 1;
-                character_status = IDLE_RIGHT;
-
+                Char_input_type.left == 1 ? character_status = RUN_LEFT : character_status = IDLE_RIGHT;
             }
             break;
             case SDLK_a: {
                 Char_input_type.left = 0;
                 //Char_input_type.idle = 1;
-                character_status = IDLE_LEFT;
+                Char_input_type.right == 1 ? character_status = RUN_RIGHT : character_status = IDLE_LEFT;
             }
             break;
             case SDLK_SPACE: {
-                Char_input_type.left == 1 ? character_status = IDLE_LEFT : character_status = IDLE_RIGHT;
-                character_status = IDLE_RIGHT;
+                if (Char_input_type.left == 1 || character_status == JUMP_LEFT || character_status == RUN_LEFT) {
+                    Char_input_type.left == 1 ? character_status = RUN_LEFT : character_status = IDLE_LEFT;
+                }
+                else {
+                    Char_input_type.right == 1 ? character_status = RUN_RIGHT : character_status = IDLE_RIGHT;
+                }
             }
             break;
         }

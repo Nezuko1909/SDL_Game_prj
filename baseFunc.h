@@ -15,7 +15,7 @@
 #include <vector>
 
 //Base 
-#define FRAME_PER_SECOND 35//fps
+#define FRAME_PER_SECOND 25//fps
 
 static SDL_Window* g_window = NULL;
 static SDL_Surface* g_screenSurface = NULL;
