@@ -46,7 +46,7 @@ const int RENDER_DRAW_COLOR = 255;
 //define for chracter animation
 
 #define FRAME_MOVE 8 /*8 frame for move animation, src: root/character_src */
-#define FRAME_ATK_1 15 /*5 frame for atk1 animation, src: root/character_src */
+#define FRAME_ATK_1 15 /*5 frame for atk1, 2, 3 animation, src: root/character_src */
 
 #define GRAVITY_SPEED 9 /*meter per second^2*/
 #define MAX_FALL_SPEED 30

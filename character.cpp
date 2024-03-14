@@ -46,7 +46,8 @@ void Character::set_clips(int frame) {
 }
 
 void Character::Show_character(SDL_Renderer* des) {
-    int attackL = 0; //0-none 1-atk1 2-atk2 3-atk3
+    int attackL = 0; // 0->none;   1->atk1;   2->atk2;   3->atk3
+
     if (character_status == JUMP_LEFT) {
         Load_Character_Img("character_src/jump_left.png", des, FRAME_MOVE);
         set_clips(FRAME_MOVE);
@@ -80,6 +81,28 @@ void Character::Show_character(SDL_Renderer* des) {
     }
     else if (character_status == ATK_1_LEFT) {
         Load_Character_Img("character_src/atk1_left.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        attackL = 1;
+    }
+
+    if (character_status == ATK_2_RIGHT) {
+        Load_Character_Img("character_src/atk2_right.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        attackL = 1;
+    }
+    else if (character_status == ATK_2_LEFT) {
+        Load_Character_Img("character_src/atk2_left.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        attackL = 1;
+    }
+
+    if (character_status == ATK_3_RIGHT) {
+        Load_Character_Img("character_src/atk3_right.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        attackL = 1;
+    }
+    else if (character_status == ATK_3_LEFT) {
+        Load_Character_Img("character_src/atk3_left.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 1;
     }
@@ -144,6 +167,33 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     is_atk = true;
                 }
             }
+            break;
+            case SDLK_k: {
+                if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
+                    character_status = ATK_2_RIGHT;
+                    Char_input_type.atk2 = 1;
+                    is_atk = true;
+                }
+                else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                    character_status = ATK_2_LEFT;
+                    Char_input_type.atk2 = 1;
+                    is_atk = true;
+                }
+            }
+            break;
+            case SDLK_l: {
+                if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
+                    character_status = ATK_3_RIGHT;
+                    Char_input_type.atk2 = 1;
+                    is_atk = true;
+                }
+                else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                    character_status = ATK_3_LEFT;
+                    Char_input_type.atk2 = 1;
+                    is_atk = true;
+                }
+            }
+            break;
         }
     }
     else if (character_event.type == SDL_KEYUP) { 

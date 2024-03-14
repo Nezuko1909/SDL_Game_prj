@@ -10,7 +10,12 @@ public:
     ~Character();
 
     enum Type_in {
-        IDLE_RIGHT, IDLE_LEFT, RUN_LEFT, RUN_RIGHT, JUMP_LEFT, JUMP_RIGHT, ATK_1_LEFT, ATK_1_RIGHT, ATK_2, ATK_3
+        IDLE_RIGHT, IDLE_LEFT, 
+        RUN_LEFT, RUN_RIGHT, 
+        JUMP_LEFT, JUMP_RIGHT, 
+        ATK_1_LEFT, ATK_1_RIGHT, 
+        ATK_2_LEFT, ATK_2_RIGHT, 
+        ATK_3_LEFT, ATK_3_RIGHT,
     };
 
     virtual bool Load_Character_Img(std::string path, SDL_Renderer* screen, int frame_count);
