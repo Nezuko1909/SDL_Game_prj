@@ -10,7 +10,6 @@ Character::Character() { //character == mainObject
     width_frame = 0;
     height_frame = 0;
     character_status = -1;
-    character_atk_status = -1;
     Char_input_type.atk1 = 0;
     Char_input_type.atk2 = 0;
     Char_input_type.atk3 = 0;
@@ -47,7 +46,7 @@ void Character::set_clips(int frame) {
 
 void Character::Show_character(SDL_Renderer* des) {
     int attackL = 0; // 0->none;   1->atk1;   2->atk2;   3->atk3
-
+    bool is_atk_right_ = false;
     if (character_status == JUMP_LEFT) {
         Load_Character_Img("character_src/jump_left.png", des, FRAME_MOVE);
         set_clips(FRAME_MOVE);
@@ -78,33 +77,51 @@ void Character::Show_character(SDL_Renderer* des) {
         Load_Character_Img("character_src/atk1_right.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 1;
+        is_atk_right_ = true;
     }
     else if (character_status == ATK_1_LEFT) {
         Load_Character_Img("character_src/atk1_left.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 1;
+        is_atk_right_ = false;
+        if (Char_input_type.atk1 == 1) {
+            x_pos -= 30;
+            Char_input_type.atk1 = 0;
+        }
     }
 
     if (character_status == ATK_2_RIGHT) {
         Load_Character_Img("character_src/atk2_right.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
-        attackL = 1;
+        attackL = 2;
+        is_atk_right_ = true;
     }
     else if (character_status == ATK_2_LEFT) {
         Load_Character_Img("character_src/atk2_left.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
-        attackL = 1;
+        attackL = 2;
+        is_atk_right_ = false;
+        if (Char_input_type.atk2 == 1) {
+            x_pos -= 30;
+            Char_input_type.atk2 = 0;
+        }
     }
 
     if (character_status == ATK_3_RIGHT) {
         Load_Character_Img("character_src/atk3_right.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
-        attackL = 1;
+        attackL = 3;
+        is_atk_right_ = true;
     }
     else if (character_status == ATK_3_LEFT) {
         Load_Character_Img("character_src/atk3_left.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
-        attackL = 1;
+        attackL = 3;
+        is_atk_right_ = false;
+        if (Char_input_type.atk3 == 1) {
+            x_pos -= 30;
+            Char_input_type.atk3 = 0;
+        }
     }
 
     if (attackL == 1) {
@@ -112,7 +129,29 @@ void Character::Show_character(SDL_Renderer* des) {
         if (wframe >= FRAME_ATK_1) {
             wframe = 0;
             is_atk = false;
-            attackL = false;
+            attackL = 0;
+            Char_input_type.atk1 = 0;
+            is_atk_right_ == true ? character_status = IDLE_RIGHT : character_status = IDLE_LEFT;
+        }
+    }
+    else if (attackL == 2) {
+        wframe++;
+        if (wframe >= FRAME_ATK_1) {
+            wframe = 0;
+            is_atk = false;
+            attackL = 0;
+            Char_input_type.atk2 = 0;
+            is_atk_right_ == true ? character_status = IDLE_RIGHT : character_status = IDLE_LEFT;
+        }
+    }
+    else if (attackL == 3) {
+        wframe++;
+        if (wframe >= FRAME_ATK_1) {
+            wframe = 0;
+            is_atk = false;
+            attackL = 0;
+            Char_input_type.atk3 = 0;
+            is_atk_right_ == true ? character_status = IDLE_RIGHT : character_status = IDLE_LEFT;
         }
     }
     else {
@@ -219,14 +258,6 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 }
             }
             break;
-        }
-    }
-    if (is_atk == false) {
-        if (character_status == ATK_1_LEFT) {
-            character_status = IDLE_LEFT;
-        }
-        else if (character_status == ATK_1_RIGHT) {
-            character_status = IDLE_RIGHT;
         }
     }
 }

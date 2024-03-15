@@ -13,6 +13,7 @@
 #include <cmath>
 #include <fstream>
 #include <vector>
+#include "stdlib.h"
 
 //Base 
 #define FRAME_PER_SECOND 30//fps
@@ -50,8 +51,15 @@ const int RENDER_DRAW_COLOR = 255;
 
 #define GRAVITY_SPEED 9 /*meter per second^2*/
 #define MAX_FALL_SPEED 30
-#define PLAYER_SPEED 20
+#define PLAYER_SPEED 15
 #define PLAYER_JUMP_VAL 30
+
+//Define for Enemy 
+
+#define ENEMY_MOVE_ACTIONS 3 //3 Actions: 0 = IDLE; 1 = move left; 2 = move right
+#define ENEMY_IDLE_FRAME 8
+#define ENEMY_SPEED 15
+#define ENEMY_JUMP_VAL 40
 
 struct Map {
     int start_X_ = 0;

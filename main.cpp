@@ -13,6 +13,8 @@ bool func_texture() {
     if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
         std::cout<<"Warning: Linear texture filtering not enable!";
     }
+    SDL_Surface* icon = IMG_Load("img_source/icon.png");
+    SDL_SetWindowIcon(g_window, icon);
     g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (g_renderer == NULL) {
         std::cout<<"Renderer could not be created! SDL Error:\n"<<SDL_GetError();
@@ -105,6 +107,8 @@ int main(int argc, char* argv[]) {
         Map Get_player_map_data = Map1.GetmapData();
         player_main_character.DoPlayer(Get_player_map_data);
         player_main_character.Show_character(g_renderer);
+
+        //enemy actions in here [111]
 
         SDL_RenderPresent(g_renderer);
 

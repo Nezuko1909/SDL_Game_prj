@@ -26,8 +26,7 @@ public:
     //map set for char
     void DoPlayer(Map& map_data);
     void CheckMapData(Map& map_data);
-    void SetMapXY(const int map_x, const int map_y) {map_x_ - map_x; map_y_ = map_y; }
-    void CenterEntityOnMap(Map &map_data);
+    void SetMapXY(const int map_x, const int map_y) {map_x_ = map_x; map_y_ = map_y; }
 
 private:
     float x_val;
@@ -39,7 +38,7 @@ private:
     SDL_Rect frame_clip[20];
     Input Char_input_type;
     int wframe;
-    int character_status, character_atk_status;
+    int character_status;
     bool on_ground;
     bool is_atk;
     int map_x_;
