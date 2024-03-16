@@ -11,8 +11,10 @@ Enemy::Enemy() {
     status_ = -1;
     Enemy_in_type.atk = 0;
     Enemy_in_type.jump = 0;
-    Enemy_in_type.left = 0;
-    Enemy_in_type.right = 0;
+    Enemy_in_type.left1 = 0;
+    Enemy_in_type.right1 = 0;
+    Enemy_in_type.left2 = 0;
+    Enemy_in_type.right2 = 0;
     on_ground = false;
     is_atk = false;
     map_x_ = 0;
@@ -45,33 +47,79 @@ void Enemy::set_clips(int frame) {
 }
 
 void Enemy::Show_Enemy(SDL_Renderer* des) {
-
+    int get_status = -1;
+    if (status_ == IDLE_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_idle_left.png", des, ENEMY_IDLE_FRAME);
+        set_clips(ENEMY_IDLE_FRAME);
+        get_status = 0;
+    }
+    else if (status_ == IDLE_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", des, ENEMY_IDLE_FRAME);
+        set_clips(ENEMY_IDLE_FRAME);
+        get_status = 1;
+    }
+    else if (status_ == WALK_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_walk_left.png", des, ENEMY_WALK_FRAME);
+        set_clips(ENEMY_WALK_FRAME);
+        get_status = 2;
+    }
+    else if (status_ == WALK_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_walk_right.png", des, ENEMY_WALK_FRAME);
+        set_clips(ENEMY_WALK_FRAME);
+        get_status = 3;
+    }
+    else if (status_ == RUN_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_run_left.png", des, ENEMY_RUN_FRAME);
+        set_clips(ENEMY_RUN_FRAME);
+        get_status = 4;
+    }
+    else if (status_ == RUN_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_run_right.png", des, ENEMY_RUN_FRAME);
+        set_clips(ENEMY_RUN_FRAME);
+        get_status = 5;
+    }
+    
+    wframe++;
+    if (get_status == 0 || get_status == 1 || get_status == 4 || get_status == 5) {
+        if (wframe >= ENEMY_IDLE_FRAME) {
+            wframe = 0;
+        }
+    }
+    else if (get_status == 2 || get_status == 3) {
+        if (wframe >= ENEMY_WALK_FRAME) {
+            wframe = 0;
+        }
+    }
+    else {
+        std::cout<<"In: Enemy::Show_Enemy(SDL_Renderer* des): "<<SDL_GetError()<<"\n";
+        return;
+    }
 }
 
 void Enemy::Action(SDL_Renderer* screen) {
 
-    int get_random_action_move = rand()%ENEMY_MOVE_ACTIONS;
-    switch (get_random_action_move) {
+    int get_random_action_ = rand()%ENEMY_MOVE_ACTIONS;
+    switch (get_random_action_) {
         case 0: {
             int gval = rand()%2;
             gval == 0 ? status_ = IDLE_RIGHT : status_ = IDLE_LEFT;
         }
         break;
         case 1: {
-            status_ = MOVE_LEFT;
-            Enemy_in_type.left = 1;
+            status_ = WALK_LEFT;
+            Enemy_in_type.left1 = 1;
         }
         break;
         case 2: {
-            status_ = MOVE_RIGHT;
-            Enemy_in_type.right = 1;
+            status_ = WALK_RIGHT;
+            Enemy_in_type.right1 = 1;
         }
         break;
     }
 }
 
 void Enemy::CheckMapData(Map& map_data) {
-        int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+    int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
     int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
     x1 = (x_pos + x_val)/TILE_SIZE;
     x2 = (x_pos + x_val + width_frame - 1)/TILE_SIZE;
@@ -124,21 +172,28 @@ void Enemy::CheckMapData(Map& map_data) {
     }
 }
 
-void Enemy::Do_Play(Map& map_data) {
+void Enemy::Do_Play(Map& map_data) { 
     x_val = 0;
     y_val += GRAVITY_SPEED;
     if (y_val > MAX_FALL_SPEED) {
         y_val = MAX_FALL_SPEED;
     }
-    if (Enemy_in_type.left == 1) {
-        x_val -= PLAYER_SPEED;
+    if (Enemy_in_type.left1 == 1) {
+        x_val -= ENEMY_WALK_SPEED;
     }
-    else if (Enemy_in_type.right == 1) {
-        x_val += PLAYER_SPEED;
+    else if (Enemy_in_type.right1 == 1) {
+        x_val += ENEMY_WALK_SPEED;
     }
+    else if (Enemy_in_type.left2 == 1) {
+        x_val -= ENEMY_RUN_SPEED;
+    }
+    else if (Enemy_in_type.right2 == 1) {
+        x_val += ENEMY_RUN_SPEED;
+    }
+
     if (Enemy_in_type.jump == 1) {
         if (on_ground == true) {
-            y_val = -PLAYER_JUMP_VAL;
+            y_val = -ENEMY_JUMP_VAL;
         }
         Enemy_in_type.jump = 0;
         on_ground = false;

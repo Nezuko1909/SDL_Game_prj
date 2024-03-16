@@ -5,8 +5,8 @@
 #include "BaseObject.h"
 
 struct type_in_enemy {
-    int left;
-    int right;
+    int left1, left2;
+    int right1, right2;
     int jump;
     int atk;
 };
@@ -19,7 +19,8 @@ public:
 
     enum Enemy_status_key {
         IDLE_LEFT, IDLE_RIGHT, 
-        MOVE_LEFT, MOVE_RIGHT, 
+        WALK_LEFT, RUN_LEFT,
+        WALK_RIGHT, RUN_RIGHT, 
         ATK_1_LEFT, ATK_1_RIGHT,
     };
 
@@ -29,6 +30,7 @@ public:
 
     //void Spawn();
     void set_clips(int frame);
+    /*Do_Play = move handling*/
     void Do_Play(Map& map_data);
     void CheckMapData(Map& map_data);
     void SetMapXY(const int map_x, const int map_y) { map_x_ = map_x; map_y_ = map_y; }

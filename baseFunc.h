@@ -57,8 +57,13 @@ const int RENDER_DRAW_COLOR = 255;
 //Define for Enemy 
 
 #define ENEMY_MOVE_ACTIONS 3 //3 Actions: 0 = IDLE; 1 = move left; 2 = move right
-#define ENEMY_IDLE_FRAME 8
-#define ENEMY_SPEED 15
+
+#define ENEMY_IDLE_FRAME 6
+#define ENEMY_WALK_FRAME 7
+#define ENEMY_RUN_FRAME 6
+
+#define ENEMY_WALK_SPEED 10
+#define ENEMY_RUN_SPEED 20
 #define ENEMY_JUMP_VAL 40
 
 struct Map {
