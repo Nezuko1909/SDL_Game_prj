@@ -4,7 +4,7 @@
 #include "gmap.h"
 #include "character.h"
 #include "imp_timer.h"
-
+#include "enemy.h"
 
 class BaseObject Background;
 
@@ -88,6 +88,11 @@ int main(int argc, char* argv[]) {
     player_main_character.Load_Character_Img("character_src/idle_right.png", g_renderer, FRAME_MOVE);
     player_main_character.set_clips(FRAME_MOVE);
 
+    Enemy hell_dog;  // enemy threats test
+    hell_dog.SetRect(rand()%10, 0);
+    hell_dog.Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", g_renderer, ENEMY_IDLE_FRAME);
+    hell_dog.set_clips(ENEMY_IDLE_FRAME);
+
     bool is_quit = false;
     while (!is_quit) {
         fps_timer.start();
@@ -97,6 +102,8 @@ int main(int argc, char* argv[]) {
             }
             player_main_character.HandelInputAction(g_event, g_renderer);
         }
+        hell_dog.Action(g_renderer, player_main_character.get_pos_x(), player_main_character.get_pos_y());
+
         SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR); //255
         SDL_RenderClear(g_renderer);
 
@@ -104,11 +111,11 @@ int main(int argc, char* argv[]) {
 
         Map1.DrawMap(g_renderer);
         // > HandleInput > DoPlayer > Show
-        Map Get_player_map_data = Map1.GetmapData();
-        player_main_character.DoPlayer(Get_player_map_data);
+        Map Get_play_map_data = Map1.GetmapData();
+        player_main_character.DoPlayer(Get_play_map_data);
+        hell_dog.Do_Play(Get_play_map_data);
         player_main_character.Show_character(g_renderer);
-
-        //enemy actions in here [111]
+        hell_dog.Show_Enemy(g_renderer);
 
         SDL_RenderPresent(g_renderer);
 

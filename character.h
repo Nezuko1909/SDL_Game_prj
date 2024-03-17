@@ -23,6 +23,11 @@ public:
     void HandelInputAction(SDL_Event character_event, SDL_Renderer* screen);
     
     void set_clips(int frame); //Load Character rect for move
+    // get x_pos for enemy
+    float get_pos_x() const {return x_pos; };
+    //get y_pos for enemy
+    float get_pos_y() const {return y_pos; };
+
     //map set for char
     void DoPlayer(Map& map_data);
     void CheckMapData(Map& map_data);

@@ -26,7 +26,7 @@ public:
 
     virtual bool Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count);
     void Show_Enemy(SDL_Renderer* des);
-    void Action(SDL_Renderer* screen);
+    void Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos);
 
     //void Spawn();
     void set_clips(int frame);

@@ -25,7 +25,7 @@ Enemy::~Enemy() {
 
 }
 
-bool Enemy::Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count) {
+bool Enemy::Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count) { /* 1 */
     bool ret = BaseObject::LoadImg(path, screen); //ret == return
     if (ret) {
         width_frame = rect_.w/frame_count;
@@ -38,6 +38,9 @@ bool Enemy::Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_cou
 }
 
 void Enemy::set_clips(int frame) {
+    if (width_frame <=0 || height_frame <=0) {
+        std::cout<<"Set_clips() Error: w = "<<width_frame<<" h = "<<height_frame<<"\n";
+    }
     for (int i = 0; i < frame; i++) {
         frame_clip[i].x = i*width_frame;
         frame_clip[i].y = 0;
@@ -46,7 +49,7 @@ void Enemy::set_clips(int frame) {
     }
 }
 
-void Enemy::Show_Enemy(SDL_Renderer* des) {
+void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
     int get_status = -1;
     if (status_ == IDLE_LEFT) {
         Load_Enemy_Img("threats_src/hell_dog/hd_idle_left.png", des, ENEMY_IDLE_FRAME);
@@ -91,34 +94,51 @@ void Enemy::Show_Enemy(SDL_Renderer* des) {
         }
     }
     else {
-        std::cout<<"In: Enemy::Show_Enemy(SDL_Renderer* des): "<<SDL_GetError()<<"\n";
+        std::cout<<"Error In: Enemy::Show_Enemy(SDL_Renderer* des)\n "<<SDL_GetError()<<"\n";
         return;
     }
+
+    rect_.x = x_pos;
+    rect_.y = y_pos;
+
+    SDL_Rect* current_clip = &frame_clip[wframe];
+
+    SDL_Rect* renderquad = new SDL_Rect;
+    *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
+
+    SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+
 }
 
-void Enemy::Action(SDL_Renderer* screen) {
+/*
+hit box x arr:
+a_____b
+|  o  |
+| /|\ |
+_______
+a = x_pos
+b = x_pos + your_val || width_frame
+*/
 
-    int get_random_action_ = rand()%ENEMY_MOVE_ACTIONS;
-    switch (get_random_action_) {
-        case 0: {
-            int gval = rand()%2;
-            gval == 0 ? status_ = IDLE_RIGHT : status_ = IDLE_LEFT;
-        }
-        break;
-        case 1: {
-            status_ = WALK_LEFT;
-            Enemy_in_type.left1 = 1;
-        }
-        break;
-        case 2: {
-            status_ = WALK_RIGHT;
-            Enemy_in_type.right1 = 1;
-        }
-        break;
+void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos) { /* 1 */
+    if (x_pos > target_x_pos + 50) {
+        status_ = WALK_LEFT;
+        Enemy_in_type.left1 = 1;
+        Enemy_in_type.right1 = 0;
+    }
+    else if (x_pos < target_x_pos - 50) {
+        status_ = WALK_RIGHT;
+        Enemy_in_type.right1 = 1;
+        Enemy_in_type.left1 = 0;
+    }
+    else {
+        x_pos >= target_x_pos ? status_ = IDLE_RIGHT : status_ = IDLE_LEFT;
+        Enemy_in_type.right1 = 0;
+        Enemy_in_type.left1 = 0;
     }
 }
 
-void Enemy::CheckMapData(Map& map_data) {
+void Enemy::CheckMapData(Map& map_data) { /* 1 */
     int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
     int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
     x1 = (x_pos + x_val)/TILE_SIZE;
@@ -172,7 +192,7 @@ void Enemy::CheckMapData(Map& map_data) {
     }
 }
 
-void Enemy::Do_Play(Map& map_data) { 
+void Enemy::Do_Play(Map& map_data) { /* 1 */
     x_val = 0;
     y_val += GRAVITY_SPEED;
     if (y_val > MAX_FALL_SPEED) {
@@ -199,5 +219,6 @@ void Enemy::Do_Play(Map& map_data) {
         on_ground = false;
     }
     CheckMapData(map_data);
+    //std::cout<<"Enemy: x_pos_ = "<<x_pos<<" y_pos = "<<y_pos<<"\n";
 }
 
