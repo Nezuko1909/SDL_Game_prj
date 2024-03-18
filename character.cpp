@@ -291,7 +291,7 @@ void Character::CheckMapData(Map& map_data) {
     x1 = (x_pos)/TILE_SIZE;
     x2 = (x_pos + width_min)/TILE_SIZE;
 
-    y1 = (y_pos + y_val)/TILE_SIZE;
+    y1 = (y_pos + TILE_SIZE + y_val)/TILE_SIZE;
     y2 = (y_pos + y_val + height_frame - 1)/TILE_SIZE;
 
     if ((x1 >= 0 && x2 < MAX_MAP_X) && (y1 >= 0 && y2 < MAX_MAP_Y)) {

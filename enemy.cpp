@@ -2,6 +2,7 @@
 
 Enemy::Enemy() {
     wframe = 0; //frame_
+    delay_frame = 0;
     x_pos = 0;
     y_pos = 0;
     x_val = 0;
@@ -81,15 +82,41 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
         set_clips(ENEMY_RUN_FRAME);
         get_status = 5;
     }
-    
-    wframe++;
+
+    if (status_ == JUMP_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_jump_left.png", des, ENEMY_JUMP_FRAME);
+        set_clips(ENEMY_JUMP_FRAME);
+        get_status = 6;
+    }
+    else if (status_ == JUMP_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_jump_right.png", des, ENEMY_JUMP_FRAME);
+        set_clips(ENEMY_JUMP_FRAME);
+        get_status = 7;
+    }
+    //std::cout<<status_<<"\n";
+
     if (get_status == 0 || get_status == 1 || get_status == 4 || get_status == 5) {
+        delay_frame++;
+        if (delay_frame % 3 == 0) wframe++;
         if (wframe >= ENEMY_IDLE_FRAME) {
             wframe = 0;
+            delay_frame = 0;
         }
     }
     else if (get_status == 2 || get_status == 3) {
+        wframe++;
         if (wframe >= ENEMY_WALK_FRAME) {
+            wframe = 0;
+        }
+    }
+    else if (get_status == 6 || get_status == 7) {
+        // jump
+        if (on_ground == false) {
+            if (y_val <= 0) wframe = 0;
+            if (y_val > 0) wframe = 1;
+        }
+        else {
+            get_status == 6 ? status_ = IDLE_LEFT : status_ = IDLE_RIGHT;
             wframe = 0;
         }
     }
@@ -97,7 +124,6 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
         std::cout<<"Error In: Enemy::Show_Enemy(SDL_Renderer* des)\n "<<SDL_GetError()<<"\n";
         return;
     }
-
     rect_.x = x_pos;
     rect_.y = y_pos;
 
@@ -110,32 +136,31 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
 
 }
 
-/*
-hit box x arr:
-a_____b
-|  o  |
-| /|\ |
-_______
-a = x_pos
-b = x_pos + your_val || width_frame
-*/
-
 void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos) { /* 1 */
+    bool is_left = false;
     if (x_pos > target_x_pos + 50) {
         status_ = WALK_LEFT;
         Enemy_in_type.left1 = 1;
         Enemy_in_type.right1 = 0;
+        is_left = true;
     }
     else if (x_pos < target_x_pos - 50) {
         status_ = WALK_RIGHT;
         Enemy_in_type.right1 = 1;
         Enemy_in_type.left1 = 0;
+        is_left = false;
     }
     else {
-        x_pos >= target_x_pos ? status_ = IDLE_RIGHT : status_ = IDLE_LEFT;
+        x_pos <= target_x_pos ? status_ = IDLE_RIGHT : status_ = IDLE_LEFT;
         Enemy_in_type.right1 = 0;
         Enemy_in_type.left1 = 0;
     }
+
+    if (y_pos + height_frame > target_y_pos) {
+        x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
+        Enemy_in_type.jump = 1;
+    }
+
 }
 
 void Enemy::CheckMapData(Map& map_data) { /* 1 */

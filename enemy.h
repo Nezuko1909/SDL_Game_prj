@@ -21,6 +21,7 @@ public:
         IDLE_LEFT, IDLE_RIGHT, 
         WALK_LEFT, RUN_LEFT,
         WALK_RIGHT, RUN_RIGHT, 
+        JUMP_LEFT, JUMP_RIGHT,
         ATK_1_LEFT, ATK_1_RIGHT,
     };
 
@@ -45,6 +46,7 @@ private:
     SDL_Rect frame_clip[20];
     type_in_enemy Enemy_in_type;
     int wframe;
+    int delay_frame;
     int status_;
     bool on_ground;
     bool is_atk;
