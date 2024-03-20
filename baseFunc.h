@@ -48,8 +48,9 @@ const int RENDER_DRAW_COLOR = 255;
 
 #define FRAME_MOVE 8 /*8 frame for move animation, src: root/character_src */
 #define FRAME_ATK_1 15 /*5 frame for atk1, 2, 3 animation, src: root/character_src */
+#define FRAME_JUMP 2
 
-#define GRAVITY_SPEED 9 /*meter per second^2*/
+#define GRAVITY_SPEED 4 /*meter per second^2*/
 #define MAX_FALL_SPEED 30
 #define PLAYER_SPEED 15
 #define PLAYER_JUMP_VAL 30
@@ -60,12 +61,18 @@ const int RENDER_DRAW_COLOR = 255;
 
 #define ENEMY_IDLE_FRAME 6
 #define ENEMY_WALK_FRAME 7
+//run frame == atk frame == 6
 #define ENEMY_RUN_FRAME 6
 #define ENEMY_JUMP_FRAME 2
+#define ENEMY_HURT_FRAME 3
 
 #define ENEMY_WALK_SPEED 10
 #define ENEMY_RUN_SPEED 20
-#define ENEMY_JUMP_VAL 40
+#define ENEMY_JUMP_VAL 10
+
+//define for attack actions
+#define ATK_HURT_VAL 30
+
 
 struct Map {
     int start_X_ = 0;
@@ -77,6 +84,12 @@ struct Map {
 };
 
 // Input []
+struct Hit_Box {
+    int x1;
+    int x2;
+    int y1;
+    int y2;
+};
 
 struct Input
 {
@@ -89,8 +102,6 @@ struct Input
     int jump;
     int idle;
 };
-
-
 
 
 #endif

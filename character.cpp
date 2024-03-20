@@ -16,7 +16,8 @@ Character::Character() { //character == mainObject
     Char_input_type.right = 0;
     Char_input_type.jump = 0;
     on_ground = false;
-    is_atk = false;
+    is_atk_left = false;
+    is_atk_right = false;
     map_x_ = 0;
     map_y_ = 0;
 }
@@ -48,12 +49,12 @@ void Character::Show_character(SDL_Renderer* des) {
     int attackL = 0; // 0->none;   1->atk1;   2->atk2;   3->atk3
     bool is_atk_right_ = false;
     if (character_status == JUMP_LEFT) {
-        Load_Character_Img("character_src/jump_left.png", des, FRAME_MOVE);
-        set_clips(FRAME_MOVE);
+        Load_Character_Img("character_src/jump_left.png", des, FRAME_JUMP);
+        set_clips(FRAME_JUMP);
     }
     else if (character_status == JUMP_RIGHT) {
-        Load_Character_Img("character_src/jump_right.png", des, FRAME_MOVE);
-        set_clips(FRAME_MOVE);
+        Load_Character_Img("character_src/jump_right.png", des, FRAME_JUMP);
+        set_clips(FRAME_JUMP);
     }
 
     if (character_status == RUN_LEFT) {
@@ -73,62 +74,85 @@ void Character::Show_character(SDL_Renderer* des) {
         set_clips(FRAME_MOVE);
     }
 
+    // attack:
     if (character_status == ATK_1_RIGHT) {
         Load_Character_Img("character_src/atk1_right.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 1;
         is_atk_right_ = true;
+        is_atk_right = true;
+        is_atk_left = false;
     }
     else if (character_status == ATK_1_LEFT) {
         Load_Character_Img("character_src/atk1_left.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 1;
         is_atk_right_ = false;
+
+        is_atk_right = false;
+        is_atk_left = true;
+
         if (Char_input_type.atk1 == 1) {
             x_pos -= 30;
             Char_input_type.atk1 = 0;
         }
     }
-
-    if (character_status == ATK_2_RIGHT) {
+    else if (character_status == ATK_2_RIGHT) {
         Load_Character_Img("character_src/atk2_right.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 2;
         is_atk_right_ = true;
+
+        is_atk_right = true;
+        is_atk_left = false;
     }
     else if (character_status == ATK_2_LEFT) {
         Load_Character_Img("character_src/atk2_left.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 2;
         is_atk_right_ = false;
+
+        is_atk_right = false;
+        is_atk_left = true;
+
         if (Char_input_type.atk2 == 1) {
             x_pos -= 30;
             Char_input_type.atk2 = 0;
         }
     }
-
-    if (character_status == ATK_3_RIGHT) {
+    else if (character_status == ATK_3_RIGHT) {
         Load_Character_Img("character_src/atk3_right.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 3;
         is_atk_right_ = true;
+
+        is_atk_right = true;
+        is_atk_left = false;
+
     }
     else if (character_status == ATK_3_LEFT) {
         Load_Character_Img("character_src/atk3_left.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         attackL = 3;
         is_atk_right_ = false;
+        
+        is_atk_right = false;
+        is_atk_left = true;
+
         if (Char_input_type.atk3 == 1) {
             x_pos -= 30;
             Char_input_type.atk3 = 0;
         }
+    }
+    else {
+        is_atk_left = false;
+        is_atk_right = false;
     }
 
     if (attackL == 1) {
         wframe++;
         if (wframe >= FRAME_ATK_1) {
             wframe = 0;
-            is_atk = false;
             attackL = 0;
             Char_input_type.atk1 = 0;
             is_atk_right_ == true ? character_status = IDLE_RIGHT : character_status = IDLE_LEFT;
@@ -138,7 +162,6 @@ void Character::Show_character(SDL_Renderer* des) {
         wframe++;
         if (wframe >= FRAME_ATK_1) {
             wframe = 0;
-            is_atk = false;
             attackL = 0;
             Char_input_type.atk2 = 0;
             is_atk_right_ == true ? character_status = IDLE_RIGHT : character_status = IDLE_LEFT;
@@ -148,10 +171,25 @@ void Character::Show_character(SDL_Renderer* des) {
         wframe++;
         if (wframe >= FRAME_ATK_1) {
             wframe = 0;
-            is_atk = false;
             attackL = 0;
             Char_input_type.atk3 = 0;
             is_atk_right_ == true ? character_status = IDLE_RIGHT : character_status = IDLE_LEFT;
+        }
+    }
+    else if (character_status == JUMP_LEFT || character_status == JUMP_RIGHT) {
+        if (!on_ground) {
+            if (y_val <= 0) wframe = 0;
+            if (y_val > 0) wframe = 1;
+        }
+        else {
+            if (Char_input_type.left == 0 || Char_input_type.right == 0) {
+                character_status == JUMP_LEFT ? character_status = IDLE_LEFT : character_status = IDLE_RIGHT;
+                //Show_character(des);
+            }
+            else {
+                character_status == JUMP_LEFT ? character_status = RUN_LEFT : character_status = RUN_RIGHT;
+                //Show_character(des);
+            }
         }
     }
     else {
@@ -198,12 +236,10 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT) {
                     character_status = ATK_1_RIGHT;
                     Char_input_type.atk1 = 1;
-                    is_atk = true;
                 }
                 else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
                     character_status = ATK_1_LEFT;
                     Char_input_type.atk1 = 1;
-                    is_atk = true;
                 }
             }
             break;
@@ -211,12 +247,10 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
                     character_status = ATK_2_RIGHT;
                     Char_input_type.atk2 = 1;
-                    is_atk = true;
                 }
                 else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
                     character_status = ATK_2_LEFT;
                     Char_input_type.atk2 = 1;
-                    is_atk = true;
                 }
             }
             break;
@@ -224,12 +258,10 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
                     character_status = ATK_3_RIGHT;
                     Char_input_type.atk2 = 1;
-                    is_atk = true;
                 }
                 else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
                     character_status = ATK_3_LEFT;
                     Char_input_type.atk2 = 1;
-                    is_atk = true;
                 }
             }
             break;
@@ -249,6 +281,7 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 Char_input_type.right == 1 ? character_status = RUN_RIGHT : character_status = IDLE_LEFT;
             }
             break;
+            /*
             case SDLK_SPACE: {
                 if (Char_input_type.left == 1 || character_status == JUMP_LEFT || character_status == RUN_LEFT) {
                     Char_input_type.left == 1 ? character_status = RUN_LEFT : character_status = IDLE_LEFT;
@@ -257,10 +290,21 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     Char_input_type.right == 1 ? character_status = RUN_RIGHT : character_status = IDLE_RIGHT;
                 }
             }
-            break;
+            break; 
+            */
         }
     }
 }
+
+void Character::get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2) {
+    int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
+    x1 = (x_pos + x_val)/TILE_SIZE;
+    x2 = (x_pos + x_val + width_frame - 1)/TILE_SIZE;
+
+    y1 = (y_pos)/TILE_SIZE;
+    y2 = (y_pos + height_min -1)/TILE_SIZE;
+}
+
 
 void Character::CheckMapData(Map& map_data) {
     int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
@@ -285,7 +329,7 @@ void Character::CheckMapData(Map& map_data) {
                 x_val = 0;
             } 
         }
-    }
+    } 
     //Vertial
     int width_min = width_frame < TILE_SIZE ? width_frame : TILE_SIZE;
     x1 = (x_pos)/TILE_SIZE;

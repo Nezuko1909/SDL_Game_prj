@@ -69,6 +69,24 @@ void close() {
     SDL_Quit();
 }
 
+bool Object_Collide(Character&  player, Enemy& enemy) {
+    Hit_Box player_hitbox;
+    player.get_hitbox_for_other_object(player_hitbox.x1, player_hitbox.x2, player_hitbox.y1, player_hitbox.y2);
+    if (player.is_atk_left) {
+        enemy.atk_action(1, player_hitbox);
+        //std::cout<<"Object_Collide: left true\n";
+        return true;
+    }
+    else if (player.is_atk_right) {
+        enemy.atk_action(2, player_hitbox);
+        //std::cout<<"Object_Collide: right true\n";
+        return true;
+    }
+    //std::cout<<"Object_Collide: false\n";
+    return false;
+    //std::cout<<"Object_collide: success";
+}
+
 int main(int argc, char* argv[]) {
     ImpTimer fps_timer;
 
@@ -89,9 +107,11 @@ int main(int argc, char* argv[]) {
     player_main_character.set_clips(FRAME_MOVE);
 
     Enemy hell_dog;  // enemy threats test
-    hell_dog.SetRect(rand()%10, 0);
+    hell_dog.SetRect(rand()%1200, 0);
     hell_dog.Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", g_renderer, ENEMY_IDLE_FRAME);
     hell_dog.set_clips(ENEMY_IDLE_FRAME);
+
+
 
     bool is_quit = false;
     while (!is_quit) {
@@ -103,6 +123,8 @@ int main(int argc, char* argv[]) {
             player_main_character.HandelInputAction(g_event, g_renderer);
         }
         hell_dog.Action(g_renderer, player_main_character.get_pos_x(), player_main_character.get_pos_y());
+       
+        if (!hell_dog.is_hurting) Object_Collide(player_main_character, hell_dog);
 
         SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR); //255
         SDL_RenderClear(g_renderer);
@@ -112,6 +134,7 @@ int main(int argc, char* argv[]) {
         Map1.DrawMap(g_renderer);
         // > HandleInput > DoPlayer > Show
         Map Get_play_map_data = Map1.GetmapData();
+
         player_main_character.DoPlayer(Get_play_map_data);
         hell_dog.Do_Play(Get_play_map_data);
         player_main_character.Show_character(g_renderer);

@@ -32,6 +32,18 @@ public:
     void DoPlayer(Map& map_data);
     void CheckMapData(Map& map_data);
     void SetMapXY(const int map_x, const int map_y) {map_x_ = map_x; map_y_ = map_y; }
+    bool is_atk_left;
+    bool is_atk_right;
+    /*
+    hitbox:
+
+    x1y1______x2y1
+        |    |
+        |    |
+    x1y2______x2y2
+
+    */
+    void get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2);
 
 private:
     float x_val;
@@ -45,7 +57,6 @@ private:
     int wframe;
     int character_status;
     bool on_ground;
-    bool is_atk;
     int map_x_;
     int map_y_;
 };
