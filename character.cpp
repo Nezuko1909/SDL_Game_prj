@@ -3,6 +3,7 @@
 
 Character::Character() { //character == mainObject
     wframe = 0; //frame_
+    delay_frame = 0;
     x_pos = 0;
     y_pos = 0;
     x_val = 0;
@@ -15,9 +16,12 @@ Character::Character() { //character == mainObject
     Char_input_type.atk3 = 0;
     Char_input_type.right = 0;
     Char_input_type.jump = 0;
+    Char_input_type.hurt_l = 0;
+    Char_input_type.hurt_r = 0;
     on_ground = false;
     is_atk_left = false;
     is_atk_right = false;
+    is_hurt = false;
     map_x_ = 0;
     map_y_ = 0;
 }
@@ -44,111 +48,125 @@ void Character::set_clips(int frame) {
         frame_clip[i].h = height_frame;
     }
 }
-
+int st = -1;
 void Character::Show_character(SDL_Renderer* des) {
     int attackL = 0; // 0->none;   1->atk1;   2->atk2;   3->atk3
     bool is_atk_right_ = false;
-    if (character_status == JUMP_LEFT) {
-        Load_Character_Img("character_src/jump_left.png", des, FRAME_JUMP);
-        set_clips(FRAME_JUMP);
-    }
-    else if (character_status == JUMP_RIGHT) {
-        Load_Character_Img("character_src/jump_right.png", des, FRAME_JUMP);
-        set_clips(FRAME_JUMP);
-    }
+    if (!is_hurt) {
+        if (character_status == JUMP_LEFT) {
+            Load_Character_Img("character_src/jump_left.png", des, FRAME_JUMP);
+            set_clips(FRAME_JUMP);
+        }
+        else if (character_status == JUMP_RIGHT) {
+            Load_Character_Img("character_src/jump_right.png", des, FRAME_JUMP);
+            set_clips(FRAME_JUMP);
+        }
 
-    if (character_status == RUN_LEFT) {
-        Load_Character_Img("character_src/run_left.png", des, FRAME_MOVE); 
-        set_clips(FRAME_MOVE);
-    }
-    else if (character_status == RUN_RIGHT) {
-        Load_Character_Img("character_src/run_right.png", des, FRAME_MOVE);
-        set_clips(FRAME_MOVE);
-    }
-    else if (character_status == IDLE_LEFT) {
-        Load_Character_Img("character_src/idle_left.png", des, FRAME_MOVE);
-        set_clips(FRAME_MOVE);
-    }
-    else if (character_status == IDLE_RIGHT) {
-        Load_Character_Img("character_src/idle_right.png", des, FRAME_MOVE);
-        set_clips(FRAME_MOVE);
-    }
+        if (character_status == RUN_LEFT) {
+            Load_Character_Img("character_src/run_left.png", des, FRAME_MOVE); 
+            set_clips(FRAME_MOVE);
+        }
+        else if (character_status == RUN_RIGHT) {
+            Load_Character_Img("character_src/run_right.png", des, FRAME_MOVE);
+            set_clips(FRAME_MOVE);
+        }
+        else if (character_status == IDLE_LEFT) {
+            Load_Character_Img("character_src/idle_left.png", des, FRAME_MOVE);
+            set_clips(FRAME_MOVE);
+        }
+        else if (character_status == IDLE_RIGHT) {
+            Load_Character_Img("character_src/idle_right.png", des, FRAME_MOVE);
+            set_clips(FRAME_MOVE);
+        }
+        else if (character_status == HURT_LEFT_ATK) {
+            Load_Character_Img("character_src/hurt_left_atk.png", des, FRAME_HURT);
+            set_clips(FRAME_HURT);
+            is_hurt = true;
+            st = 0;
+        }
+        else if (character_status == HURT_RIGHT_ATK) {
+            Load_Character_Img("character_src/hurt_right_atk.png", des, FRAME_HURT);
+            set_clips(FRAME_HURT);
+            is_hurt = true;
+            st = 1;
+        }
 
-    // attack:
-    if (character_status == ATK_1_RIGHT) {
-        Load_Character_Img("character_src/atk1_right.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        attackL = 1;
-        is_atk_right_ = true;
-        is_atk_right = true;
-        is_atk_left = false;
-    }
-    else if (character_status == ATK_1_LEFT) {
-        Load_Character_Img("character_src/atk1_left.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        attackL = 1;
-        is_atk_right_ = false;
+        // attack:
+        if (character_status == ATK_1_RIGHT) {
+            Load_Character_Img("character_src/atk1_right.png", des, FRAME_ATK_1);
+            set_clips(FRAME_ATK_1);
+            attackL = 1;
+            is_atk_right_ = true;
+            is_atk_right = true;
+            is_atk_left = false;
+        }
+        else if (character_status == ATK_1_LEFT) {
+            Load_Character_Img("character_src/atk1_left.png", des, FRAME_ATK_1);
+            set_clips(FRAME_ATK_1);
+            attackL = 1;
+            is_atk_right_ = false;
 
-        is_atk_right = false;
-        is_atk_left = true;
+            is_atk_right = false;
+            is_atk_left = true;
 
-        if (Char_input_type.atk1 == 1) {
-            x_pos -= 30;
-            Char_input_type.atk1 = 0;
+            if (Char_input_type.atk1 == 1) {
+                x_pos -= 30;
+                Char_input_type.atk1 = 0;
+            }
+        }
+        else if (character_status == ATK_2_RIGHT) {
+            Load_Character_Img("character_src/atk2_right.png", des, FRAME_ATK_1);
+            set_clips(FRAME_ATK_1);
+            attackL = 2;
+            is_atk_right_ = true;
+
+            is_atk_right = true;
+            is_atk_left = false;
+        }
+        else if (character_status == ATK_2_LEFT) {
+            Load_Character_Img("character_src/atk2_left.png", des, FRAME_ATK_1);
+            set_clips(FRAME_ATK_1);
+            attackL = 2;
+            is_atk_right_ = false;
+
+            is_atk_right = false;
+            is_atk_left = true;
+
+            if (Char_input_type.atk2 == 1) {
+                x_pos -= 30;
+                Char_input_type.atk2 = 0;
+            }
+        }
+        else if (character_status == ATK_3_RIGHT) {
+            Load_Character_Img("character_src/atk3_right.png", des, FRAME_ATK_1);
+            set_clips(FRAME_ATK_1);
+            attackL = 3;
+            is_atk_right_ = true;
+
+            is_atk_right = true;
+            is_atk_left = false;
+
+        }
+        else if (character_status == ATK_3_LEFT) {
+            Load_Character_Img("character_src/atk3_left.png", des, FRAME_ATK_1);
+            set_clips(FRAME_ATK_1);
+            attackL = 3;
+            is_atk_right_ = false;
+            
+            is_atk_right = false;
+            is_atk_left = true;
+
+            if (Char_input_type.atk3 == 1) {
+                x_pos -= 30;
+                Char_input_type.atk3 = 0;
+            }
+        }
+        else {
+            is_atk_left = false;
+            is_atk_right = false;
         }
     }
-    else if (character_status == ATK_2_RIGHT) {
-        Load_Character_Img("character_src/atk2_right.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        attackL = 2;
-        is_atk_right_ = true;
-
-        is_atk_right = true;
-        is_atk_left = false;
-    }
-    else if (character_status == ATK_2_LEFT) {
-        Load_Character_Img("character_src/atk2_left.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        attackL = 2;
-        is_atk_right_ = false;
-
-        is_atk_right = false;
-        is_atk_left = true;
-
-        if (Char_input_type.atk2 == 1) {
-            x_pos -= 30;
-            Char_input_type.atk2 = 0;
-        }
-    }
-    else if (character_status == ATK_3_RIGHT) {
-        Load_Character_Img("character_src/atk3_right.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        attackL = 3;
-        is_atk_right_ = true;
-
-        is_atk_right = true;
-        is_atk_left = false;
-
-    }
-    else if (character_status == ATK_3_LEFT) {
-        Load_Character_Img("character_src/atk3_left.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        attackL = 3;
-        is_atk_right_ = false;
-        
-        is_atk_right = false;
-        is_atk_left = true;
-
-        if (Char_input_type.atk3 == 1) {
-            x_pos -= 30;
-            Char_input_type.atk3 = 0;
-        }
-    }
-    else {
-        is_atk_left = false;
-        is_atk_right = false;
-    }
-
+    std::cout<<"char status: "<<character_status<<"\n";
     if (attackL == 1) {
         wframe++;
         if (wframe >= FRAME_ATK_1) {
@@ -198,6 +216,16 @@ void Character::Show_character(SDL_Renderer* des) {
             wframe = 0;
         }
     }
+
+    if (st == 0 || st == 1) {
+        wframe = 0;
+        delay_frame++;
+        if (delay_frame == 9) {
+            is_hurt = false;
+            st = -1;
+        }
+    }
+
     rect_.x = x_pos;
     rect_.y = y_pos;
 
@@ -382,3 +410,39 @@ void Character::DoPlayer(Map& map_data) {
     CheckMapData(map_data);
 }
 
+void Character::atk_action(int get_inf, Hit_Box source_hitbox) {
+    Hit_Box hb;
+    get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
+    /*
+    int a, b, c, d, e, f;
+    a = hb.x1;
+    b = (hb.x1 + hb.x2)/2;
+    c = hb.x2;
+    d = source_hitbox.x1;
+    e = (source_hitbox.x1 + source_hitbox.x2)/2;
+    f = source_hitbox.x2;
+    bool check = false;
+    if ((d > a && f < c) || (d < a && f > c) || (d > a && d < c) || (f > a && f < c)) 
+    */
+   bool check = false;
+    if (abs(hb.x1 - source_hitbox.x1) <= 2) {
+        check = true;
+    }
+    if (check) {
+        if (get_inf == 2) {
+            character_status = HURT_RIGHT_ATK;
+            Char_input_type.hurt_r = 1;
+            //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
+        }
+        else if (get_inf == 1) {
+            character_status = HURT_LEFT_ATK;
+            Char_input_type.hurt_l = 1;
+            //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
+        }
+        return;
+    }
+    else {
+        //std::cout<<"Enemy::action - false: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
+        return;
+    }
+}

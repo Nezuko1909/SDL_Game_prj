@@ -16,6 +16,7 @@ public:
         ATK_1_LEFT, ATK_1_RIGHT, 
         ATK_2_LEFT, ATK_2_RIGHT, 
         ATK_3_LEFT, ATK_3_RIGHT,
+        HURT_RIGHT_ATK, HURT_LEFT_ATK,
     };
 
     virtual bool Load_Character_Img(std::string path, SDL_Renderer* screen, int frame_count);
@@ -32,8 +33,12 @@ public:
     void DoPlayer(Map& map_data);
     void CheckMapData(Map& map_data);
     void SetMapXY(const int map_x, const int map_y) {map_x_ = map_x; map_y_ = map_y; }
+    void atk_action(int get_inf, Hit_Box source_hitbox);
+
     bool is_atk_left;
     bool is_atk_right;
+
+    bool is_hurt;
     /*
     hitbox:
 
@@ -55,6 +60,7 @@ private:
     SDL_Rect frame_clip[20];
     Input Char_input_type;
     int wframe;
+    int delay_frame;
     int character_status;
     bool on_ground;
     int map_x_;

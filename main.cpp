@@ -71,7 +71,9 @@ void close() {
 
 bool Object_Collide(Character&  player, Enemy& enemy) {
     Hit_Box player_hitbox;
+    Hit_Box enemy_hitbox;
     player.get_hitbox_for_other_object(player_hitbox.x1, player_hitbox.x2, player_hitbox.y1, player_hitbox.y2);
+    enemy.get_hitbox_for_other_object(enemy_hitbox.x1, enemy_hitbox.x2, enemy_hitbox.y1, enemy_hitbox.y2);
     if (player.is_atk_left) {
         enemy.atk_action(1, player_hitbox);
         //std::cout<<"Object_Collide: left true\n";
@@ -81,6 +83,12 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
         enemy.atk_action(2, player_hitbox);
         //std::cout<<"Object_Collide: right true\n";
         return true;
+    }
+    else if (enemy.is_atk_left == true) { 
+        player.atk_action(1, enemy_hitbox);
+    }
+    else if (enemy.is_atk_right) {
+        player.atk_action(2, enemy_hitbox);
     }
     //std::cout<<"Object_Collide: false\n";
     return false;

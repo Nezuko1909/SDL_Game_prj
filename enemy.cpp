@@ -135,7 +135,6 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
             is_atk_right = true;
         }
     }
-    std::cout<<"status: "<<status_<<" get_status: "<<get_status<<"\n";
     //hanle: get frame
     if (get_status == 0 || get_status == 1 || get_status == 4 || get_status == 5) {
         delay_frame++;

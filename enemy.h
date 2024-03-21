@@ -44,7 +44,9 @@ public:
     bool is_hurting;
     //use in Enemy::Show_Enemy()
     int get_status;
-
+    bool is_atk_left;
+    bool is_atk_right;
+    
 private:
     float x_val;
     float y_val;
@@ -58,8 +60,6 @@ private:
     int delay_frame;
     int status_;
     bool on_ground;
-    bool is_atk_left;
-    bool is_atk_right;
     int map_x_;
     int map_y_;
 
