@@ -76,12 +76,12 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     enemy.get_hitbox_for_other_object(enemy_hitbox.x1, enemy_hitbox.x2, enemy_hitbox.y1, enemy_hitbox.y2);
     if (player.is_atk_left) {
         enemy.atk_action(1, player_hitbox);
-        //std::cout<<"Object_Collide: left true\n";
+        std::cout<<" Object_Collide: left true\n";
         return true;
     }
     else if (player.is_atk_right) {
         enemy.atk_action(2, player_hitbox);
-        //std::cout<<"Object_Collide: right true\n";
+        std::cout<<" Object_Collide: right true\n";
         return true;
     }
     // else if (enemy.is_atk_left == true) { 
@@ -130,9 +130,12 @@ int main(int argc, char* argv[]) {
             }
             player_main_character.HandelInputAction(g_event, g_renderer);
         }
-        hell_dog.Action(g_renderer, player_main_character.get_pos_x(), player_main_character.get_pos_y());
        
-        if (!hell_dog.is_hurting) Object_Collide(player_main_character, hell_dog);
+        if (!hell_dog.is_hurting) {
+            if (!Object_Collide(player_main_character, hell_dog)) {
+                hell_dog.Action(g_renderer, player_main_character.get_pos_x(), player_main_character.get_pos_y());
+            }
+        }
 
         SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR); //255
         SDL_RenderClear(g_renderer);

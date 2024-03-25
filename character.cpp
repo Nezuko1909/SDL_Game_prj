@@ -155,8 +155,8 @@ void Character::Show_character(SDL_Renderer* des) {
             Char_input_type.atk1 = 0;
             Char_input_type.atk2 = 0;
             Char_input_type.atk3 = 0;
-            is_atk_left = 0;
-            is_atk_right = 0;
+            is_atk_left = false;
+            is_atk_right = false;
         }
     }
     //jump
@@ -183,6 +183,7 @@ void Character::Show_character(SDL_Renderer* des) {
             wframe = 0;
         }
     }
+    //hurt
     else if (get_stt == 12 || get_stt == 13) {
         wframe = 0;
         delay_frame = 1;
@@ -192,6 +193,8 @@ void Character::Show_character(SDL_Renderer* des) {
             is_hurt = false;
         }
     }
+    //std::cout<<" Character: "<<get_stt<<" "<<is_atk_left<<" "<<is_atk_right<<"\t";
+
     rect_.x = x_pos;
     rect_.y = y_pos;
 
@@ -209,11 +212,21 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
             case SDLK_d: { 
                 character_status = RUN_RIGHT;
                 Char_input_type.right = 1;
+                Char_input_type.atk1 = 0;
+                Char_input_type.atk2 = 0;
+                Char_input_type.atk3 = 0;
+                is_atk_left = false;
+                is_atk_right = false;
             }
             break;
             case SDLK_a: {
                 character_status = RUN_LEFT; // char status -> load Img for status
                 Char_input_type.left = 1; // char input type -> move
+                Char_input_type.atk1 = 0;
+                Char_input_type.atk2 = 0;
+                Char_input_type.atk3 = 0;
+                is_atk_left = false;
+                is_atk_right = false;
             }
             break;
             case SDLK_SPACE: {
@@ -224,6 +237,11 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     character_status = JUMP_RIGHT;
                 } 
                 Char_input_type.jump = 1;
+                Char_input_type.atk1 = 0;
+                Char_input_type.atk2 = 0;
+                Char_input_type.atk3 = 0;
+                is_atk_left = false;
+                is_atk_right = false;
             }
             break;
             case SDLK_j: {  // first_atk_animation
@@ -251,11 +269,11 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
             case SDLK_l: {
                 if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
                     character_status = ATK_3_RIGHT;
-                    Char_input_type.atk2 = 1;
+                    Char_input_type.atk3 = 1;
                 }
                 else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
                     character_status = ATK_3_LEFT;
-                    Char_input_type.atk2 = 1;
+                    Char_input_type.atk3 = 1;
                 }
             }
             break;
@@ -292,11 +310,11 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
 
 void Character::get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2) {
     int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
-    x1 = (x_pos + x_val)/TILE_SIZE;
-    x2 = (x_pos + x_val + width_frame - 1)/TILE_SIZE;
+    x1 = (x_pos + x_val);
+    x2 = (x_pos + x_val + width_frame - 1);
 
-    y1 = (y_pos)/TILE_SIZE;
-    y2 = (y_pos + height_min -1)/TILE_SIZE;
+    y1 = (y_pos);
+    y2 = (y_pos + height_min -1);
 }
 
 
@@ -391,7 +409,7 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox) {
     if ((d > a && f < c) || (d < a && f > c) || (d > a && d < c) || (f > a && f < c)) 
     */
    bool check = false;
-    if (abs(hb.x1 - source_hitbox.x1) <= 2) {
+    if (abs(hb.x1 - source_hitbox.x1) <= 2*TILE_SIZE) {
         check = true;
     }
     if (check) {
