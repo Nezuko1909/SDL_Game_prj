@@ -3,6 +3,7 @@
 
 #include "baseFunc.h"
 #include "BaseObject.h"
+#include "heal_point.h"
 
 class Character : public BaseObject {
 public: 
@@ -33,7 +34,7 @@ public:
     void DoPlayer(Map& map_data);
     void CheckMapData(Map& map_data);
     void SetMapXY(const int map_x, const int map_y) {map_x_ = map_x; map_y_ = map_y; }
-    void atk_action(int get_inf, Hit_Box source_hitbox);
+    void atk_action(int get_inf, Hit_Box source_hitbox, int dmg);
 
     bool is_atk_left;
     bool is_atk_right;
@@ -49,6 +50,7 @@ public:
 
     */
     void get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2);
+    Heal_Point Heal;
 
 private:
     float x_val;

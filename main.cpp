@@ -84,12 +84,12 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
         std::cout<<" Object_Collide: right true\n";
         return true;
     }
-    // else if (enemy.is_atk_left == true) { 
-    //     player.atk_action(1, enemy_hitbox);
-    // }
-    // else if (enemy.is_atk_right) {
-    //     player.atk_action(2, enemy_hitbox);
-    // }
+    else if (enemy.is_atk_left == true) { 
+        player.atk_action(1, enemy_hitbox, 200);
+    }
+    else if (enemy.is_atk_right) {
+        player.atk_action(2, enemy_hitbox, 200);
+    }
     // //std::cout<<"Object_Collide: false\n";
     return false;
     // //std::cout<<"Object_collide: success";

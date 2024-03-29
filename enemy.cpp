@@ -67,6 +67,8 @@ void Enemy::set_clips(int frame) {
     }
 }
 
+bool ret_idle = true; // for Enemy::action()
+
 void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
     // load
     if (!is_hurting) {
@@ -126,18 +128,18 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
             Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_left.png", des, ENEMY_RUN_FRAME);
             set_clips(ENEMY_RUN_FRAME);
             get_status = 10;
-            is_atk_left = true;
+            //is_atk_left = true;
         }
         else if (status_ == ATK_1_RIGHT) {
             Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_right.png", des, ENEMY_RUN_FRAME);
             set_clips(ENEMY_RUN_FRAME);
             get_status = 11;
-            is_atk_right = true;
+            //is_atk_right = true;
         }
     }
     std::cout<<"enemy get_status: "<<get_status<<" is hurting: "<<is_hurting<<" is attack l/r: "<<is_atk_left<<" "<<is_atk_right<<"\n";
     //hanle: get frame
-    //idle and move
+        //idle and move
     if (get_status == 0 || get_status == 1 || get_status == 4 || get_status == 5) {
         delay_frame++;
         if (delay_frame % 3 == 0) wframe++;
@@ -189,8 +191,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
         if (wframe >= ENEMY_RUN_FRAME) {
             wframe = 0;
             delay_frame = 1;
-            is_atk_left = false;
-            is_atk_right = false;
+            ret_idle = true;
         }
     }
     
@@ -204,13 +205,14 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
 
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
-
+    if (is_atk_right == true) is_atk_right = false;
+    if (is_atk_left == true) is_atk_left = false;
 }
 
 void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos) { 
     atk_cd++;
     bool is_left = false;
-    if (!is_atk_left && !is_atk_right && !is_hurting) {
+    if (!is_hurting) {
         if (x_pos > target_x_pos + 50) {
             status_ = WALK_LEFT;
             Enemy_in_type.left1 = 1;
@@ -224,10 +226,13 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos)
             is_left = false;
         }
         else {
-            x_pos <= target_x_pos ? status_ = IDLE_RIGHT : status_ = IDLE_LEFT;
-            Enemy_in_type.right1 = 0;
-            Enemy_in_type.left1 = 0;
+            if (ret_idle == true) {
+                x_pos <= target_x_pos ? status_ = IDLE_RIGHT : status_ = IDLE_LEFT;
+                Enemy_in_type.right1 = 0;
+                Enemy_in_type.left1 = 0;
+            }
             if (atk_cd / FRAME_PER_SECOND == 3) {
+                ret_idle = false;
                 if (status_ == WALK_LEFT || status_ == IDLE_LEFT) {
                     status_ = ATK_1_LEFT;
                     is_atk_left = true;

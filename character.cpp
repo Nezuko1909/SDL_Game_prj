@@ -24,6 +24,8 @@ Character::Character() { //character == mainObject
     is_hurt = false;
     map_x_ = 0;
     map_y_ = 0;
+    Heal.set_HP_Rect(0, 0, TILE_SIZE * 5, TILE_SIZE / 2);
+    Heal.Set_Heal_Point(5000);
 }
 
 Character::~Character() {
@@ -204,6 +206,8 @@ void Character::Show_character(SDL_Renderer* des) {
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
 
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+
+    Heal.Show(des);
 }
 
 void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) {  
@@ -394,7 +398,7 @@ void Character::DoPlayer(Map& map_data) {
     CheckMapData(map_data);
 }
 
-void Character::atk_action(int get_inf, Hit_Box source_hitbox) {
+void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
     Hit_Box hb;
     get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
     /*
@@ -416,11 +420,13 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox) {
         if (get_inf == 2) {
             character_status = HURT_RIGHT_ATK;
             Char_input_type.hurt_r = 1;
+            Heal.decrease_HP(dmg);
             //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
         else if (get_inf == 1) {
             character_status = HURT_LEFT_ATK;
             Char_input_type.hurt_l = 1;
+            Heal.decrease_HP(dmg);
             //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
         return;
