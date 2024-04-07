@@ -52,8 +52,9 @@ void Character::set_clips(int frame) {
 }
 //for up frame
 int get_stt = -1;
+
 void Character::Show_character(SDL_Renderer* des) {
-    if (!is_hurt) {
+    //if (!is_hurt) {
         if (character_status == JUMP_LEFT) {
             Load_Character_Img("character_src/jump_left.png", des, FRAME_JUMP);
             set_clips(FRAME_JUMP);
@@ -88,12 +89,12 @@ void Character::Show_character(SDL_Renderer* des) {
         else if (character_status == HURT_LEFT_ATK) {
             Load_Character_Img("character_src/hurt_left_atk.png", des, FRAME_HURT);
             set_clips(FRAME_HURT);
-            is_hurt = true;
+            get_stt = 12;
         }
         else if (character_status == HURT_RIGHT_ATK) {
             Load_Character_Img("character_src/hurt_right_atk.png", des, FRAME_HURT);
             set_clips(FRAME_HURT);
-            is_hurt = true;
+            get_stt = 13;
         }
 
         // attack:
@@ -142,12 +143,12 @@ void Character::Show_character(SDL_Renderer* des) {
             Load_Character_Img("character_src/atk3_left.png", des, FRAME_ATK_1);
             set_clips(FRAME_ATK_1);
             get_stt = 10;
-            
+        
             is_atk_right = false;
             is_atk_left = true;
         }
-    }
-    //std::cout<<"char status: "<<character_status<<"\n";
+    //}
+    //std::cout<<" char status: "<<character_status<<"\n";
     //atk: 6 7 8 9 10 11
     if (get_stt == 6 || get_stt == 7 || get_stt == 8 || get_stt == 9 || get_stt == 10 || get_stt == 11) {
         wframe++;
@@ -168,13 +169,11 @@ void Character::Show_character(SDL_Renderer* des) {
             if (y_val > 0) wframe = 1;
         }
         else {
-            if (Char_input_type.left == 0 || Char_input_type.right == 0) {
+            if (Char_input_type.left == 0 && Char_input_type.right == 0) {
                 character_status == JUMP_LEFT ? character_status = IDLE_LEFT : character_status = IDLE_RIGHT;
-                //Show_character(des);
             }
             else {
                 character_status == JUMP_LEFT ? character_status = RUN_LEFT : character_status = RUN_RIGHT;
-                //Show_character(des);
             }
         }
     }
@@ -188,14 +187,16 @@ void Character::Show_character(SDL_Renderer* des) {
     //hurt
     else if (get_stt == 12 || get_stt == 13) {
         wframe = 0;
-        delay_frame = 1;
+        delay_frame++;
         if (delay_frame > 6) {
-            get_stt == 12 ? character_status = IDLE_LEFT : character_status == IDLE_RIGHT;
-            delay_frame = 1;
+            if (get_stt == 12) character_status = IDLE_LEFT;
+            else character_status = IDLE_RIGHT;
+            delay_frame = 0;
             is_hurt = false;
+            get_stt = -1;
         }
     }
-    //std::cout<<" Character: "<<get_stt<<" "<<is_atk_left<<" "<<is_atk_right<<"\t";
+    //std::cout<<" Character: delay frame: "<<delay_frame<<" is hurt: "<<is_hurt<<" get_stt: "<<get_stt<<"";
 
     rect_.x = x_pos;
     rect_.y = y_pos;
@@ -207,7 +208,6 @@ void Character::Show_character(SDL_Renderer* des) {
 
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
 
-    Heal.Show(des);
 }
 
 void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) {  
@@ -248,7 +248,7 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 is_atk_right = false;
             }
             break;
-            case SDLK_j: {  // first_atk_animation
+            case SDLK_j: {  
                 if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT) {
                     character_status = ATK_1_RIGHT;
                     Char_input_type.atk1 = 1;
@@ -320,7 +320,6 @@ void Character::get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2) 
     y1 = (y_pos);
     y2 = (y_pos + height_min -1);
 }
-
 
 void Character::CheckMapData(Map& map_data) {
     int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
@@ -398,6 +397,7 @@ void Character::DoPlayer(Map& map_data) {
     CheckMapData(map_data);
 }
 
+//get hurt animations and take dmg
 void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
     Hit_Box hb;
     get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
@@ -419,14 +419,16 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
     if (check) {
         if (get_inf == 2) {
             character_status = HURT_RIGHT_ATK;
-            Char_input_type.hurt_r = 1;
+            //Char_input_type.hurt_r = 1;
             Heal.decrease_HP(dmg);
+            is_hurt = true;
             //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
         else if (get_inf == 1) {
             character_status = HURT_LEFT_ATK;
-            Char_input_type.hurt_l = 1;
+            //Char_input_type.hurt_l = 1;
             Heal.decrease_HP(dmg);
+            is_hurt = true;
             //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
         return;
@@ -436,3 +438,5 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
         return;
     }
 }
+
+
