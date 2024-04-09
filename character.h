@@ -25,11 +25,10 @@ public:
     void HandelInputAction(SDL_Event character_event, SDL_Renderer* screen);
     
     void set_clips(int frame); //Load Character rect for move
-    // get x_pos for enemy
-    float get_pos_x() const {return x_pos; };
-    //get y_pos for enemy
-    float get_pos_y() const {return y_pos + height_frame; };
-
+    //get inf
+    float get_pos_x() const { return x_pos; };
+    float get_pos_y() const { return y_pos + height_frame; };
+    int get_status() const { return character_status; };
     //map set for char
     void DoPlayer(Map& map_data);
     void CheckMapData(Map& map_data);
@@ -51,6 +50,7 @@ public:
     */
     void get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2);
     Heal_Point Heal;
+    int get_dmg(int status, bool is_ultimate);
 
 private:
     float x_val;

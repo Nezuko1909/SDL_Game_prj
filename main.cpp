@@ -48,6 +48,10 @@ bool init_Data() { //create window
             if (!func_texture()) {
                 success = false;
             }
+            if (TTF_Init() == -1) {
+                std::cout<<"TTF could not initialize, SDL_Error: "<<SDL_GetError();
+                success = false;
+            }
         }
     }
     return success;
@@ -75,13 +79,13 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     player.get_hitbox_for_other_object(player_hitbox.x1, player_hitbox.x2, player_hitbox.y1, player_hitbox.y2);
     enemy.get_hitbox_for_other_object(enemy_hitbox.x1, enemy_hitbox.x2, enemy_hitbox.y1, enemy_hitbox.y2);
     if (player.is_atk_left) {
-        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, 500);
+        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, player.get_dmg(player.get_status(), 0)); // hien tai chua co code ultimate nen mac dinh la false
         std::cout<<" Object_Collide: p left true\n";
         player.is_atk_left = false;
         return true;
     }
     else if (player.is_atk_right) {
-        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, 500);
+        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, player.get_dmg(player.get_status(), 0));
         std::cout<<" Object_Collide: p right true\n";
         player.is_atk_right = false;
         return true;
@@ -91,7 +95,7 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     }
 
     if (enemy.is_atk_left) { 
-        player.atk_action(1, enemy_hitbox, 200);
+        player.atk_action(1, enemy_hitbox,enemy.get_dmg(enemy.get_status_()));
         std::cout<<" Object_Collide: enemy left true\n";
     }
     else if (enemy.is_atk_right) {

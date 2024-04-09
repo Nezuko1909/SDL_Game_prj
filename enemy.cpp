@@ -268,7 +268,7 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
             is_left = false;
             found_player = false;
         }
-        else if (y_pos + height_frame > target_y_pos) {
+        else if (y_pos + height_frame > target_y_pos && on_ground) {
             x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
             Enemy_in_type.jump = 1;
             found_player = false;
@@ -392,4 +392,17 @@ void Enemy::Do_Play(Map& map_data) { /* 1 */
     //std::cout<<"Enemy: x_pos_ = "<<x_pos<<" y_pos = "<<y_pos<<"\n";
 }
 
+int Enemy::get_dmg(int status) {
+    int base_dmg;
+    base_dmg = rand()%700;
+    if (base_dmg < 300) base_dmg = 500;
+    //critical rate = 50%; critical dmg 150 ~ 200% 
+    int is_crit = rand()%101;
+    if (is_crit < 50) {
+        double val = (rand() % 101) + 100;
+        val /= 100.0;
+        return int(base_dmg*val);
+    }
+    return base_dmg;
+}
 

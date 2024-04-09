@@ -37,8 +37,10 @@ public:
     /*Do_Play = move handling*/
     void Do_Play(Map& map_data);
     void CheckMapData(Map& map_data);
-    void SetMapXY(const int map_x, const int map_y) { map_x_ = map_x; map_y_ = map_y; }
+    void SetMapXY(const int map_x, const int map_y) { map_x_ = map_x; map_y_ = map_y; };
     void get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2);
+    
+    int get_status_() const { return status_; };
 
     //use in Enemy::Show_Enemy()
     bool is_hurting;
@@ -49,6 +51,7 @@ public:
     bool is_atk_right;
 
     Heal_Point HP;
+    int get_dmg(int status);
     
 private:
     float x_val;

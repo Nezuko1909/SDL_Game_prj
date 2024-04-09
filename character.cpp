@@ -434,4 +434,19 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
     }
 }
 
-
+int Character::get_dmg(int status, bool is_ultimate) {
+    int base_dmg;
+    base_dmg = rand()%1000;
+    if (base_dmg < 500) base_dmg = 500;
+    if (status == ATK_2_LEFT || status == ATK_2_RIGHT) base_dmg -= rand()%101;
+    if (status == ATK_3_LEFT || status == ATK_3_RIGHT) base_dmg += rand()%101;
+    if (is_ultimate) base_dmg+=2000;
+    //critical rate = 50%; critical dmg 150 ~ 250% 
+    int is_crit = rand()%101;
+    if (is_ultimate ? is_crit < 50 : is_crit < 75) {
+        double val = (rand() % 101) + (is_ultimate ? 150 : 250);
+        val /= 100.0;
+        return int(base_dmg*val);
+    }
+    return base_dmg;
+}

@@ -23,6 +23,8 @@ static SDL_Surface* g_screenSurface = NULL;
 static SDL_Event g_event; //Event: get key press on keybroad
 static SDL_Texture* g_texture = NULL;
 static SDL_Renderer* g_renderer = NULL;
+static TTF_Font* g_font = NULL;
+
 //screen
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 640;
