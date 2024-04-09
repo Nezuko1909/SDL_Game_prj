@@ -3,7 +3,7 @@
 
 #include "baseFunc.h"
 #include "BaseObject.h"
-#include "heal_point.h"
+
 
 class Character : public BaseObject {
 public: 

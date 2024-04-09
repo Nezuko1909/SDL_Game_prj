@@ -75,17 +75,19 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     player.get_hitbox_for_other_object(player_hitbox.x1, player_hitbox.x2, player_hitbox.y1, player_hitbox.y2);
     enemy.get_hitbox_for_other_object(enemy_hitbox.x1, enemy_hitbox.x2, enemy_hitbox.y1, enemy_hitbox.y2);
     if (player.is_atk_left) {
-        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox);
+        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, 500);
         std::cout<<" Object_Collide: p left true\n";
+        player.is_atk_left = false;
         return true;
     }
     else if (player.is_atk_right) {
-        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox);
+        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, 500);
         std::cout<<" Object_Collide: p right true\n";
+        player.is_atk_right = false;
         return true;
     }
     else {
-        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 0, player_hitbox);
+        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 0, player_hitbox, 0);
     }
 
     if (enemy.is_atk_left) { 
@@ -152,7 +154,7 @@ int main(int argc, char* argv[]) {
         player_main_character.Show_character(g_renderer);
         player_main_character.Heal.Show(g_renderer);
         hell_dog.Show_Enemy(g_renderer);
-
+        hell_dog.HP.Show(g_renderer);
         SDL_RenderPresent(g_renderer);
 
         int real_imp_time = fps_timer.get_ticks();

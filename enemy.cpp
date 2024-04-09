@@ -28,6 +28,7 @@ Enemy::Enemy() {
     found_player = true;
     get_status = -1;
     atk_cd = 1;
+    HP.Set_Heal_Point(10000);
 }
 
 Enemy::~Enemy() {
@@ -72,73 +73,71 @@ bool ret_idle = true; // for Enemy::action()
 
 void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
     // load
-    if (!is_hurting) {
-        if (status_ == IDLE_LEFT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_idle_left.png", des, ENEMY_IDLE_FRAME);
-            set_clips(ENEMY_IDLE_FRAME);
-            get_status = 0;
-        }
-        else if (status_ == IDLE_RIGHT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", des, ENEMY_IDLE_FRAME);
-            set_clips(ENEMY_IDLE_FRAME);
-            get_status = 1;
-        }
-        else if (status_ == WALK_LEFT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_walk_left.png", des, ENEMY_WALK_FRAME);
-            set_clips(ENEMY_WALK_FRAME);
-            get_status = 2;
-        }
-        else if (status_ == WALK_RIGHT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_walk_right.png", des, ENEMY_WALK_FRAME);
-            set_clips(ENEMY_WALK_FRAME);
-            get_status = 3;
-        }
-        else if (status_ == RUN_LEFT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_run_left.png", des, ENEMY_RUN_FRAME);
-            set_clips(ENEMY_RUN_FRAME);
-            get_status = 4;
-        }
-        else if (status_ == RUN_RIGHT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_run_right.png", des, ENEMY_RUN_FRAME);
-            set_clips(ENEMY_RUN_FRAME);
-            get_status = 5;
-        }
-        else if (status_ == JUMP_LEFT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_jump_left.png", des, ENEMY_JUMP_FRAME);
-            set_clips(ENEMY_JUMP_FRAME);
-            get_status = 6;
-        }
-        else if (status_ == JUMP_RIGHT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_jump_right.png", des, ENEMY_JUMP_FRAME);
-            set_clips(ENEMY_JUMP_FRAME);
-            get_status = 7;
-        }
-        else if (status_ == HURT_RIGHT_ATK) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_hurt_right_atk.png", des, ENEMY_HURT_FRAME);
-            set_clips(ENEMY_HURT_FRAME);
-            get_status = 8;
-            is_hurting = true;
-        }
-        else if (status_ == HURT_LEFT_ATK) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_hurt_left_atk.png", des, ENEMY_HURT_FRAME);
-            set_clips(ENEMY_HURT_FRAME);
-            get_status = 9;
-            is_hurting = true;
-        }
-        else if (status_ == ATK_1_LEFT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_left.png", des, ENEMY_RUN_FRAME);
-            set_clips(ENEMY_RUN_FRAME);
-            get_status = 10;
-            //is_atk_left = true;
-        }
-        else if (status_ == ATK_1_RIGHT) {
-            Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_right.png", des, ENEMY_RUN_FRAME);
-            set_clips(ENEMY_RUN_FRAME);
-            get_status = 11;
-            //is_atk_right = true;
-        }
+    if (status_ == IDLE_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_idle_left.png", des, ENEMY_IDLE_FRAME);
+        set_clips(ENEMY_IDLE_FRAME);
+        get_status = 0;
     }
-    //std::cout<<"\tenemy get_status: "<<get_status<<" is hurting: "<<is_hurting<<" is attack l/r: "<<is_atk_left<<" "<<is_atk_right<<"\n";
+    else if (status_ == IDLE_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", des, ENEMY_IDLE_FRAME);
+        set_clips(ENEMY_IDLE_FRAME);
+        get_status = 1;
+    }
+    else if (status_ == WALK_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_walk_left.png", des, ENEMY_WALK_FRAME);
+        set_clips(ENEMY_WALK_FRAME);
+        get_status = 2;
+    }
+    else if (status_ == WALK_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_walk_right.png", des, ENEMY_WALK_FRAME);
+        set_clips(ENEMY_WALK_FRAME);
+        get_status = 3;
+    }
+    else if (status_ == RUN_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_run_left.png", des, ENEMY_RUN_FRAME);
+        set_clips(ENEMY_RUN_FRAME);
+        get_status = 4;
+    }
+    else if (status_ == RUN_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_run_right.png", des, ENEMY_RUN_FRAME);
+        set_clips(ENEMY_RUN_FRAME);
+        get_status = 5;
+    }
+    else if (status_ == JUMP_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_jump_left.png", des, ENEMY_JUMP_FRAME);
+        set_clips(ENEMY_JUMP_FRAME);
+        get_status = 6;
+    }
+    else if (status_ == JUMP_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_jump_right.png", des, ENEMY_JUMP_FRAME);
+        set_clips(ENEMY_JUMP_FRAME);
+        get_status = 7;
+    }
+    else if (status_ == HURT_RIGHT_ATK) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_hurt_right_atk.png", des, ENEMY_HURT_FRAME);
+        set_clips(ENEMY_HURT_FRAME);
+        get_status = 8;
+        is_hurting = true;
+    }
+    else if (status_ == HURT_LEFT_ATK) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_hurt_left_atk.png", des, ENEMY_HURT_FRAME);
+        set_clips(ENEMY_HURT_FRAME);
+        get_status = 9;
+        is_hurting = true;
+    }
+    else if (status_ == ATK_1_LEFT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_left.png", des, ENEMY_RUN_FRAME);
+        set_clips(ENEMY_RUN_FRAME);
+        get_status = 10;
+        //is_atk_left = true;
+    }
+    else if (status_ == ATK_1_RIGHT) {
+        Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_right.png", des, ENEMY_RUN_FRAME);
+        set_clips(ENEMY_RUN_FRAME);
+        get_status = 11;
+        //is_atk_right = true;
+    }
+    std::cout<<"\tenemy found player: "<<found_player<<" is hurting: "<<is_hurting<<" is attack l/r: "<<is_atk_left<<" "<<is_atk_right<<"\n";
     //hanle: get frame
     //idle and move
     if (get_status == 0 || get_status == 1 || get_status == 4 || get_status == 5) {
@@ -179,10 +178,6 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
             if (y_val <= 0) wframe = 0;
             if (y_val > 0) wframe = 1;
         }
-        else {
-            //get_status == 6 ? status_ = IDLE_LEFT : status_ = IDLE_RIGHT;
-            wframe = 0;
-        }
     }
     //atk
     else if (get_status == 10 || get_status == 11) {
@@ -192,12 +187,14 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
         }
         if (wframe >= ENEMY_RUN_FRAME) {
             wframe = 0;
-            delay_frame = 1;
+            delay_frame = 0;
             is_atk_left = false;
             is_atk_right = false;
             ret_idle = true;
         }
     }
+
+    HP.set_HP_Rect(x_pos, y_pos - (TILE_SIZE / 2), width_frame, TILE_SIZE / 4);
 
     //render
     rect_.x = x_pos;
@@ -214,7 +211,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
 }
 
 // get_inf = player(character) atk status, return 0 if not atk
-void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox) { 
+void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg) { 
     if (get_inf != 0 && !is_atk_left && !is_atk_right) {
         Hit_Box hb;
         get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
@@ -238,6 +235,7 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
                 status_ = HURT_RIGHT_ATK;
                 Enemy_in_type.hurt_r = 1;
                 is_hurting = true;
+                HP.decrease_HP(dmg);
                 //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
 
             }
@@ -245,6 +243,7 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
                 status_ = HURT_LEFT_ATK;
                 Enemy_in_type.hurt_l = 1;
                 is_hurting = true;
+                HP.decrease_HP(dmg);
                 //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
             }
         }
@@ -284,9 +283,9 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
         }
     }
 
-    atk_cd++;
+    atk_cd < 1000000 ? atk_cd++ : atk_cd = 1;
     if (!is_hurting && found_player) {
-        if (atk_cd / FRAME_PER_SECOND == 3) {
+        if (atk_cd % (FRAME_PER_SECOND*3) == 0) {
             ret_idle = false;
             if (status_ == WALK_LEFT || status_ == IDLE_LEFT) {
                 status_ = ATK_1_LEFT;
@@ -299,6 +298,7 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
             atk_cd = 1;
         }
     }
+    //std::cout<<" atk cd: "<<atk_cd<<" ";
 }
 
 void Enemy::CheckMapData(Map& map_data) { /* 1 */
@@ -392,7 +392,4 @@ void Enemy::Do_Play(Map& map_data) { /* 1 */
     //std::cout<<"Enemy: x_pos_ = "<<x_pos<<" y_pos = "<<y_pos<<"\n";
 }
 
-void Enemy::atk_action(int get_inf, Hit_Box source_hitbox) {
-    
-}
 

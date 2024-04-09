@@ -4,6 +4,7 @@
 #include "baseFunc.h"
 #include "BaseObject.h"
 
+
 struct type_in_enemy {
     int left1, left2;
     int right1, right2;
@@ -29,8 +30,7 @@ public:
 
     virtual bool Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count);
     void Show_Enemy(SDL_Renderer* des);
-    void Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox);
-    void atk_action(int get_inf, Hit_Box source_hitbox);
+    void Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg);
 
     //void Spawn();
     void set_clips(int frame);
@@ -47,6 +47,8 @@ public:
     int get_status;
     bool is_atk_left;
     bool is_atk_right;
+
+    Heal_Point HP;
     
 private:
     float x_val;

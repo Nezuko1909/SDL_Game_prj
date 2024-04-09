@@ -2,6 +2,7 @@
 #define BASE_OBJECT_H_
 
 #include "baseFunc.h"
+#include "heal_point.h"
 
 class BaseObject {
 public: 

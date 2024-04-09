@@ -2,9 +2,9 @@
 #define Heal_point_H_
 
 #include "baseFunc.h"
-#include "BaseObject.h"
 
-class Heal_Point : public BaseObject {
+
+class Heal_Point {
 public:
     Heal_Point();
     ~Heal_Point();
@@ -16,6 +16,7 @@ public:
     void Show(SDL_Renderer* des);
 
 protected:
+    SDL_Rect rect_;
     int max_HP;
     int current_HP;
     bool is_negative; // hp is negative ? kill object : continue
