@@ -24,8 +24,12 @@ Character::Character() { //character == mainObject
     is_hurt = false;
     map_x_ = 0;
     map_y_ = 0;
-    Heal.set_HP_Rect(0, 0, TILE_SIZE * 5, TILE_SIZE / 2);
-    Heal.Set_Heal_Point(5000);
+    Heal.set_HP_Rect(0, 0, TILE_SIZE * 5, TILE_SIZE / 2); 
+    Heal.Set_Heal_Point(5000); 
+    Heal.HP_font = TTF_OpenFont("text/LSB.ttf", 28);
+    Heal.showHP.SetPosition(Heal.get_rect_().x + TILE_SIZE / 4 , Heal.get_rect_().y + 2);
+    Heal.showHP.SetText(std::to_string(Heal.current_HP));
+    show_dmg.SetColor_(show_dmg.RED_COLOR);
 }
 
 Character::~Character() {
@@ -53,7 +57,7 @@ void Character::set_clips(int frame) {
 //for up frame
 int get_stt = -1;
 
-void Character::Show_character(SDL_Renderer* des) {
+void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     //if (!is_hurt) {
         if (character_status == JUMP_LEFT) {
             Load_Character_Img("character_src/jump_left.png", des, FRAME_JUMP);
@@ -170,13 +174,14 @@ void Character::Show_character(SDL_Renderer* des) {
     //hurt
     else if (get_stt == 12 || get_stt == 13) {
         wframe = 0;
-        delay_frame++;
+        delay_frame++; 
         if (delay_frame > 6) {
             if (get_stt == 12) character_status = IDLE_LEFT;
             else character_status = IDLE_RIGHT;
             delay_frame = 0;
             is_hurt = false;
             get_stt = -1;
+            show_dmg.Free();
         }
     }
     //std::cout<<" Character: delay frame: "<<delay_frame<<" is hurt: "<<is_hurt<<" get_stt: "<<get_stt<<"";
@@ -191,6 +196,13 @@ void Character::Show_character(SDL_Renderer* des) {
 
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
 
+    Heal.Show(des);
+    Heal.showHP.LoadFromRenderText(Heal.HP_font, des);
+    Heal.showHP.RenderText(des, Heal.showHP.x_pos, Heal.showHP.y_pos);
+
+    show_dmg.LoadFromRenderText(fonts, des);
+    if (show_dmg.y_pos < y_pos - 2*TILE_SIZE) show_dmg.Free();
+    show_dmg.RenderText(des, show_dmg.x_pos, show_dmg.y_pos);
 }
 
 void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) {  
@@ -390,6 +402,7 @@ void Character::DoPlayer(Map& map_data) {
         on_ground = false;
     }
     CheckMapData(map_data);
+    show_dmg.SetPosition(show_dmg.x_pos, show_dmg.y_pos - (TILE_SIZE / 4));
 }
 
 //get hurt animations and take dmg
@@ -416,14 +429,20 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
             character_status = HURT_RIGHT_ATK;
             //Char_input_type.hurt_r = 1;
             Heal.decrease_HP(dmg);
+            Heal.showHP.SetText(std::to_string(Heal.current_HP));
             is_hurt = true;
+            show_dmg.SetText(std::to_string(dmg));
+            show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
             //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
         else if (get_inf == 1) {
             character_status = HURT_LEFT_ATK;
             //Char_input_type.hurt_l = 1;
             Heal.decrease_HP(dmg);
+            Heal.showHP.SetText(std::to_string(Heal.current_HP));
             is_hurt = true;
+            show_dmg.SetText(std::to_string(dmg));
+            show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
             //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
         return;

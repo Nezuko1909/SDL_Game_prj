@@ -21,7 +21,7 @@ public:
     };
 
     virtual bool Load_Character_Img(std::string path, SDL_Renderer* screen, int frame_count);
-    void Show_character(SDL_Renderer* des);
+    void Show_character(SDL_Renderer* des, TTF_Font* fonts);
     void HandelInputAction(SDL_Event character_event, SDL_Renderer* screen);
     
     void set_clips(int frame); //Load Character rect for move
@@ -37,7 +37,6 @@ public:
 
     bool is_atk_left;
     bool is_atk_right;
-
     bool is_hurt;
     /*
     hitbox:
@@ -51,6 +50,7 @@ public:
     void get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2);
     Heal_Point Heal;
     int get_dmg(int status, bool is_ultimate);
+    TextObject show_dmg;
 
 private:
     float x_val;

@@ -29,6 +29,10 @@ Enemy::Enemy() {
     get_status = -1;
     atk_cd = 1;
     HP.Set_Heal_Point(10000);
+    HP.HP_font = TTF_OpenFont("text/LSB.ttf", 16);
+    HP.showHP.SetPosition(HP.get_rect_().x, HP.get_rect_().y);
+    HP.showHP.SetText(std::to_string(HP.current_HP));
+    show_dmg.SetColor_(show_dmg.WHITE_COLOR);
 }
 
 Enemy::~Enemy() {
@@ -71,7 +75,7 @@ void Enemy::set_clips(int frame) {
 
 bool ret_idle = true; // for Enemy::action()
 
-void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
+void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     // load
     if (status_ == IDLE_LEFT) {
         Load_Enemy_Img("threats_src/hell_dog/hd_idle_left.png", des, ENEMY_IDLE_FRAME);
@@ -129,15 +133,13 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
         Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_left.png", des, ENEMY_RUN_FRAME);
         set_clips(ENEMY_RUN_FRAME);
         get_status = 10;
-        //is_atk_left = true;
     }
     else if (status_ == ATK_1_RIGHT) {
         Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_right.png", des, ENEMY_RUN_FRAME);
         set_clips(ENEMY_RUN_FRAME);
         get_status = 11;
-        //is_atk_right = true;
     }
-    std::cout<<"\tenemy found player: "<<found_player<<" is hurting: "<<is_hurting<<" is attack l/r: "<<is_atk_left<<" "<<is_atk_right<<"\n";
+    //std::cout<<"\tenemy found player: "<<found_player<<" is hurting: "<<is_hurting<<" is attack l/r: "<<is_atk_left<<" "<<is_atk_right<<"\n";
     //hanle: get frame
     //idle and move
     if (get_status == 0 || get_status == 1 || get_status == 4 || get_status == 5) {
@@ -194,8 +196,6 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
         }
     }
 
-    HP.set_HP_Rect(x_pos, y_pos - (TILE_SIZE / 2), width_frame, TILE_SIZE / 4);
-
     //render
     rect_.x = x_pos;
     rect_.y = y_pos;
@@ -206,8 +206,20 @@ void Enemy::Show_Enemy(SDL_Renderer* des) { /* 1 */
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
 
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+    
     if (is_atk_right == true) is_atk_right = false;
     if (is_atk_left == true) is_atk_left = false;
+    
+    HP.set_HP_Rect(x_pos, y_pos - (TILE_SIZE / 2), width_frame, TILE_SIZE / 4);
+    HP.showHP.SetText(std::to_string(HP.current_HP));
+    HP.showHP.SetPosition(HP.get_rect_().x, HP.get_rect_().y);
+    HP.Show(des);
+    HP.showHP.LoadFromRenderText(HP.HP_font, des);
+    HP.showHP.RenderText(des, HP.showHP.x_pos, HP.showHP.y_pos);
+
+    show_dmg.LoadFromRenderText(font, des);
+    if (show_dmg.y_pos < y_pos - 2*TILE_SIZE) show_dmg.Free();
+    show_dmg.RenderText(des, show_dmg.x_pos, show_dmg.y_pos);
 }
 
 // get_inf = player(character) atk status, return 0 if not atk
@@ -235,21 +247,23 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
                 status_ = HURT_RIGHT_ATK;
                 Enemy_in_type.hurt_r = 1;
                 is_hurting = true;
+                delay_frame = 1;
                 HP.decrease_HP(dmg);
+                show_dmg.SetText(std::to_string(dmg));
+                show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
                 //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
-
             }
             else if (get_inf == 1) {
                 status_ = HURT_LEFT_ATK;
                 Enemy_in_type.hurt_l = 1;
                 is_hurting = true;
+                delay_frame = 1;
                 HP.decrease_HP(dmg);
+                show_dmg.SetText(std::to_string(dmg));
+                show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
                 //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
             }
         }
-        //else {
-            //std::cout<<"Enemy::action - false: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
-        //}
     }
 
     bool is_left = false;
@@ -389,7 +403,7 @@ void Enemy::Do_Play(Map& map_data) { /* 1 */
         on_ground = false;
     }
     CheckMapData(map_data);
-    //std::cout<<"Enemy: x_pos_ = "<<x_pos<<" y_pos = "<<y_pos<<"\n";
+    show_dmg.SetPosition(show_dmg.x_pos, show_dmg.y_pos - (TILE_SIZE / 4));
 }
 
 int Enemy::get_dmg(int status) {

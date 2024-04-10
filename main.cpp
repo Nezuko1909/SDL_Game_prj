@@ -6,6 +6,7 @@
 #include "imp_timer.h"
 #include "enemy.h"
 
+
 class BaseObject Background;
 
 //Function
@@ -39,19 +40,17 @@ bool init_Data() { //create window
     }
     else {
         // create window here
-        g_window = SDL_CreateWindow("Sammurai Combat 2D",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        g_window = SDL_CreateWindow("Sammurai Combat 2D", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         if (g_window == NULL) {
             std::cout<<"Window could not be created| SDL ERROR:\n"<<SDL_GetError();
             success = false;
         }
-        else {
-            if (!func_texture()) {
-                success = false;
-            }
-            if (TTF_Init() == -1) {
-                std::cout<<"TTF could not initialize, SDL_Error: "<<SDL_GetError();
-                success = false;
-            }
+        if (!func_texture()) {
+            success = false;
+        }
+        if (TTF_Init() == -1) {
+            std::cout<<"TTF could not initialize, SDL_Error: "<<SDL_GetError();
+            success = false;
         }
     }
     return success;
@@ -79,14 +78,18 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     player.get_hitbox_for_other_object(player_hitbox.x1, player_hitbox.x2, player_hitbox.y1, player_hitbox.y2);
     enemy.get_hitbox_for_other_object(enemy_hitbox.x1, enemy_hitbox.x2, enemy_hitbox.y1, enemy_hitbox.y2);
     if (player.is_atk_left) {
-        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, player.get_dmg(player.get_status(), 0)); // hien tai chua co code ultimate nen mac dinh la false
-        std::cout<<" Object_Collide: p left true\n";
+        int damage = player.get_dmg(player.get_status(), 0); // hien tai chua co ultimate nen mac dinh = 0
+        damage >= 1000 ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
+        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, damage);
+        //std::cout<<" Object_Collide: p left true\n";
         player.is_atk_left = false;
         return true;
     }
     else if (player.is_atk_right) {
-        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, player.get_dmg(player.get_status(), 0));
-        std::cout<<" Object_Collide: p right true\n";
+        int damage = player.get_dmg(player.get_status(), 0);
+        damage >= 1000 ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
+        enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, damage);
+        //std::cout<<" Object_Collide: p right true\n";
         player.is_atk_right = false;
         return true;
     }
@@ -95,12 +98,12 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     }
 
     if (enemy.is_atk_left) { 
-        player.atk_action(1, enemy_hitbox,enemy.get_dmg(enemy.get_status_()));
-        std::cout<<" Object_Collide: enemy left true\n";
+        player.atk_action(1, enemy_hitbox, enemy.get_dmg(enemy.get_status_()));
+        //std::cout<<" Object_Collide: enemy left true\n";
     }
     else if (enemy.is_atk_right) {
-        player.atk_action(2, enemy_hitbox, 200);
-        std::cout<<" Object_Collide: enemy right true\n";
+        player.atk_action(2, enemy_hitbox, enemy.get_dmg(enemy.get_status_()));
+        //std::cout<<" Object_Collide: enemy right true\n";
     }
     // //std::cout<<"Object_Collide: false\n";
     return false;
@@ -118,6 +121,12 @@ int main(int argc, char* argv[]) {
         return -1; //error
     }
 
+    g_font = TTF_OpenFont("text/LSB.ttf", 30);
+    if (g_font == NULL) {
+        std::cout<<" could not open: text/LSB.ttf with size 25 \n";
+        return -1;
+    }
+
     Game_map Map1;
     Map1.LoadMap("texture_src/map2.txt");
     Map1.LoadTile(g_renderer);
@@ -130,6 +139,9 @@ int main(int argc, char* argv[]) {
     hell_dog.SetRect(rand()%1200, 0);
     hell_dog.Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", g_renderer, ENEMY_IDLE_FRAME);
     hell_dog.set_clips(ENEMY_IDLE_FRAME);
+
+    TextObject show_dmg;
+    show_dmg.SetColor_(show_dmg.WHITE_COLOR);
 
     bool is_quit = false;
     while (!is_quit) {
@@ -155,10 +167,10 @@ int main(int argc, char* argv[]) {
         player_main_character.DoPlayer(Get_play_map_data);
         hell_dog.Do_Play(Get_play_map_data);
 
-        player_main_character.Show_character(g_renderer);
-        player_main_character.Heal.Show(g_renderer);
-        hell_dog.Show_Enemy(g_renderer);
-        hell_dog.HP.Show(g_renderer);
+        player_main_character.Show_character(g_renderer, g_font);
+        
+        hell_dog.Show_Enemy(g_renderer, g_font);
+        
         SDL_RenderPresent(g_renderer);
 
         int real_imp_time = fps_timer.get_ticks();

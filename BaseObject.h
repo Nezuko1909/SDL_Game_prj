@@ -3,6 +3,7 @@
 
 #include "baseFunc.h"
 #include "heal_point.h"
+#include "text.h"
 
 class BaseObject {
 public: 

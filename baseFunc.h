@@ -53,7 +53,7 @@ const int RENDER_DRAW_COLOR = 255;
 #define FRAME_JUMP 2
 #define FRAME_HURT 1
 
-#define GRAVITY_SPEED 4 /*meter per second^2*/
+#define GRAVITY_SPEED 9 /*meter per second^2*/
 #define MAX_FALL_SPEED 30
 #define PLAYER_SPEED 15
 #define PLAYER_JUMP_VAL 30

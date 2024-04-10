@@ -4,6 +4,8 @@ Heal_Point::Heal_Point() {
     max_HP = 0;
     current_HP = 0;
     is_negative = false;
+    HP_font = TTF_OpenFont("text/yumindb.ttf", 14);
+    showHP.SetColor_(showHP.BLACK_COLOR);
 }
 
 Heal_Point::~Heal_Point() {
@@ -33,4 +35,5 @@ void Heal_Point::Show(SDL_Renderer* des) {
         current_HP_rect.w = 0;
     }
     SDL_RenderFillRect(des, &current_HP_rect);
+    showHP.RenderText(des, showHP.x_pos, showHP.y_pos);
 }

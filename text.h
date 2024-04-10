@@ -15,15 +15,17 @@ public:
 
     bool LoadFromRenderText(TTF_Font* font, SDL_Renderer* screen);
     void Free();
-    void SetColor(Uint8 r, Uint8 g, Unit8 b);
+    void SetColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void SetColor_(int type);
-
+    void SetPosition(int x, int y) { x_pos = x; y_pos = y; };
     void RenderText(SDL_Renderer* screen, int xp, int yp, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
-    int GetWidth() const { return width; };
-    int GetHeight() const { return height; };
+    int GetWidth() const { return t_width; };
+    int GetHeight() const { return t_height; };
     void SetText(const std::string& text) { str_val = text; };
     std::string GetText() const { return str_val; };
+    int x_pos;
+    int y_pos;
 
 private:
     std::string str_val;

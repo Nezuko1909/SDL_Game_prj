@@ -29,7 +29,7 @@ public:
     };
 
     virtual bool Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count);
-    void Show_Enemy(SDL_Renderer* des);
+    void Show_Enemy(SDL_Renderer* des, TTF_Font* font);
     void Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg);
 
     //void Spawn();
@@ -52,6 +52,7 @@ public:
 
     Heal_Point HP;
     int get_dmg(int status);
+    TextObject show_dmg;
     
 private:
     float x_val;
