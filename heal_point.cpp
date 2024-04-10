@@ -19,6 +19,11 @@ void Heal_Point::decrease_HP(int val) {
     }
 }
 
+void Heal_Point::increase_HP(int val) {
+    current_HP += val;
+    if (current_HP > max_HP) current_HP = max_HP;
+}
+
 void Heal_Point::Show(SDL_Renderer* des) {
     SDL_Rect max_HP_Rect = rect_;
     

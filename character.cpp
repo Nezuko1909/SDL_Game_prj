@@ -4,8 +4,8 @@
 Character::Character() { //character == mainObject
     wframe = 0; //frame_
     delay_frame = 0;
-    x_pos = 0;
-    y_pos = 0;
+    x_pos = 2*TILE_SIZE;
+    y_pos = 4*TILE_SIZE;
     x_val = 0;
     y_val = 0;
     width_frame = 0;
@@ -25,10 +25,10 @@ Character::Character() { //character == mainObject
     map_x_ = 0;
     map_y_ = 0;
     Heal.set_HP_Rect(0, 0, TILE_SIZE * 5, TILE_SIZE / 2); 
-    Heal.Set_Heal_Point(5000); 
+    Heal.Set_Heal_Point(5501); 
     Heal.HP_font = TTF_OpenFont("text/LSB.ttf", 28);
     Heal.showHP.SetPosition(Heal.get_rect_().x + TILE_SIZE / 4 , Heal.get_rect_().y + 2);
-    Heal.showHP.SetText(std::to_string(Heal.current_HP));
+    Heal.showHP.SetText("HP: " + std::to_string(Heal.current_HP) + "/" + std::to_string(Heal.max_HP));
     show_dmg.SetColor_(show_dmg.RED_COLOR);
 }
 
@@ -197,6 +197,7 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
 
     Heal.Show(des);
+    Heal.showHP.SetText("HP: " + std::to_string(Heal.current_HP) + "/" + std::to_string(Heal.max_HP));
     Heal.showHP.LoadFromRenderText(Heal.HP_font, des);
     Heal.showHP.RenderText(des, Heal.showHP.x_pos, Heal.showHP.y_pos);
 
@@ -288,6 +289,12 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 }
             }
             break;
+            case SDLK_h: {
+                Heal.increase_HP(500);
+                show_dmg.SetColor(0, 222, 0, 0);
+                show_dmg.SetText(std::to_string(500));
+                show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+            }
         }
     }
     else if (character_event.type == SDL_KEYUP) { 
@@ -429,20 +436,20 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
             character_status = HURT_RIGHT_ATK;
             //Char_input_type.hurt_r = 1;
             Heal.decrease_HP(dmg);
-            Heal.showHP.SetText(std::to_string(Heal.current_HP));
             is_hurt = true;
             show_dmg.SetText(std::to_string(dmg));
             show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+            show_dmg.SetColor_(show_dmg.RED_COLOR);
             //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
         else if (get_inf == 1) {
             character_status = HURT_LEFT_ATK;
             //Char_input_type.hurt_l = 1;
             Heal.decrease_HP(dmg);
-            Heal.showHP.SetText(std::to_string(Heal.current_HP));
             is_hurt = true;
             show_dmg.SetText(std::to_string(dmg));
             show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+            show_dmg.SetColor_(show_dmg.RED_COLOR);
             //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
         return;

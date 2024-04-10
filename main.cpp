@@ -139,6 +139,7 @@ int main(int argc, char* argv[]) {
     hell_dog.SetRect(rand()%1200, 0);
     hell_dog.Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", g_renderer, ENEMY_IDLE_FRAME);
     hell_dog.set_clips(ENEMY_IDLE_FRAME);
+    //hell_dog.SetRect(18*TILE_SIZE, 6*TILE_SIZE);
 
     TextObject show_dmg;
     show_dmg.SetColor_(show_dmg.WHITE_COLOR);
@@ -167,10 +168,9 @@ int main(int argc, char* argv[]) {
         player_main_character.DoPlayer(Get_play_map_data);
         hell_dog.Do_Play(Get_play_map_data);
 
-        player_main_character.Show_character(g_renderer, g_font);
-        
+        player_main_character.Show_character(g_renderer, g_font);  
         hell_dog.Show_Enemy(g_renderer, g_font);
-        
+
         SDL_RenderPresent(g_renderer);
 
         int real_imp_time = fps_timer.get_ticks();
@@ -179,6 +179,13 @@ int main(int argc, char* argv[]) {
             int delay_time = time_one_frame - real_imp_time;
             if (delay_time < 0) delay_time = 0;
             SDL_Delay(delay_time); //milisecond
+        }
+
+        if (hell_dog.HP.is_negative) {
+            hell_dog.SetPos(18*TILE_SIZE, 6*TILE_SIZE);
+            hell_dog.HP.Set_Heal_Point(hell_dog.HP.max_HP + 10000);
+            player_main_character.Heal.Set_Heal_Point(5501);
+            hell_dog.HP.is_negative = false;
         }
     }
     close();

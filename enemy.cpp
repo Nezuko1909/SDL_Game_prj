@@ -4,11 +4,11 @@
 Enemy::Enemy() {
     wframe = 0; //frame_
     delay_frame = 0;
-    x_pos = 0;
+    x_pos = 18*TILE_SIZE;
     y_pos = 0;
     x_val = 0;
     y_val = 0;
-    width_frame = 0;
+    width_frame = 0; 
     height_frame = 0;
     status_ = -1;
     Enemy_in_type.atk = 0;
@@ -31,7 +31,7 @@ Enemy::Enemy() {
     HP.Set_Heal_Point(10000);
     HP.HP_font = TTF_OpenFont("text/LSB.ttf", 16);
     HP.showHP.SetPosition(HP.get_rect_().x, HP.get_rect_().y);
-    HP.showHP.SetText(std::to_string(HP.current_HP));
+    HP.showHP.SetText("HP: " + std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
     show_dmg.SetColor_(show_dmg.WHITE_COLOR);
 }
 
@@ -211,7 +211,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     if (is_atk_left == true) is_atk_left = false;
     
     HP.set_HP_Rect(x_pos, y_pos - (TILE_SIZE / 2), width_frame, TILE_SIZE / 4);
-    HP.showHP.SetText(std::to_string(HP.current_HP));
+    HP.showHP.SetText("HP: " + std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
     HP.showHP.SetPosition(HP.get_rect_().x, HP.get_rect_().y);
     HP.Show(des);
     HP.showHP.LoadFromRenderText(HP.HP_font, des);
