@@ -31,7 +31,7 @@ Enemy::Enemy() {
     HP.Set_Heal_Point(10000);
     HP.HP_font = TTF_OpenFont("text/LSB.ttf", 16);
     HP.showHP.SetPosition(HP.get_rect_().x, HP.get_rect_().y);
-    HP.showHP.SetText("HP: " + std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
+    HP.showHP.SetText(std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
     show_dmg.SetColor_(show_dmg.WHITE_COLOR);
 }
 
@@ -48,7 +48,10 @@ void Enemy::get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2) {
     y2 = (y_pos + height_min -1);
 }
 
-
+/*
+return true if Load img success
+return false if could not open image
+*/
 bool Enemy::Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count) { /* 1 */
     bool ret = BaseObject::LoadImg(path, screen); //ret == return
     if (ret) {
@@ -211,7 +214,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     if (is_atk_left == true) is_atk_left = false;
     
     HP.set_HP_Rect(x_pos, y_pos - (TILE_SIZE / 2), width_frame, TILE_SIZE / 4);
-    HP.showHP.SetText("HP: " + std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
+    HP.showHP.SetText(std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
     HP.showHP.SetPosition(HP.get_rect_().x, HP.get_rect_().y);
     HP.Show(des);
     HP.showHP.LoadFromRenderText(HP.HP_font, des);
@@ -418,5 +421,29 @@ int Enemy::get_dmg(int status) {
         return int(base_dmg*val);
     }
     return base_dmg;
+}
+
+int wdfr = 0;
+//return true if wframe = max (5)
+bool Enemy::Dead(SDL_Renderer* des) {
+    Load_Enemy_Img("threats_src/hell_dog/hd_dead.png", des, 6);
+    set_clips(6);
+    delay_frame++;
+    if (delay_frame % 10 == 0) wdfr++;
+    if (wdfr >= 6) {
+        wdfr = 0;
+        return true;
+    }
+
+    rect_.x = x_pos;
+    rect_.y = y_pos;
+
+    SDL_Rect* current_clip = &frame_clip[wdfr];
+
+    SDL_Rect* renderquad = new SDL_Rect;
+    *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
+
+    SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+    return false;
 }
 

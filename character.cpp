@@ -476,3 +476,24 @@ int Character::get_dmg(int status, bool is_ultimate) {
     }
     return base_dmg;
 }
+
+void Character::dead(SDL_Renderer* des) {
+    Load_Character_Img("character_src/die_right.png", des, 6);
+    set_clips(6);
+    delay_frame++;
+    if (delay_frame % 10 == 0) wframe++;
+    if (wframe >= 6) {
+        wframe = 5;
+    }
+    rect_.x = x_pos;
+    rect_.y = y_pos;
+
+    SDL_Rect* current_clip = &frame_clip[wframe];
+
+    SDL_Rect* renderquad = new SDL_Rect;
+    *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
+
+    SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+}
+
+

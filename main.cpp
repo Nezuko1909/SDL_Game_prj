@@ -148,13 +148,17 @@ int main(int argc, char* argv[]) {
     while (!is_quit) {
         fps_timer.start();
 
-        Object_Collide(player_main_character, hell_dog);
+        if (!hell_dog.HP.is_negative) Object_Collide(player_main_character, hell_dog);
         
         while(SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;
             }
-            if (!player_main_character.is_hurt) player_main_character.HandelInputAction(g_event, g_renderer);
+            if (!player_main_character.Heal.is_negative) {
+                if (!player_main_character.is_hurt) {
+                    player_main_character.HandelInputAction(g_event, g_renderer);
+                }
+            }
         }
 
         SDL_SetRenderDrawColor(g_renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR); //255 255 255 255 - R G B A
@@ -165,11 +169,23 @@ int main(int argc, char* argv[]) {
         // > HandleInput > DoPlayer > Show
         Map Get_play_map_data = Map1.GetmapData();
 
-        player_main_character.DoPlayer(Get_play_map_data);
-        hell_dog.Do_Play(Get_play_map_data);
+        if (player_main_character.Heal.is_negative) {
+            player_main_character.dead(g_renderer);
+        }
+        if (hell_dog.HP.is_negative) {
+            if (hell_dog.Dead(g_renderer)) {
+                hell_dog.SetPos(18*TILE_SIZE, 6*TILE_SIZE);
+                hell_dog.HP.Set_Heal_Point(hell_dog.HP.max_HP + 10000);
+                player_main_character.Heal.Set_Heal_Point(5501);
+                hell_dog.HP.is_negative = false;
+            }
+        }
+        
+        if (!player_main_character.Heal.is_negative) player_main_character.DoPlayer(Get_play_map_data);
+        if (!hell_dog.HP.is_negative) hell_dog.Do_Play(Get_play_map_data);
 
-        player_main_character.Show_character(g_renderer, g_font);  
-        hell_dog.Show_Enemy(g_renderer, g_font);
+        if (!player_main_character.Heal.is_negative) player_main_character.Show_character(g_renderer, g_font);  
+        if (!hell_dog.HP.is_negative) hell_dog.Show_Enemy(g_renderer, g_font);
 
         SDL_RenderPresent(g_renderer);
 
@@ -179,13 +195,6 @@ int main(int argc, char* argv[]) {
             int delay_time = time_one_frame - real_imp_time;
             if (delay_time < 0) delay_time = 0;
             SDL_Delay(delay_time); //milisecond
-        }
-
-        if (hell_dog.HP.is_negative) {
-            hell_dog.SetPos(18*TILE_SIZE, 6*TILE_SIZE);
-            hell_dog.HP.Set_Heal_Point(hell_dog.HP.max_HP + 10000);
-            player_main_character.Heal.Set_Heal_Point(5501);
-            hell_dog.HP.is_negative = false;
         }
     }
     close();

@@ -52,6 +52,8 @@ public:
     int get_dmg(int status, bool is_ultimate);
     TextObject show_dmg;
 
+    void dead(SDL_Renderer* des);
+
 private:
     float x_val;
     float y_val;
