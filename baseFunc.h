@@ -39,7 +39,7 @@ const int RENDER_DRAW_COLOR = 255;
 //map
 
 #define TILE_SIZE 64
-#define MAX_MAP_X 20
+#define MAX_MAP_X 400
 #define MAX_MAP_Y 10
 #define MAX_TILES 7
 #define BLANK_TILE 2 //BLANK_TILE define to grass_block "2.png"

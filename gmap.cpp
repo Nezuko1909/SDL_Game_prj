@@ -12,23 +12,23 @@ void Game_map::LoadMap(const char name[]) {
     if (!fp.is_open()) {
         std::cout<<name<<" not found\n";
     }
-    for (int i=0;i<MAX_MAP_Y;i++) {
-        for (int j=0; j<MAX_MAP_X; j++) {
+    for (int i=0; i < MAX_MAP_Y; i++) {
+        for (int j=0; j < MAX_MAP_X; j++) {
             fp>>game_map_.tile[i][j];
             int val = game_map_.tile[i][j]; // i -> height; j -> width
             if (val > 0) {
                 if (j > game_map_.max_x_) {
                     game_map_.max_x_ = j; // x -> j -> width
                 }
-                if (i>game_map_.max_y_) {
+                if (i > game_map_.max_y_) {
                     game_map_.max_y_ = i; // y -> i -> height
                 }
             }
         }
     }
     //std::cout<<d<<"\n"<<game_map_.max_x_<<"\n"<<game_map_.max_y_<<"\n";
-    game_map_.max_x_ = (game_map_.max_x_+1)*TILE_SIZE;
-    game_map_.max_y_ = (game_map_.max_y_+1)*TILE_SIZE;
+    game_map_.max_x_ = (game_map_.max_x_ + 1) * TILE_SIZE;
+    game_map_.max_y_ = (game_map_.max_y_ + 1) * TILE_SIZE;
     game_map_.start_X_ = 0;
     game_map_.start_y_ = 0;
     game_map_.file_name = name;

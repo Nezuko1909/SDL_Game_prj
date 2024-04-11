@@ -39,7 +39,10 @@ public:
     void CheckMapData(Map& map_data);
     void SetMapXY(const int map_x, const int map_y) { map_x_ = map_x; map_y_ = map_y; };
     void get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2);
+
     void SetPos(int x, int y) { x_pos = x; y_pos = y; };
+    void SetVal(int x, int y) { x_val = x; y_val = y; };
+    
     int get_status_() const { return status_; };
 
     //use in Enemy::Show_Enemy()

@@ -186,8 +186,8 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     }
     //std::cout<<" Character: delay frame: "<<delay_frame<<" is hurt: "<<is_hurt<<" get_stt: "<<get_stt<<"";
 
-    rect_.x = x_pos;
-    rect_.y = y_pos;
+    rect_.x = x_pos - map_x_;
+    rect_.y = y_pos - map_y_;
 
     SDL_Rect* current_clip = &frame_clip[wframe];
 
@@ -389,6 +389,24 @@ void Character::CheckMapData(Map& map_data) {
     }
 }
 
+void Character::CenterOnMap(Map &map_data) { 
+    map_data.start_X_ = x_pos - (SCREEN_WIDTH / 2);
+    if (map_data.start_X_ < 0) {
+        map_data.start_X_ = 0;
+    }
+    else if (map_data.start_X_ + SCREEN_WIDTH >= map_data.max_x_) {
+        map_data.start_X_ = map_data.max_x_ - SCREEN_WIDTH;
+    }
+
+    map_data.start_y_ = y_pos - (SCREEN_HEIGHT / 2);
+    if (map_data.start_y_ < 0) {
+        map_data.start_y_ = 0;
+    }
+    else if (map_data.start_y_ + (SCREEN_HEIGHT) > map_data.max_y_) {
+        map_data.start_y_ = map_data.start_y_ - SCREEN_HEIGHT;
+    }
+}
+
 void Character::DoPlayer(Map& map_data) {
     x_val = 0;
     y_val += GRAVITY_SPEED;
@@ -409,6 +427,7 @@ void Character::DoPlayer(Map& map_data) {
         on_ground = false;
     }
     CheckMapData(map_data);
+    CenterOnMap(map_data);
     show_dmg.SetPosition(show_dmg.x_pos, show_dmg.y_pos - (TILE_SIZE / 4));
 }
 

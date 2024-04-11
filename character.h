@@ -34,6 +34,7 @@ public:
     void CheckMapData(Map& map_data);
     void SetMapXY(const int map_x, const int map_y) {map_x_ = map_x; map_y_ = map_y; }
     void atk_action(int get_inf, Hit_Box source_hitbox, int dmg);
+    void CenterOnMap(Map &map_data);
 
     bool is_atk_left;
     bool is_atk_right;
