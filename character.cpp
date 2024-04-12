@@ -30,6 +30,7 @@ Character::Character() { //character == mainObject
     Heal.showHP.SetPosition(Heal.get_rect_().x + TILE_SIZE / 4 , Heal.get_rect_().y + 2);
     Heal.showHP.SetText("HP: " + std::to_string(Heal.current_HP) + "/" + std::to_string(Heal.max_HP));
     show_dmg.SetColor_(show_dmg.RED_COLOR);
+    Heal_bottle = 10;
 }
 
 Character::~Character() {
@@ -290,10 +291,14 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
             }
             break;
             case SDLK_h: {
-                Heal.increase_HP(500);
-                show_dmg.SetColor(0, 222, 0, 0);
-                show_dmg.SetText(std::to_string(500));
-                show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+                if (Heal_bottle > 0 && Heal.current_HP < Heal.max_HP) {
+                    Heal.increase_HP(500);
+                    show_dmg.SetColor(0, 222, 0, 0);
+                    show_dmg.SetText(std::to_string(500));
+                    show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
+                    Heal_bottle --;
+                    printf("Current Heal bottle: %d \n",Heal_bottle);
+                }
             }
         }
     }
@@ -428,7 +433,7 @@ void Character::DoPlayer(Map& map_data) {
     }
     CheckMapData(map_data);
     CenterOnMap(map_data);
-    show_dmg.SetPosition(show_dmg.x_pos, show_dmg.y_pos - (TILE_SIZE / 4));
+    show_dmg.SetPosition(show_dmg.x_pos - map_x_, show_dmg.y_pos - (TILE_SIZE / 4));
 }
 
 //get hurt animations and take dmg
@@ -457,7 +462,7 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
             Heal.decrease_HP(dmg);
             is_hurt = true;
             show_dmg.SetText(std::to_string(dmg));
-            show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+            show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
             show_dmg.SetColor_(show_dmg.RED_COLOR);
             //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
@@ -467,7 +472,7 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
             Heal.decrease_HP(dmg);
             is_hurt = true;
             show_dmg.SetText(std::to_string(dmg));
-            show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+            show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
             show_dmg.SetColor_(show_dmg.RED_COLOR);
             //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
         }
@@ -504,8 +509,8 @@ void Character::dead(SDL_Renderer* des) {
     if (wframe >= 6) {
         wframe = 5;
     }
-    rect_.x = x_pos;
-    rect_.y = y_pos;
+    rect_.x = x_pos - map_x_;
+    rect_.y = y_pos - map_y_;
 
     SDL_Rect* current_clip = &frame_clip[wframe];
 

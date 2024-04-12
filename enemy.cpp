@@ -4,7 +4,7 @@
 Enemy::Enemy() {
     wframe = 0; //frame_
     delay_frame = 0;
-    x_pos = 18*TILE_SIZE;
+    x_pos = 0;
     y_pos = 0;
     x_val = 0;
     y_val = 0;
@@ -200,8 +200,8 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     }
 
     //render
-    rect_.x = x_pos;
-    rect_.y = y_pos;
+    rect_.x = x_pos - map_x_;
+    rect_.y = y_pos - map_y_;
 
     SDL_Rect* current_clip = &frame_clip[wframe];
 
@@ -213,7 +213,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     if (is_atk_right == true) is_atk_right = false;
     if (is_atk_left == true) is_atk_left = false;
     
-    HP.set_HP_Rect(x_pos, y_pos - (TILE_SIZE / 2), width_frame, TILE_SIZE / 4);
+    HP.set_HP_Rect(x_pos - map_x_, y_pos - (TILE_SIZE / 2) - map_y_, width_frame, TILE_SIZE / 4);
     HP.showHP.SetText(std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
     HP.showHP.SetPosition(HP.get_rect_().x, HP.get_rect_().y);
     HP.Show(des);
@@ -253,7 +253,7 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
                 delay_frame = 1;
                 HP.decrease_HP(dmg);
                 show_dmg.SetText(std::to_string(dmg));
-                show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+                show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
                 //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
             }
             else if (get_inf == 1) {
@@ -263,7 +263,7 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
                 delay_frame = 1;
                 HP.decrease_HP(dmg);
                 show_dmg.SetText(std::to_string(dmg));
-                show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+                show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
                 //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
             }
         }
@@ -271,30 +271,37 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
 
     bool is_left = false;
     if (!is_hurting) {
-        if (x_pos > target_x_pos + 50) {
+        if (x_pos > target_x_pos + 50 && (target_x_pos >= x_home - (3*TILE_SIZE) && target_x_pos <= x_home + (3*TILE_SIZE))) {
             status_ = WALK_LEFT;
             Enemy_in_type.left1 = 1;
             Enemy_in_type.right1 = 0;
             is_left = true;
             found_player = false;
         }
-        else if (x_pos < target_x_pos - 50) {
+        else if (x_pos < target_x_pos - 50 && (target_x_pos >= x_home - (3*TILE_SIZE) && target_x_pos <= x_home + (3*TILE_SIZE))) {
             status_ = WALK_RIGHT;
             Enemy_in_type.right1 = 1;
             Enemy_in_type.left1 = 0;
             is_left = false;
             found_player = false;
         }
-        else if (y_pos + height_frame > target_y_pos && on_ground) {
+        else if (y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + TILE_SIZE && target_y_pos >= y_pos -TILE_SIZE)) {
             x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
             Enemy_in_type.jump = 1;
             found_player = false;
         }
         else {
             if (found_player == true && !is_atk_left && !is_atk_right) {
-                x_pos <= target_x_pos ? status_ = IDLE_RIGHT : status_ = IDLE_LEFT;
-                Enemy_in_type.right1 = 0;
-                Enemy_in_type.left1 = 0;
+                if (x_pos <= x_home) { 
+                    status_ = IDLE_RIGHT;
+                    Enemy_in_type.right1 = 0;
+                    Enemy_in_type.left1 = 0;
+                }
+                else {
+                    status_ = IDLE_LEFT;
+                    Enemy_in_type.right1 = 0;
+                    Enemy_in_type.left1 = 0;
+                }
             }
             found_player = true;
         }
@@ -435,8 +442,8 @@ bool Enemy::Dead(SDL_Renderer* des) {
         return true;
     }
 
-    rect_.x = x_pos;
-    rect_.y = y_pos;
+    rect_.x = x_pos - map_x_;
+    rect_.y = y_pos - map_y_;
 
     SDL_Rect* current_clip = &frame_clip[wdfr];
 

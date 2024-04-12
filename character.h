@@ -52,6 +52,7 @@ public:
     Heal_Point Heal;
     int get_dmg(int status, bool is_ultimate);
     TextObject show_dmg;
+    int Heal_bottle;
 
     void dead(SDL_Renderer* des);
 

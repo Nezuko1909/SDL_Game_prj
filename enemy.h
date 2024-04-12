@@ -42,6 +42,9 @@ public:
 
     void SetPos(int x, int y) { x_pos = x; y_pos = y; };
     void SetVal(int x, int y) { x_val = x; y_val = y; };
+    void SetHome(int x, int y) { x_home = x; y_home = y; };
+    float get_x_pos() const { return x_pos; };
+    float get_y_pos() const { return y_pos; };
     
     int get_status_() const { return status_; };
 
@@ -64,6 +67,8 @@ private:
     float y_val;
     float x_pos;
     float y_pos;
+    float x_home;
+    float y_home;
     int width_frame;
     int height_frame;
     SDL_Rect frame_clip[20];

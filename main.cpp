@@ -136,20 +136,34 @@ int main(int argc, char* argv[]) {
     player_main_character.set_clips(FRAME_MOVE);
 
     // Enemy hell_dog;  // enemy threats test
-    // hell_dog.SetRect(rand()%1200, 0);
     // hell_dog.Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", g_renderer, ENEMY_IDLE_FRAME);
     // hell_dog.set_clips(ENEMY_IDLE_FRAME);
     
     //hell_dog.SetRect(18*TILE_SIZE, 6*TILE_SIZE);
 
-    TextObject show_dmg;
-    show_dmg.SetColor_(show_dmg.WHITE_COLOR);
+    std::vector<Enemy> hed;
+    const int num_of_enemy = 36;
+    for (int i = 0; i < num_of_enemy; i++) {
+        Enemy hell_dog;  // enemy threats test
+        hell_dog.Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", g_renderer, ENEMY_IDLE_FRAME);
+        hell_dog.set_clips(ENEMY_IDLE_FRAME);
+        hell_dog.SetPos(TILE_SIZE*10 + i*10*TILE_SIZE, 0);
+        hell_dog.SetHome(TILE_SIZE*10 + i*10*TILE_SIZE, 0);
+        hed.push_back(hell_dog);
+    }
+    std::vector<bool> Check_enemy_is_dead(num_of_enemy, false);
 
     bool is_quit = false;
     while (!is_quit) {
         fps_timer.start();
 
-        //if (!hell_dog.HP.is_negative) Object_Collide(player_main_character, hell_dog);
+        int px = player_main_character.get_pos_x() / (10*TILE_SIZE);
+        if (px >= 35) px = 34;
+        if (px <= 0) px = 1;
+
+        for (size_t i = px - 1; i <= px + 1; i++) {
+            if (!hed[i].HP.is_negative) Object_Collide(player_main_character, hed[i]);
+        }
         
         while(SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
@@ -173,20 +187,34 @@ int main(int argc, char* argv[]) {
         if (player_main_character.Heal.is_negative) {
             player_main_character.dead(g_renderer);
         }
-        // if (hell_dog.HP.is_negative) {
-        //     if (hell_dog.Dead(g_renderer)) {
-        //         hell_dog.SetPos(18*TILE_SIZE, 6*TILE_SIZE);
-        //         hell_dog.HP.Set_Heal_Point(hell_dog.HP.max_HP + 10000);
-        //         hell_dog.HP.is_negative = false;
-        //     }
-        // }
+
+        for (size_t i = px - 1; i <= px + 1; i++) {
+            if (hed[i].HP.is_negative && !Check_enemy_is_dead[i]) {
+                hed[i].SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
+                if (hed[i].Dead(g_renderer)) {
+                    hed[i].Free();
+                    Check_enemy_is_dead[i] = true;
+                    player_main_character.Heal_bottle++;
+                }
+            }
+        }
 
         if (!player_main_character.Heal.is_negative) player_main_character.SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
         if (!player_main_character.Heal.is_negative) player_main_character.DoPlayer(Get_play_map_data);
-        //if (!hell_dog.HP.is_negative) hell_dog.Do_Play(Get_play_map_data);
+        for (int i = px - 1; i <= px + 1; i++) {
+            if (!hed[i].HP.is_negative) { 
+                hed[i].SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
+                hed[i].Do_Play(Get_play_map_data);
+            }
+        }
 
         Map1.DrawMap(g_renderer);
         if (!player_main_character.Heal.is_negative) player_main_character.Show_character(g_renderer, g_font);  
+        for (int i = px - 1; i <= px + 1; i++) {
+            if (!hed[i].HP.is_negative) {
+                hed[i].Show_Enemy(g_renderer, g_font);
+            }
+        }
         //if (!hell_dog.HP.is_negative) hell_dog.Show_Enemy(g_renderer, g_font);
 
         Map1.SetMap(Get_play_map_data);
