@@ -5,7 +5,7 @@
 #include "character.h"
 #include "imp_timer.h"
 #include "enemy.h"
-
+#include "gui.h"
 
 class BaseObject Background;
 
@@ -56,12 +56,6 @@ bool init_Data() { //create window
     return success;
 }
 
-bool loadBackGround() {
-    bool ret = Background.LoadImg("img_source/BGR.png",g_renderer);
-    if (ret == false) return false;
-    return true;
-}
-
 void close() {
     Background.Free();
     SDL_DestroyRenderer(g_renderer);
@@ -110,16 +104,12 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     // //std::cout<<"Object_collide: success";
 }
 
-int main(int argc, char* argv[]) {
+int MainGamePlay() {
+    if (!Background.LoadImg("img_source/BGR.png",g_renderer)) {
+        return -1;
+    }
+
     ImpTimer fps_timer;
-
-    if (!init_Data()) {
-        return -1; //error
-    }
-
-    if (!loadBackGround()) {
-        return -1; //error
-    }
 
     g_font = TTF_OpenFont("text/LSB.ttf", 30);
     if (g_font == NULL) {
@@ -134,12 +124,6 @@ int main(int argc, char* argv[]) {
     Character player_main_character; // Samurai
     player_main_character.Load_Character_Img("character_src/idle_right.png", g_renderer, FRAME_MOVE);
     player_main_character.set_clips(FRAME_MOVE);
-
-    // Enemy hell_dog;  // enemy threats test
-    // hell_dog.Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", g_renderer, ENEMY_IDLE_FRAME);
-    // hell_dog.set_clips(ENEMY_IDLE_FRAME);
-    
-    //hell_dog.SetRect(18*TILE_SIZE, 6*TILE_SIZE);
 
     std::vector<Enemy> hed;
     const int num_of_enemy = 36;
@@ -230,6 +214,78 @@ int main(int argc, char* argv[]) {
         }
     }
     close();
+    return 0;
+}
+
+int UserInterface() {
+    Background.LoadImg("img_source/BGR.png", g_renderer);
+    Background.Render(g_renderer, NULL);
+    const int text_size = 50;
+    g_font = TTF_OpenFont("text/calibri.ttf", text_size);
+    if (g_font == NULL) {
+         std::cout<<" could not open: text/calibri.ttf with size 25 \n";
+        return -1;
+    }
+
+    Button Start;
+    Start.SetRectAll(8*TILE_SIZE + (TILE_SIZE / 2), 3*TILE_SIZE, 3*TILE_SIZE, TILE_SIZE);
+    Start.Fill(g_renderer, 97, 18, 110, 255);
+    Start.tile.SetText("Start");
+    Start.SetForTile(g_font);
+    Start.tile.SetColor(255, 255, 255, 255);
+    Start.RenderTile(g_renderer, g_font);
+
+    Button Quit_bt;
+    Quit_bt.SetRectAll(8*TILE_SIZE + (TILE_SIZE / 2), 5*TILE_SIZE, 3*TILE_SIZE, TILE_SIZE);
+    Quit_bt.Fill(g_renderer, 97, 18, 110, 255);
+    Quit_bt.tile.SetColor(255, 255, 255, 255);
+    Quit_bt.tile.SetText("Quit");
+    Quit_bt.SetForTile(g_font);
+    Quit_bt.RenderTile(g_renderer, g_font);
+
+    SDL_RenderPresent(g_renderer);
+
+    std::vector<Button> level;
+    for (int i = 1; i <= 3; i++) {
+        Button add_level;
+        add_level.SetSize(2*TILE_SIZE, TILE_SIZE);
+        add_level.tile.SetText("Level " + std::to_string(i));
+        level.push_back(add_level);
+    }
+
+    bool is_quit = false;
+    while (!is_quit) {
+        while (SDL_PollEvent(&g_event) != 0) {
+            if (g_event.type == SDL_QUIT) {
+                is_quit = true;
+            }
+            Start.Events(g_renderer, g_event);
+            Quit_bt.Events(g_renderer, g_event);
+            if (Quit_bt.is_click) break;
+        }
+        SDL_RenderClear(g_renderer);
+        Background.Render(g_renderer, NULL);
+
+        Start.is_pointing == true ? Start.Fill(g_renderer, 192, 39, 217, 255) : Start.Fill(g_renderer, 97, 18, 110, 255);
+        Quit_bt.is_pointing == true ? Quit_bt.Fill(g_renderer, 192, 39, 217, 255) : Quit_bt.Fill(g_renderer, 97, 18, 110, 255);
+
+        Start.RenderTile(g_renderer, g_font);
+        Quit_bt.RenderTile(g_renderer, g_font);
+
+        SDL_RenderPresent(g_renderer);
+    }
+    close();
+    return 0;
+}
+
+int main(int argc, char* argv[]) {
+    if (!init_Data()) {
+        return -1; //error
+    }
+    if (UserInterface() == -1) {
+        std::cout<<"User Interface run Error\n";
+    }
+    //MainGamePlay();
     return 0;
 }
 

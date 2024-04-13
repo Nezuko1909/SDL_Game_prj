@@ -12,6 +12,7 @@ BaseObject::~BaseObject() {
     Free();
 }
 
+/*return true if p_Object != NULL*/
 bool BaseObject::LoadImg(std::string path, SDL_Renderer* screen) {
     Free();
     SDL_Texture* new_texture = NULL;
@@ -34,6 +35,12 @@ void BaseObject::Render(SDL_Renderer* des, const SDL_Rect* clip) { //true. retur
     if (SDL_RenderCopy(des, p_Object, clip, &renderquad) != 0) {
         std::cerr<<"Render Error: "<<SDL_GetError()<<"\n";
     };
+}
+
+void BaseObject::Fill(SDL_Renderer* des, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+    SDL_SetRenderDrawColor(des, r, g, b, a);
+    const SDL_Rect fill_rect = rect_;
+    SDL_RenderFillRect(des, &fill_rect);
 }
 
 void BaseObject::Free() {

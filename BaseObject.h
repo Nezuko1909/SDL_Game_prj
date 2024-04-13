@@ -9,12 +9,19 @@ class BaseObject {
 public: 
     BaseObject();
     ~BaseObject();
+
     void SetRect(const int &x, const int &y) {rect_.x=x; rect_.y=y; }
-    SDL_Rect GetRect() const {return rect_; }
-    SDL_Texture* GetTexture() {return p_Object; }
+    void SetSize(const int w, const int h) { rect_.w = w; rect_.h = h; }
+
+    SDL_Rect GetRect() const { return rect_; }
+    SDL_Texture* GetTexture() { return p_Object; }
 
     bool LoadImg(std::string path, SDL_Renderer* screen);
     void Render(SDL_Renderer* des, const SDL_Rect* clip = NULL);
+    /* Render Fill Rect
+    get SDL_Renderer and RGBA Color to fill
+    */
+    void Fill(SDL_Renderer* des, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void Free();
 
 protected:
