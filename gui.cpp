@@ -68,7 +68,7 @@ void Button::SetForTile(TTF_Font* font) {
 
     int xp = ((2*rect_.x + rect_.w - w) / 2);
     int yp = ((2*rect_.y + rect_.h - h) / 2);
-    printf("SetPosition: x = %d y = %d\n",xp, yp);
+    //printf("SetPosition: x = %d y = %d\n",xp, yp);
     tile.SetPosition(xp, yp);
 }
 

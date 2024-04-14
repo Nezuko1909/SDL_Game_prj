@@ -103,7 +103,76 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     return false;
     // //std::cout<<"Object_collide: success";
 }
+/*
+return 0 : Resume
+return 1: Restart
+return 2: Main Menu
+return -1: Error
+*/
+int PauseMenu() {
+    TTF_CloseFont(g_font);
+    g_font= TTF_OpenFont("text/calibri.ttf", 64);
+    int ret = -1;
+    Button Resume;
+    Resume.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 3*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
+    Resume.tile.SetText("Resume");
+    Resume.SetForTile(g_font);
+    Resume.tile.SetColor(255, 255, 255, 255);
 
+    Button Restart;
+    Restart.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 5*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
+    Restart.tile.SetText("Restart");
+    Restart.SetForTile(g_font);
+    Resume.tile.SetColor(255, 255, 255, 255);
+
+    Button MainMenu;
+    MainMenu.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 7*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
+    MainMenu.tile.SetText("Main Menu");
+    MainMenu.SetForTile(g_font);
+    MainMenu.tile.SetColor(255, 255, 255, 255);
+
+    bool is_quit = false;
+    while(!is_quit) {
+        while(SDL_PollEvent(&g_event) != 0) {
+            if (g_event.type == SDL_QUIT) {
+                is_quit = true;
+            }
+            Resume.Events(g_renderer, g_event);
+            Restart.Events(g_renderer, g_event);
+            MainMenu.Events(g_renderer, g_event);
+        }
+
+        Resume.Fill(g_renderer);
+        Restart.Fill(g_renderer);
+        MainMenu.Fill(g_renderer);
+
+        Resume.RenderTile(g_renderer, g_font);
+        Restart.RenderTile(g_renderer, g_font);
+        MainMenu.RenderTile(g_renderer, g_font);
+
+        SDL_RenderPresent(g_renderer);
+
+        if (Resume.is_click) {
+            ret = 0;
+            break;
+        }
+        if (Restart.is_click) {
+            ret = 1;
+            break;
+        }
+        if (MainMenu.is_click) {
+            ret = 2;
+            break;
+        }
+    }
+    return ret;
+}
+
+/*
+Return 0: Win
+Return 1: Restart
+Return 2: Defeat
+*/
 int MainGamePlay(int level) {
     SDL_RenderClear(g_renderer);
 
@@ -112,7 +181,7 @@ int MainGamePlay(int level) {
     }
 
     ImpTimer fps_timer;
-
+    TTF_CloseFont(g_font);
     g_font = TTF_OpenFont("text/LSB.ttf", 30);
     if (g_font == NULL) {
         std::cout<<" could not open: text/LSB.ttf with size 25 \n";
@@ -120,7 +189,8 @@ int MainGamePlay(int level) {
     }
 
     Game_map Map1;
-    Map1.LoadMap("texture_src/map1.txt");
+    std::string map_path = "texture_src/map" + std::to_string(level) + ".txt";
+    Map1.LoadMap(map_path.c_str());
     Map1.LoadTile(g_renderer);
 
     Character player_main_character; // Samurai
@@ -143,6 +213,9 @@ int MainGamePlay(int level) {
     while (!is_quit) {
         fps_timer.start();
 
+        TTF_CloseFont(g_font);
+        g_font = TTF_OpenFont("text/LSB.ttf", 30);
+
         int px = player_main_character.get_pos_x() / (10*TILE_SIZE);
         if (px >= 35) px = 34;
         if (px <= 0) px = 1;
@@ -154,6 +227,15 @@ int MainGamePlay(int level) {
         while(SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;
+            }
+            if (g_event.key.keysym.sym == SDLK_ESCAPE) {
+                int pmr = PauseMenu();
+                if (pmr == 1) {
+                    return 1;
+                }
+                else if (pmr == 2) {
+                    return 0;
+                }
             }
             if (!player_main_character.Heal.is_negative) {
                 if (!player_main_character.is_hurt) {
@@ -171,7 +253,9 @@ int MainGamePlay(int level) {
         Map Get_play_map_data = Map1.GetmapData();
 
         if (player_main_character.Heal.is_negative) {
-            player_main_character.dead(g_renderer);
+            if (player_main_character.dead(g_renderer)) {
+                return 2;
+            }
         }
 
         for (size_t i = px - 1; i <= px + 1; i++) {
@@ -245,6 +329,8 @@ int Level_List() {
 
     bool is_quit = false;
     while (!is_quit) {
+        TTF_CloseFont(g_font);
+        g_font = TTF_OpenFont("text/calibri.ttf", 50);
         while (SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;
@@ -273,8 +359,12 @@ int Level_List() {
         }
         for (size_t i = 0; i < level.size(); i++) {
             if (level[i].is_click) {
-
+                int mgr = MainGamePlay(i + 1);
+                while (mgr == 1) {
+                    mgr = MainGamePlay(i + 1);
+                }
             }
+            level[i].is_click = false;
         }
 
         SDL_RenderPresent(g_renderer);

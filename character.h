@@ -54,7 +54,7 @@ public:
     TextObject show_dmg;
     int Heal_bottle;
 
-    void dead(SDL_Renderer* des);
+    bool dead(SDL_Renderer* des);
 
 private:
     float x_val;
