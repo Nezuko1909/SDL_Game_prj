@@ -37,12 +37,6 @@ void BaseObject::Render(SDL_Renderer* des, const SDL_Rect* clip) { //true. retur
     };
 }
 
-void BaseObject::Fill(SDL_Renderer* des, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
-    SDL_SetRenderDrawColor(des, r, g, b, a);
-    const SDL_Rect fill_rect = rect_;
-    SDL_RenderFillRect(des, &fill_rect);
-}
-
 void BaseObject::Free() {
     if (p_Object != NULL) {
         SDL_DestroyTexture(p_Object);

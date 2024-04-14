@@ -104,7 +104,9 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
     // //std::cout<<"Object_collide: success";
 }
 
-int MainGamePlay() {
+int MainGamePlay(int level) {
+    SDL_RenderClear(g_renderer);
+
     if (!Background.LoadImg("img_source/BGR.png",g_renderer)) {
         return -1;
     }
@@ -213,45 +215,33 @@ int MainGamePlay() {
             SDL_Delay(delay_time); //milisecond
         }
     }
-    close();
     return 0;
 }
 
-int UserInterface() {
-    Background.LoadImg("img_source/BGR.png", g_renderer);
-    Background.Render(g_renderer, NULL);
-    const int text_size = 50;
-    g_font = TTF_OpenFont("text/calibri.ttf", text_size);
-    if (g_font == NULL) {
-         std::cout<<" could not open: text/calibri.ttf with size 25 \n";
-        return -1;
-    }
+int Level_List() {
+    SDL_RenderClear(g_renderer);
+    Background.Render(g_renderer);
 
-    Button Start;
-    Start.SetRectAll(8*TILE_SIZE + (TILE_SIZE / 2), 3*TILE_SIZE, 3*TILE_SIZE, TILE_SIZE);
-    Start.Fill(g_renderer, 97, 18, 110, 255);
-    Start.tile.SetText("Start");
-    Start.SetForTile(g_font);
-    Start.tile.SetColor(255, 255, 255, 255);
-    Start.RenderTile(g_renderer, g_font);
-
-    Button Quit_bt;
-    Quit_bt.SetRectAll(8*TILE_SIZE + (TILE_SIZE / 2), 5*TILE_SIZE, 3*TILE_SIZE, TILE_SIZE);
-    Quit_bt.Fill(g_renderer, 97, 18, 110, 255);
-    Quit_bt.tile.SetColor(255, 255, 255, 255);
-    Quit_bt.tile.SetText("Quit");
-    Quit_bt.SetForTile(g_font);
-    Quit_bt.RenderTile(g_renderer, g_font);
-
-    SDL_RenderPresent(g_renderer);
+    TTF_CloseFont(g_font);
+    g_font = TTF_OpenFont("text/calibri.ttf", 50);
 
     std::vector<Button> level;
     for (int i = 1; i <= 3; i++) {
         Button add_level;
-        add_level.SetSize(2*TILE_SIZE, TILE_SIZE);
+        add_level.SetRectAll(TILE_SIZE + (i > 1 ? TILE_SIZE*4*(i-1) : 0), i < 3 ? TILE_SIZE : (i/3) * TILE_SIZE, 3*TILE_SIZE, TILE_SIZE);
         add_level.tile.SetText("Level " + std::to_string(i));
+        add_level.SetForTile(g_font);
+        add_level.tile.SetColor(255, 255, 255, 255);
         level.push_back(add_level);
     }
+
+    Button Back;
+    Back.SetRectAll(SCREEN_WIDTH - 3*TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE, 3*TILE_SIZE, TILE_SIZE);
+    Back.Fill(g_renderer);
+    Back.tile.SetText("Back");
+    Back.SetForTile(g_font);
+    Back.tile.SetColor_(Back.tile.WHITE_COLOR);
+    Back.RenderTile(g_renderer, g_font);
 
     bool is_quit = false;
     while (!is_quit) {
@@ -259,22 +249,100 @@ int UserInterface() {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;
             }
+            for (size_t i = 0; i < level.size(); i++) {
+                level[i].Events(g_renderer, g_event);
+            }
+            Back.Events(g_renderer, g_event);
+        }
+        SDL_RenderClear(g_renderer);
+        Background.Render(g_renderer);
+
+        Back.Fill(g_renderer);
+        Back.RenderTile(g_renderer, g_font);
+        for (size_t i = 0; i < level.size(); i++) {
+            level[i].Fill(g_renderer);
+            level[i].RenderTile(g_renderer, g_font);
+        }
+
+        if (Back.is_click) {
+            for (size_t i = 0; i < level.size(); i++) {
+                level[i].Clear();
+            }
+            Back.Clear();
+            break;
+        }
+        for (size_t i = 0; i < level.size(); i++) {
+            if (level[i].is_click) {
+
+            }
+        }
+
+        SDL_RenderPresent(g_renderer);
+    }
+    return 0;
+}
+
+int UserInterface() {
+    SDL_RenderClear(g_renderer);
+    Background.LoadImg("img_source/BGR.png", g_renderer);
+    Background.Render(g_renderer, NULL);
+    const int text_size = 64;
+    TTF_CloseFont(g_font);
+    g_font = TTF_OpenFont("text/calibri.ttf", text_size);
+    if (g_font == NULL) {
+         std::cout<<" could not open: text/calibri.ttf with size 25 \n";
+        return -1;
+    }
+
+    Button Start;
+    Start.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 5*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
+    Start.Fill(g_renderer);
+    Start.tile.SetText("Start");
+    Start.SetForTile(g_font);
+    Start.tile.SetColor(255, 255, 255, 255);
+    Start.RenderTile(g_renderer, g_font);
+
+    Button Quit_bt;
+    Quit_bt.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 7*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
+    Quit_bt.Fill(g_renderer);
+    Quit_bt.tile.SetColor(255, 255, 255, 255);
+    Quit_bt.tile.SetText("Quit");
+    Quit_bt.SetForTile(g_font);
+    Quit_bt.RenderTile(g_renderer, g_font);
+
+    SDL_RenderPresent(g_renderer);
+
+    bool is_quit = false;
+    while (!is_quit) {
+        TTF_CloseFont(g_font);
+        g_font = TTF_OpenFont("text/calibri.ttf", text_size);
+
+        while (SDL_PollEvent(&g_event) != 0) {
+            if (g_event.type == SDL_QUIT) {
+                is_quit = true;
+            }
             Start.Events(g_renderer, g_event);
             Quit_bt.Events(g_renderer, g_event);
-            if (Quit_bt.is_click) break;
         }
         SDL_RenderClear(g_renderer);
         Background.Render(g_renderer, NULL);
 
-        Start.is_pointing == true ? Start.Fill(g_renderer, 192, 39, 217, 255) : Start.Fill(g_renderer, 97, 18, 110, 255);
-        Quit_bt.is_pointing == true ? Quit_bt.Fill(g_renderer, 192, 39, 217, 255) : Quit_bt.Fill(g_renderer, 97, 18, 110, 255);
+        Start.Fill(g_renderer);
+        Quit_bt.Fill(g_renderer);
 
         Start.RenderTile(g_renderer, g_font);
         Quit_bt.RenderTile(g_renderer, g_font);
 
+        if (Start.is_click) {
+            Level_List();
+            Start.is_click = false;
+        }
+        if (Quit_bt.is_click) {
+            break;
+            Quit_bt.is_click = false;
+        }
         SDL_RenderPresent(g_renderer);
     }
-    close();
     return 0;
 }
 
@@ -282,10 +350,8 @@ int main(int argc, char* argv[]) {
     if (!init_Data()) {
         return -1; //error
     }
-    if (UserInterface() == -1) {
-        std::cout<<"User Interface run Error\n";
-    }
-    //MainGamePlay();
+    UserInterface();
+    close();
     return 0;
 }
 

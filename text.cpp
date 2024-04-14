@@ -23,8 +23,8 @@ void TextObject::Free() {
 }
 
 bool TextObject::LoadFromRenderText(TTF_Font* font, SDL_Renderer* screen) {
+    Free();
     SDL_Surface* text_surface = TTF_RenderText_Solid(font, str_val.c_str(), text_color);
-    
     // if (font != NULL) std::cout<<"g_font != NULL; str_val.c_str(): "<<str_val.c_str()<<" ";
     // else std::cout<<"g_font == NULL; str_val.c_str(): "<<str_val.c_str()<<" ";
     // printf(" r %d g %d b %d a %d \n",text_color.r, text_color.g, text_color.b, text_color.a);

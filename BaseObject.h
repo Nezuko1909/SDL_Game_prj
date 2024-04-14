@@ -21,7 +21,6 @@ public:
     /* Render Fill Rect
     get SDL_Renderer and RGBA Color to fill
     */
-    void Fill(SDL_Renderer* des, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void Free();
 
 protected:
