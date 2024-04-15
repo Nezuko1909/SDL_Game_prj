@@ -31,6 +31,7 @@ Character::Character() { //character == mainObject
     Heal.showHP.SetText("HP: " + std::to_string(Heal.current_HP) + "/" + std::to_string(Heal.max_HP));
     show_dmg.SetColor_(show_dmg.RED_COLOR);
     Heal_bottle = 10;
+    heal_font = TTF_OpenFont("text/calibri.ttf", 64);
 }
 
 Character::~Character() {
@@ -140,14 +141,15 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     //atk: 6 7 8 9 10 11
     if (get_stt == 6 || get_stt == 7 || get_stt == 8 || get_stt == 9 || get_stt == 10 || get_stt == 11) {
         wframe++;
+        is_atk_left = false;
+        is_atk_right = false;
         if (wframe >= FRAME_ATK_1) {
             wframe = 0;  
-            is_atk_right == true ? character_status = IDLE_RIGHT : character_status = IDLE_LEFT;
+            if (get_stt == 7 || get_stt == 9 || get_stt == 11) character_status = IDLE_RIGHT; 
+            else character_status = IDLE_LEFT;
             Char_input_type.atk1 = 0;
             Char_input_type.atk2 = 0;
             Char_input_type.atk3 = 0;
-            is_atk_left = false;
-            is_atk_right = false;
         }
     }
     //jump
@@ -205,6 +207,14 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     show_dmg.LoadFromRenderText(fonts, des);
     if (show_dmg.y_pos < y_pos - 2*TILE_SIZE) show_dmg.Free();
     show_dmg.RenderText(des, show_dmg.x_pos, show_dmg.y_pos);
+
+    Show_Heal_bottle.LoadImg("character_src/heal_bottle.png", des);
+    Show_Heal_bottle.SetRect(0, SCREEN_HEIGHT - Show_Heal_bottle.GetRect().h);\
+    Show_Heal_bottle.Render(des);
+    show_heal_bottle_text.SetText(std::to_string(Heal_bottle));
+    show_heal_bottle_text.LoadFromRenderText(heal_font, des);
+    show_heal_bottle_text.SetPosition(Show_Heal_bottle.GetRect().x + Show_Heal_bottle.GetRect().w, Show_Heal_bottle.GetRect().y);
+    show_heal_bottle_text.RenderText(des, show_heal_bottle_text.x_pos, show_heal_bottle_text.y_pos);
 }
 
 void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) {  
@@ -458,6 +468,8 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
     if (check) {
         if (get_inf == 2) {
             character_status = HURT_RIGHT_ATK;
+            Char_input_type.left = 0;
+            Char_input_type.right = 0;
             //Char_input_type.hurt_r = 1;
             Heal.decrease_HP(dmg);
             is_hurt = true;
@@ -468,6 +480,8 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
         }
         else if (get_inf == 1) {
             character_status = HURT_LEFT_ATK;
+            Char_input_type.left = 0;
+            Char_input_type.right = 0;
             //Char_input_type.hurt_l = 1;
             Heal.decrease_HP(dmg);
             is_hurt = true;
@@ -521,5 +535,3 @@ bool Character::dead(SDL_Renderer* des) {
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
     return false;
 }
-
-

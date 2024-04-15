@@ -30,7 +30,7 @@ public:
 
     virtual bool Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count);
     void Show_Enemy(SDL_Renderer* des, TTF_Font* font);
-    void Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg);
+    int Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg);
 
     //void Spawn();
     void set_clips(int frame);
@@ -42,7 +42,7 @@ public:
 
     void SetPos(int x, int y) { x_pos = x; y_pos = y; };
     void SetVal(int x, int y) { x_val = x; y_val = y; };
-    void SetHome(int x, int y) { x_home = x; y_home = y; };
+    void SetHome(int x, int y) { x_home = x; y_home = y; }; 
     float get_x_pos() const { return x_pos; };
     float get_y_pos() const { return y_pos; };
     

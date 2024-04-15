@@ -66,26 +66,32 @@ void close() {
     SDL_Quit();
 }
 
-bool Object_Collide(Character&  player, Enemy& enemy) {
+/*
+return 1: Player atk_left
+return 2: player atk_right
+return 0: player not atk
+*/
+int Object_Collide(Character&  player, Enemy& enemy) {
     Hit_Box player_hitbox;
     Hit_Box enemy_hitbox;
+    int ret = 0;
     player.get_hitbox_for_other_object(player_hitbox.x1, player_hitbox.x2, player_hitbox.y1, player_hitbox.y2);
     enemy.get_hitbox_for_other_object(enemy_hitbox.x1, enemy_hitbox.x2, enemy_hitbox.y1, enemy_hitbox.y2);
     if (player.is_atk_left) {
         int damage = player.get_dmg(player.get_status(), 0); // hien tai chua co ultimate nen mac dinh = 0
         damage >= 1000 ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, damage);
-        //std::cout<<" Object_Collide: p left true\n";
-        player.is_atk_left = false;
-        return true;
+        //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
+        //player.is_atk_left = false;
+        ret = 1;
     }
     else if (player.is_atk_right) {
         int damage = player.get_dmg(player.get_status(), 0);
         damage >= 1000 ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, damage);
-        //std::cout<<" Object_Collide: p right true\n";
-        player.is_atk_right = false;
-        return true;
+        //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
+        //player.is_atk_right = false;
+        ret = 2;
     }
     else {
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 0, player_hitbox, 0);
@@ -100,14 +106,16 @@ bool Object_Collide(Character&  player, Enemy& enemy) {
         //std::cout<<" Object_Collide: enemy right true\n";
     }
     // //std::cout<<"Object_Collide: false\n";
-    return false;
+    return ret;
     // //std::cout<<"Object_collide: success";
 }
+
 /*
 return 0 : Resume
 return 1: Restart
 return 2: Main Menu
 return -1: Error
+return 3: Quit Window
 */
 int PauseMenu() {
     TTF_CloseFont(g_font);
@@ -127,7 +135,7 @@ int PauseMenu() {
 
     Button MainMenu;
     MainMenu.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 7*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
-    MainMenu.tile.SetText("Main Menu");
+    MainMenu.tile.SetText("Leave");
     MainMenu.SetForTile(g_font);
     MainMenu.tile.SetColor(255, 255, 255, 255);
 
@@ -135,7 +143,7 @@ int PauseMenu() {
     while(!is_quit) {
         while(SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
-                is_quit = true;
+                return 3;
             }
             Resume.Events(g_renderer, g_event);
             Restart.Events(g_renderer, g_event);
@@ -172,6 +180,7 @@ int PauseMenu() {
 Return 0: Win
 Return 1: Restart
 Return 2: Defeat
+Return 3: Quit Window
 */
 int MainGamePlay(int level) {
     SDL_RenderClear(g_renderer);
@@ -215,18 +224,10 @@ int MainGamePlay(int level) {
 
         TTF_CloseFont(g_font);
         g_font = TTF_OpenFont("text/LSB.ttf", 30);
-
-        int px = player_main_character.get_pos_x() / (10*TILE_SIZE);
-        if (px >= 35) px = 34;
-        if (px <= 0) px = 1;
-
-        for (size_t i = px - 1; i <= px + 1; i++) {
-            if (!hed[i].HP.is_negative) Object_Collide(player_main_character, hed[i]);
-        }
         
         while(SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
-                is_quit = true;
+                return 3;
             }
             if (g_event.key.keysym.sym == SDLK_ESCAPE) {
                 int pmr = PauseMenu();
@@ -236,11 +237,24 @@ int MainGamePlay(int level) {
                 else if (pmr == 2) {
                     return 0;
                 }
+                else if (pmr == 3) {
+                    return 3;
+                }
             }
             if (!player_main_character.Heal.is_negative) {
                 if (!player_main_character.is_hurt) {
                     player_main_character.HandelInputAction(g_event, g_renderer);
                 }
+            }
+        }
+
+        int px = player_main_character.get_pos_x() / (10*TILE_SIZE);
+        if (px >= num_of_enemy - 1) px = num_of_enemy - 2;
+        if (px <= 0) px = 1;
+
+        for (size_t i = px - 1; i <= px + 1; i++) {
+            if (!hed[i].HP.is_negative) {
+                Object_Collide(player_main_character, hed[i]);
             }
         }
 
@@ -251,6 +265,25 @@ int MainGamePlay(int level) {
         Map1.DrawMap(g_renderer);
         // > HandleInput > DoPlayer > Show
         Map Get_play_map_data = Map1.GetmapData();
+
+        if (!player_main_character.Heal.is_negative) player_main_character.SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
+        if (!player_main_character.Heal.is_negative) player_main_character.DoPlayer(Get_play_map_data);
+        
+        for (size_t i = px - 1; i <= px + 1; i++) {
+            if (!hed[i].HP.is_negative) { 
+                hed[i].SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
+                hed[i].Do_Play(Get_play_map_data);
+            }
+        }
+
+        Map1.DrawMap(g_renderer);
+
+        for (size_t i = px - 1; i <= px + 1; i++) {
+            if (!hed[i].HP.is_negative) {
+                hed[i].Show_Enemy(g_renderer, g_font);
+            }
+        }
+        if (!player_main_character.Heal.is_negative) player_main_character.Show_character(g_renderer, g_font);
 
         if (player_main_character.Heal.is_negative) {
             if (player_main_character.dead(g_renderer)) {
@@ -269,24 +302,6 @@ int MainGamePlay(int level) {
             }
         }
 
-        if (!player_main_character.Heal.is_negative) player_main_character.SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
-        if (!player_main_character.Heal.is_negative) player_main_character.DoPlayer(Get_play_map_data);
-        for (int i = px - 1; i <= px + 1; i++) {
-            if (!hed[i].HP.is_negative) { 
-                hed[i].SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
-                hed[i].Do_Play(Get_play_map_data);
-            }
-        }
-
-        Map1.DrawMap(g_renderer);
-        if (!player_main_character.Heal.is_negative) player_main_character.Show_character(g_renderer, g_font);  
-        for (int i = px - 1; i <= px + 1; i++) {
-            if (!hed[i].HP.is_negative) {
-                hed[i].Show_Enemy(g_renderer, g_font);
-            }
-        }
-        //if (!hell_dog.HP.is_negative) hell_dog.Show_Enemy(g_renderer, g_font);
-
         Map1.SetMap(Get_play_map_data);
 
         SDL_RenderPresent(g_renderer);
@@ -302,6 +317,10 @@ int MainGamePlay(int level) {
     return 0;
 }
 
+/*
+Return 0: Success
+return 3: Quit window
+*/
 int Level_List() {
     SDL_RenderClear(g_renderer);
     Background.Render(g_renderer);
@@ -359,14 +378,16 @@ int Level_List() {
         }
         for (size_t i = 0; i < level.size(); i++) {
             if (level[i].is_click) {
-                int mgr = MainGamePlay(i + 1);
-                while (mgr == 1) {
+                int mgr = MainGamePlay(i + 1); 
+                while (mgr == 1) { 
                     mgr = MainGamePlay(i + 1);
+                }
+                if (mgr == 3) {
+                    return 3;
                 }
             }
             level[i].is_click = false;
         }
-
         SDL_RenderPresent(g_renderer);
     }
     return 0;
@@ -424,8 +445,11 @@ int UserInterface() {
         Quit_bt.RenderTile(g_renderer, g_font);
 
         if (Start.is_click) {
-            Level_List();
+            int ret = Level_List();
             Start.is_click = false;
+            if (ret == 3) {
+                return 0;
+            }
         }
         if (Quit_bt.is_click) {
             break;

@@ -36,7 +36,7 @@ void Button::Events(SDL_Renderer* des, SDL_Event event) {
         if (event.type == SDL_MOUSEBUTTONDOWN) {
             is_click = true;
             std::cout<<tile.GetText();
-            printf(": is click down Pos: x = %d \ty = %d\n", event.motion.x, event.motion.y);
+            printf(": is click down\tPos:\tx = %d\ty = %d\n", event.motion.x, event.motion.y);
         }
         else if (event.type == SDL_MOUSEBUTTONUP) {
             is_click = false;
@@ -74,5 +74,5 @@ void Button::SetForTile(TTF_Font* font) {
 
 void Button::Clear() {
     Free();
-    tile.SetText("");
+    tile.Free();
 }

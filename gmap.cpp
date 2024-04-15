@@ -35,7 +35,7 @@ void Game_map::LoadMap(const char name[]) {
 }
 
 void Game_map::LoadTile(SDL_Renderer*& screen) {
-    std::vector<std::string> tile_path = {"texture_src/0.png", "texture_src/1.png", "texture_src/2.png", "texture_src/3.png", "texture_src/4.png", "texture_src/5.png", "texture_src/6.png"}; //all resourcepack path
+    std::vector<std::string> tile_path = {"texture_src/0.png", "texture_src/1.png", "texture_src/2.png", "texture_src/3.png", "texture_src/4.png", "texture_src/5.png", "texture_src/6.png", "texture_src/7.png", "texture_src/8.png", "texture_src/9.png"}; //all resourcepack path
     for (int i = 0; i<MAX_TILES; i++) {
         if (!tile_mat[i].LoadImg(tile_path[i], screen)) {
             std::cout<<"Unable to load: "<<tile_path[i]<<"\n";
@@ -55,7 +55,7 @@ void Game_map::DrawMap(SDL_Renderer*& screen) {
     y1 = (game_map_.start_y_%TILE_SIZE)*-1;
     y2 = y1 + SCREEN_HEIGHT + (y1 == 0 ? 0 : TILE_SIZE);
 
-    for (int i=y1; i < y2; i+=TILE_SIZE) { // i -> height
+    for (int i = y1; i < y2; i+=TILE_SIZE) { // i -> height
         vx=game_map_.start_X_/TILE_SIZE; //set x to start and continue load with y
         for (int j=x1; j < x2;j+=TILE_SIZE) { // j -> width
             int val = game_map_.tile[vy][vx];

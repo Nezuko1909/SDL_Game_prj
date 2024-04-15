@@ -32,7 +32,7 @@ public:
     //map set for char
     void DoPlayer(Map& map_data);
     void CheckMapData(Map& map_data);
-    void SetMapXY(const int map_x, const int map_y) {map_x_ = map_x; map_y_ = map_y; }
+    void SetMapXY(const int map_x, const int map_y) { map_x_ = map_x; map_y_ = map_y; }
     void atk_action(int get_inf, Hit_Box source_hitbox, int dmg);
     void CenterOnMap(Map &map_data);
 
@@ -52,7 +52,11 @@ public:
     Heal_Point Heal;
     int get_dmg(int status, bool is_ultimate);
     TextObject show_dmg;
+
     int Heal_bottle;
+    BaseObject Show_Heal_bottle;
+    TextObject show_heal_bottle_text;
+    TTF_Font* heal_font;
 
     bool dead(SDL_Renderer* des);
 

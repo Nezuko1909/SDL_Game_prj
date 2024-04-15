@@ -226,14 +226,14 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
 }
 
 // get_inf = player(character) atk status, return 0 if not atk
-void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg) { 
+int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg) { 
     if (get_inf != 0 && !is_atk_left && !is_atk_right) {
         Hit_Box hb;
         get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
         /*
         int a, b, c, d, e, f;
         a = hb.x1;
-        b = (hb.x1 + hb.x2)/2;
+        b = (hb.x1 + hb.x2)/2; 
         c = hb.x2;
         d = source_hitbox.x1;
         e = (source_hitbox.x1 + source_hitbox.x2)/2;
@@ -254,7 +254,6 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
                 HP.decrease_HP(dmg);
                 show_dmg.SetText(std::to_string(dmg));
                 show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
-                //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
             }
             else if (get_inf == 1) {
                 status_ = HURT_LEFT_ATK;
@@ -264,13 +263,12 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
                 HP.decrease_HP(dmg);
                 show_dmg.SetText(std::to_string(dmg));
                 show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
-                //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
             }
         }
     }
 
     bool is_left = false;
-    if (!is_hurting) {
+    if (!is_hurting && on_ground) {
         if (x_pos > target_x_pos + 50 && (target_x_pos >= x_home - (3*TILE_SIZE) && target_x_pos <= x_home + (3*TILE_SIZE))) {
             status_ = WALK_LEFT;
             Enemy_in_type.left1 = 1;
@@ -285,26 +283,26 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
             is_left = false;
             found_player = false;
         }
-        else if (y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + TILE_SIZE && target_y_pos >= y_pos -TILE_SIZE)) {
-            x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
-            Enemy_in_type.jump = 1;
-            found_player = false;
-        }
         else {
             if (found_player == true && !is_atk_left && !is_atk_right) {
                 if (x_pos <= x_home) { 
-                    status_ = IDLE_RIGHT;
+                    status_ = IDLE_LEFT;
                     Enemy_in_type.right1 = 0;
                     Enemy_in_type.left1 = 0;
                 }
                 else {
-                    status_ = IDLE_LEFT;
+                    status_ = IDLE_RIGHT;
                     Enemy_in_type.right1 = 0;
                     Enemy_in_type.left1 = 0;
                 }
             }
             found_player = true;
         }
+    }
+    if (atk_cd % (2*FRAME_PER_SECOND) == 0 && !is_hurting && y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + TILE_SIZE && target_y_pos >= y_pos -TILE_SIZE)) {
+        x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
+        Enemy_in_type.jump = 1;
+        found_player = false;
     }
 
     atk_cd < 1000000 ? atk_cd++ : atk_cd = 1;
@@ -323,6 +321,7 @@ void Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos,
         }
     }
     //std::cout<<" atk cd: "<<atk_cd<<" ";
+    return 0;
 }
 
 void Enemy::CheckMapData(Map& map_data) { /* 1 */
