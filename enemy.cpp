@@ -113,7 +113,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     }
     else if (status_ == RUN_RIGHT) {
         std::string path = "threats_src/" + Enemy_name + "/run.png";
-        Load_Enemy_Img("threats_src/hell_dog/hd_run.png", des, ENEMY_RUN_FRAME);
+        Load_Enemy_Img(path, des, ENEMY_RUN_FRAME);
         set_clips(ENEMY_RUN_FRAME);
         get_status = 5;
     }
@@ -130,7 +130,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
         get_status = 7;
     }
     else if (status_ == HURT_RIGHT_ATK) {
-        std::string path = "threats_src/" + Enemy_name + "hurt_atk.png";
+        std::string path = "threats_src/" + Enemy_name + "/hurt_atk.png";
         Load_Enemy_Img(path, des, ENEMY_HURT_FRAME);
         set_clips(ENEMY_HURT_FRAME);
         get_status = 8;
@@ -145,14 +145,14 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     }
     else if (status_ == ATK_1_LEFT) {
         std::string path = "threats_src/" + Enemy_name + "/atk_1.png";
-        Load_Enemy_Img(path, des, ENEMY_RUN_FRAME);
-        set_clips(ENEMY_RUN_FRAME);
+        Load_Enemy_Img(path, des, ENEMY_ATK_FRAME);
+        set_clips(ENEMY_ATK_FRAME);
         get_status = 10;
     }
     else if (status_ == ATK_1_RIGHT) {
         std::string path = "threats_src/" + Enemy_name + "/atk_1.png";
-        Load_Enemy_Img(path, des, ENEMY_RUN_FRAME);
-        set_clips(ENEMY_RUN_FRAME);
+        Load_Enemy_Img(path, des, ENEMY_ATK_FRAME);
+        set_clips(ENEMY_ATK_FRAME);
         get_status = 11;
     }
     //std::cout<<"\tenemy found player: "<<found_player<<" is hurting: "<<is_hurting<<" is attack l/r: "<<is_atk_left<<" "<<is_atk_right<<"\n";
@@ -203,7 +203,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
         if (delay_frame % 3 == 0) {
             wframe++;
         }
-        if (wframe >= ENEMY_RUN_FRAME) {
+        if (wframe >= ENEMY_ATK_FRAME) {
             wframe = 0;
             delay_frame = 0;
             is_atk_left = false;
@@ -241,7 +241,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
 
 // get_inf = player(character) atk status, return 0 if not atk
 int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg) { 
-    if (get_inf != 0 && !is_atk_left && !is_atk_right && ret_idle) {
+    if (get_inf != 0 && ret_idle) {
         Hit_Box hb;
         get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
         /*
@@ -282,16 +282,16 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
     }
 
     bool is_left = false;
-    if (!is_hurting && on_ground && ret_idle) {
+    if (!is_hurting) {
         if (x_pos > target_x_pos + 50 && (target_x_pos >= x_home - (3*TILE_SIZE) && target_x_pos <= x_home + (3*TILE_SIZE))) {
-            status_ = WALK_LEFT;
+            status_ = RUN_LEFT;
             Enemy_in_type.left1 = 1;
             Enemy_in_type.right1 = 0;
             is_left = true;
             found_player = false;
         }
         else if (x_pos < target_x_pos - 50 && (target_x_pos >= x_home - (3*TILE_SIZE) && target_x_pos <= x_home + (3*TILE_SIZE))) {
-            status_ = WALK_RIGHT;
+            status_ = RUN_RIGHT;
             Enemy_in_type.right1 = 1;
             Enemy_in_type.left1 = 0;
             is_left = false;
@@ -321,7 +321,7 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
 
     atk_cd < 1000000 ? atk_cd++ : atk_cd = 1;
     if (!is_hurting && found_player) {
-        if (atk_cd % (FRAME_PER_SECOND*3) == 0) {
+        if (atk_cd % (FRAME_PER_SECOND*5) == 0) {
             ret_idle = false;
             if (status_ == WALK_LEFT || status_ == IDLE_LEFT) {
                 status_ = ATK_1_LEFT;
@@ -446,7 +446,8 @@ int Enemy::get_dmg(int status) {
 int wdfr = 0;
 //return true if wframe = max (5)
 bool Enemy::Dead(SDL_Renderer* des) {
-    Load_Enemy_Img("threats_src/hell_dog/hd_dead.png", des, 6);
+    std::string path = "threats_src/" + Enemy_name + "/dead.png";
+    Load_Enemy_Img(path, des, 6);
     set_clips(6);
     delay_frame++;
     if (delay_frame % 10 == 0) wdfr++;

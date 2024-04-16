@@ -203,14 +203,16 @@ int MainGamePlay(int level) {
     Map1.LoadTile(g_renderer);
 
     Character player_main_character; // Samurai
-    player_main_character.Load_Character_Img("character_src/idle_right.png", g_renderer, FRAME_MOVE);
+    player_main_character.Load_Character_Img("character_src/idle.png", g_renderer, FRAME_MOVE);
     player_main_character.set_clips(FRAME_MOVE);
 
     std::vector<Enemy> hed;
     const int num_of_enemy = 36;
     for (int i = 0; i < num_of_enemy; i++) {
         Enemy hell_dog;  // enemy threats test
-        hell_dog.SetPath("hell_dog");
+        int getr = rand() % 101;
+        getr > 50 ? hell_dog.SetPath("hell_dog") : hell_dog.SetPath("wolf");
+        std::string enmp = "threats_src/" + hell_dog.get_path() + "/idle.png";
         hell_dog.Load_Enemy_Img("threats_src/hell_dog/idle.png", g_renderer, ENEMY_IDLE_FRAME);
         hell_dog.set_clips(ENEMY_IDLE_FRAME);
         hell_dog.SetPos(TILE_SIZE*10 + i*10*TILE_SIZE, 0);
@@ -462,6 +464,7 @@ int UserInterface() {
 }
 
 int main(int argc, char* argv[]) {
+    std::srand(time(NULL));
     if (!init_Data()) {
         return -1; //error
     }
