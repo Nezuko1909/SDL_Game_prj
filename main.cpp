@@ -210,7 +210,8 @@ int MainGamePlay(int level) {
     const int num_of_enemy = 36;
     for (int i = 0; i < num_of_enemy; i++) {
         Enemy hell_dog;  // enemy threats test
-        hell_dog.Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", g_renderer, ENEMY_IDLE_FRAME);
+        hell_dog.SetPath("hell_dog");
+        hell_dog.Load_Enemy_Img("threats_src/hell_dog/idle.png", g_renderer, ENEMY_IDLE_FRAME);
         hell_dog.set_clips(ENEMY_IDLE_FRAME);
         hell_dog.SetPos(TILE_SIZE*10 + i*10*TILE_SIZE, 0);
         hell_dog.SetHome(TILE_SIZE*10 + i*10*TILE_SIZE, 0);

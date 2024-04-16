@@ -33,6 +33,7 @@ Enemy::Enemy() {
     HP.showHP.SetPosition(HP.get_rect_().x, HP.get_rect_().y);
     HP.showHP.SetText(std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
     show_dmg.SetColor_(show_dmg.WHITE_COLOR);
+    Enemy_name = "hell_dog"; //default
 }
 
 Enemy::~Enemy() {
@@ -52,7 +53,7 @@ void Enemy::get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2) {
 return true if Load img success
 return false if could not open image
 */
-bool Enemy::Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count) { /* 1 */
+bool Enemy::Load_Enemy_Img(std::string path, SDL_Renderer* screen, int frame_count) {
     bool ret = BaseObject::LoadImg(path, screen); //ret == return
     if (ret) {
         width_frame = rect_.w/frame_count;
@@ -81,64 +82,76 @@ bool ret_idle = true; // for Enemy::action()
 void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     // load
     if (status_ == IDLE_LEFT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_idle_left.png", des, ENEMY_IDLE_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/idle.png";
+        Load_Enemy_Img(path, des, ENEMY_IDLE_FRAME);
         set_clips(ENEMY_IDLE_FRAME);
         get_status = 0;
     }
     else if (status_ == IDLE_RIGHT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_idle_right.png", des, ENEMY_IDLE_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/idle.png";
+        Load_Enemy_Img(path, des, ENEMY_IDLE_FRAME);
         set_clips(ENEMY_IDLE_FRAME);
         get_status = 1;
     }
     else if (status_ == WALK_LEFT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_walk_left.png", des, ENEMY_WALK_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/walk.png";
+        Load_Enemy_Img(path, des, ENEMY_WALK_FRAME);
         set_clips(ENEMY_WALK_FRAME);
         get_status = 2;
     }
     else if (status_ == WALK_RIGHT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_walk_right.png", des, ENEMY_WALK_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/walk.png";
+        Load_Enemy_Img(path, des, ENEMY_WALK_FRAME);
         set_clips(ENEMY_WALK_FRAME);
         get_status = 3;
     }
     else if (status_ == RUN_LEFT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_run_left.png", des, ENEMY_RUN_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/run.png";
+        Load_Enemy_Img(path, des, ENEMY_RUN_FRAME);
         set_clips(ENEMY_RUN_FRAME);
         get_status = 4;
     }
     else if (status_ == RUN_RIGHT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_run_right.png", des, ENEMY_RUN_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/run.png";
+        Load_Enemy_Img("threats_src/hell_dog/hd_run.png", des, ENEMY_RUN_FRAME);
         set_clips(ENEMY_RUN_FRAME);
         get_status = 5;
     }
     else if (status_ == JUMP_LEFT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_jump_left.png", des, ENEMY_JUMP_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/jump.png";
+        Load_Enemy_Img(path, des, ENEMY_JUMP_FRAME);
         set_clips(ENEMY_JUMP_FRAME);
         get_status = 6;
     }
     else if (status_ == JUMP_RIGHT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_jump_right.png", des, ENEMY_JUMP_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/jump.png";
+        Load_Enemy_Img(path, des, ENEMY_JUMP_FRAME);
         set_clips(ENEMY_JUMP_FRAME);
         get_status = 7;
     }
     else if (status_ == HURT_RIGHT_ATK) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_hurt_right_atk.png", des, ENEMY_HURT_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "hurt_atk.png";
+        Load_Enemy_Img(path, des, ENEMY_HURT_FRAME);
         set_clips(ENEMY_HURT_FRAME);
         get_status = 8;
         is_hurting = true;
     }
     else if (status_ == HURT_LEFT_ATK) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_hurt_left_atk.png", des, ENEMY_HURT_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/hurt_atk.png";
+        Load_Enemy_Img(path, des, ENEMY_HURT_FRAME);
         set_clips(ENEMY_HURT_FRAME);
         get_status = 9;
         is_hurting = true;
     }
     else if (status_ == ATK_1_LEFT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_left.png", des, ENEMY_RUN_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/atk_1.png";
+        Load_Enemy_Img(path, des, ENEMY_RUN_FRAME);
         set_clips(ENEMY_RUN_FRAME);
         get_status = 10;
     }
     else if (status_ == ATK_1_RIGHT) {
-        Load_Enemy_Img("threats_src/hell_dog/hd_atk_1_right.png", des, ENEMY_RUN_FRAME);
+        std::string path = "threats_src/" + Enemy_name + "/atk_1.png";
+        Load_Enemy_Img(path, des, ENEMY_RUN_FRAME);
         set_clips(ENEMY_RUN_FRAME);
         get_status = 11;
     }
@@ -208,7 +221,8 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     SDL_Rect* renderquad = new SDL_Rect;
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
 
-    SDL_RenderCopyEx(des, p_Object, current_clip, &*renderquad);
+    if (get_status == 1 || get_status == 3 || get_status == 5 || get_status == 7 || get_status == 9 || get_status == 11) SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+    else SDL_RenderCopyEx(des, p_Object, current_clip, &*renderquad, 0, NULL, SDL_FLIP_HORIZONTAL);
     
     if (is_atk_right == true) is_atk_right = false;
     if (is_atk_left == true) is_atk_left = false;
