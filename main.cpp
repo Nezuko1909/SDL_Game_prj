@@ -67,7 +67,7 @@ void close() {
 }
 
 /*
-return 1: Player atk_left
+\returns 1: Player atk_left
 return 2: player atk_right
 return 0: player not atk
 */

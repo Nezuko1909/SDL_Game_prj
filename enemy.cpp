@@ -208,7 +208,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     SDL_Rect* renderquad = new SDL_Rect;
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
 
-    SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+    SDL_RenderCopyEx(des, p_Object, current_clip, &*renderquad);
     
     if (is_atk_right == true) is_atk_right = false;
     if (is_atk_left == true) is_atk_left = false;
@@ -227,7 +227,7 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
 
 // get_inf = player(character) atk status, return 0 if not atk
 int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg) { 
-    if (get_inf != 0 && !is_atk_left && !is_atk_right) {
+    if (get_inf != 0 && !is_atk_left && !is_atk_right && ret_idle) {
         Hit_Box hb;
         get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
         /*
@@ -268,7 +268,7 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
     }
 
     bool is_left = false;
-    if (!is_hurting && on_ground) {
+    if (!is_hurting && on_ground && ret_idle) {
         if (x_pos > target_x_pos + 50 && (target_x_pos >= x_home - (3*TILE_SIZE) && target_x_pos <= x_home + (3*TILE_SIZE))) {
             status_ = WALK_LEFT;
             Enemy_in_type.left1 = 1;
@@ -299,7 +299,7 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
             found_player = true;
         }
     }
-    if (atk_cd % (2*FRAME_PER_SECOND) == 0 && !is_hurting && y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + TILE_SIZE && target_y_pos >= y_pos -TILE_SIZE)) {
+    if (ret_idle && atk_cd % (2*FRAME_PER_SECOND) == 0 && !is_hurting && y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + TILE_SIZE && target_y_pos >= y_pos -TILE_SIZE)) {
         x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
         Enemy_in_type.jump = 1;
         found_player = false;
