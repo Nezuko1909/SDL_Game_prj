@@ -14,7 +14,7 @@ public:
     Game_map() {;}
     ~Game_map() {;}
     void LoadMap(const char name[]);
-    void LoadTile(SDL_Renderer*& screen);
+    void LoadTile(SDL_Renderer*& screen, int maps);
     void DrawMap(SDL_Renderer*& screen);
     Map GetmapData() const {return game_map_;};
     void SetMap(Map& map_data) { game_map_ = map_data;};

@@ -58,7 +58,7 @@ void Character::set_clips(int frame) {
 }
 //for up frame
 int get_stt = -1;
-
+int check_get_stt;
 void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     //if (!is_hurt) {
         if (character_status == JUMP_LEFT) {
@@ -136,7 +136,10 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
             set_clips(FRAME_ATK_1);
             get_stt = 10;
         }
-    //}
+    if (check_get_stt != get_stt) {
+        wframe = 0;
+        check_get_stt = get_stt;
+    }
     //std::cout<<" char status: "<<character_status<<"\n";
     //atk: 6 7 8 9 10 11
     if (get_stt == 6 || get_stt == 7 || get_stt == 8 || get_stt == 9 || get_stt == 10 || get_stt == 11) {
@@ -343,12 +346,10 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
 }
 
 void Character::get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2) {
-    int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
-    x1 = (x_pos + x_val);
-    x2 = (x_pos + x_val + width_frame - 1);
-
-    y1 = (y_pos);
-    y2 = (y_pos + height_min -1);
+    x1 = x_pos;
+    x2 = x_pos + width_frame;
+    y1 = y_pos;
+    y2 = y_pos + height_frame;
 }
 
 void Character::CheckMapData(Map& map_data) {
@@ -449,53 +450,25 @@ void Character::DoPlayer(Map& map_data) {
 
 //get hurt animations and take dmg
 void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
-    Hit_Box hb;
-    get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
-    /*
-    int a, b, c, d, e, f;
-    a = hb.x1;
-    b = (hb.x1 + hb.x2)/2;
-    c = hb.x2;
-    d = source_hitbox.x1;
-    e = (source_hitbox.x1 + source_hitbox.x2)/2;
-    f = source_hitbox.x2;
-    bool check = false;
-    if ((d > a && f < c) || (d < a && f > c) || (d > a && d < c) || (f > a && f < c)) 
-    */
-   bool check = false;
-    if (abs(hb.x1 - source_hitbox.x1) <= 2*TILE_SIZE) {
-        check = true;
+    if (get_inf == 2) {
+        character_status = HURT_RIGHT_ATK;
+        Char_input_type.left = 0;
+        Char_input_type.right = 0;
+        Heal.decrease_HP(dmg);
+        is_hurt = true;
+        show_dmg.SetText(std::to_string(dmg));
+        show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+        show_dmg.SetColor_(show_dmg.RED_COLOR);
     }
-    if (check) {
-        if (get_inf == 2) {
-            character_status = HURT_RIGHT_ATK;
-            Char_input_type.left = 0;
-            Char_input_type.right = 0;
-            //Char_input_type.hurt_r = 1;
-            Heal.decrease_HP(dmg);
-            is_hurt = true;
-            show_dmg.SetText(std::to_string(dmg));
-            show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
-            show_dmg.SetColor_(show_dmg.RED_COLOR);
-            //std::cout<<"Enemy::action hurt right - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
-        }
-        else if (get_inf == 1) {
-            character_status = HURT_LEFT_ATK;
-            Char_input_type.left = 0;
-            Char_input_type.right = 0;
-            //Char_input_type.hurt_l = 1;
-            Heal.decrease_HP(dmg);
-            is_hurt = true;
-            show_dmg.SetText(std::to_string(dmg));
-            show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
-            show_dmg.SetColor_(show_dmg.RED_COLOR);
-            //std::cout<<"Enemy::action hurt left - true: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
-        }
-        return;
-    }
-    else {
-        //std::cout<<"Enemy::action - false: hb.x1, src.x1: "<<hb.x1<<", "<<source_hitbox.x1<<"\tabs(hb.x1 - src.x1): "<<abs(hb.x1 - source_hitbox.x1)<<"\n";
-        return;
+    else if (get_inf == 1) {
+        character_status = HURT_LEFT_ATK;
+        Char_input_type.left = 0;
+        Char_input_type.right = 0;
+        Heal.decrease_HP(dmg);
+        is_hurt = true;
+        show_dmg.SetText(std::to_string(dmg));
+        show_dmg.SetPosition(x_pos, y_pos + (height_frame / 2));
+        show_dmg.SetColor_(show_dmg.RED_COLOR);
     }
 }
 
@@ -518,6 +491,11 @@ int Character::get_dmg(int status, bool is_ultimate) {
 
 bool Character::dead(SDL_Renderer* des) {
     Load_Character_Img("character_src/die.png", des, 6);
+    get_stt = -1;
+    if (get_stt != check_get_stt) {
+        check_get_stt = get_stt;
+        wframe = 0;
+    }
     set_clips(6);
     delay_frame++;
     if (delay_frame % 10 == 0) wframe++;

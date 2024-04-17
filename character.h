@@ -39,15 +39,7 @@ public:
     bool is_atk_left;
     bool is_atk_right;
     bool is_hurt;
-    /*
-    hitbox:
 
-    x1y1______x2y1
-        |    |
-        |    |
-    x1y2______x2y2
-
-    */
     void get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2);
     Heal_Point Heal;
     int get_dmg(int status, bool is_ultimate);

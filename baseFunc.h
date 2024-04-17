@@ -41,7 +41,7 @@ const int RENDER_DRAW_COLOR = 255;
 #define TILE_SIZE 64
 #define MAX_MAP_X 400
 #define MAX_MAP_Y 10
-#define MAX_TILES 7
+#define MAX_TILES 10
 #define BLANK_TILE 2 //BLANK_TILE define to grass_block "2.png"
 #define TILE_4 4 //4.png --> left moving
 #define TILE_3 3 //3.png --> right_moving

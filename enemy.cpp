@@ -41,12 +41,10 @@ Enemy::~Enemy() {
 }
 
 void Enemy::get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2) {
-    int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
-    x1 = (x_pos + x_val);
-    x2 = (x_pos + x_val + width_frame - 1);
-
-    y1 = (y_pos);
-    y2 = (y_pos + height_min -1);
+    x1 = x_pos;
+    x2 = x_pos + width_frame;
+    y1 = y_pos;
+    y2 = y_pos + height_frame;
 }
 
 /*
@@ -179,12 +177,6 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
         if (wframe >= ENEMY_HURT_FRAME) {
             wframe = 0;
             delay_frame = 1;
-            if (get_status == 8) {
-                status_ = IDLE_LEFT;
-            }
-            else {
-                status_ = IDLE_RIGHT;
-            }
             Enemy_in_type.hurt_l = 0;
             Enemy_in_type.hurt_r = 0;
             is_hurting = false;
@@ -192,9 +184,12 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
     }
     else if (get_status == 6 || get_status == 7) {
         // jump
-        if (on_ground == false) {
+        if (!on_ground) {
             if (y_val <= 0) wframe = 0;
             if (y_val > 0) wframe = 1;
+        }
+        else {
+            ret_idle = true;
         }
     }
     //atk
@@ -241,64 +236,49 @@ void Enemy::Show_Enemy(SDL_Renderer* des, TTF_Font* font) { /* 1 */
 
 // get_inf = player(character) atk status, return 0 if not atk
 int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, int get_inf, Hit_Box source_hitbox, int dmg) { 
-    if (get_inf != 0 && ret_idle) {
-        Hit_Box hb;
-        get_hitbox_for_other_object(hb.x1, hb.x2, hb.y1, hb.y2);
-        /*
-        int a, b, c, d, e, f;
-        a = hb.x1;
-        b = (hb.x1 + hb.x2)/2; 
-        c = hb.x2;
-        d = source_hitbox.x1;
-        e = (source_hitbox.x1 + source_hitbox.x2)/2;
-        f = source_hitbox.x2;
-        bool check = false;
-        if ((d > a && f < c) || (d < a && f > c) || (d > a && d < c) || (f > a && f < c)) 
-        */
-        bool check = false;
-        if (abs(hb.x1 - source_hitbox.x1) <= TILE_SIZE) {
-            check = true;
-        }
-        if (check) {
-            if (get_inf == 2) {
+    if (get_inf != 0) {
+        if (get_inf == 2) {
+            if (ret_idle) {
                 status_ = HURT_RIGHT_ATK;
                 Enemy_in_type.hurt_r = 1;
                 is_hurting = true;
                 delay_frame = 1;
-                HP.decrease_HP(dmg);
-                show_dmg.SetText(std::to_string(dmg));
-                show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
             }
-            else if (get_inf == 1) {
+            HP.decrease_HP(dmg);
+            show_dmg.SetText(std::to_string(dmg));
+            show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
+        }
+        else if (get_inf == 1) {
+            if (ret_idle) {
                 status_ = HURT_LEFT_ATK;
                 Enemy_in_type.hurt_l = 1;
                 is_hurting = true;
                 delay_frame = 1;
-                HP.decrease_HP(dmg);
-                show_dmg.SetText(std::to_string(dmg));
-                show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
             }
+            HP.decrease_HP(dmg);
+            show_dmg.SetText(std::to_string(dmg));
+            show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
         }
     }
 
     bool is_left = false;
-    if (!is_hurting) {
-        if (x_pos > target_x_pos + 50 && (target_x_pos >= x_home - (3*TILE_SIZE) && target_x_pos <= x_home + (3*TILE_SIZE))) {
-            status_ = RUN_LEFT;
-            Enemy_in_type.left1 = 1;
-            Enemy_in_type.right1 = 0;
-            is_left = true;
-            found_player = false;
-        }
-        else if (x_pos < target_x_pos - 50 && (target_x_pos >= x_home - (3*TILE_SIZE) && target_x_pos <= x_home + (3*TILE_SIZE))) {
-            status_ = RUN_RIGHT;
-            Enemy_in_type.right1 = 1;
-            Enemy_in_type.left1 = 0;
-            is_left = false;
-            found_player = false;
-        }
-        else {
-            if (found_player == true && !is_atk_left && !is_atk_right) {
+    if ((target_x_pos >= x_home - (5*TILE_SIZE) && target_x_pos <= x_home + (5*TILE_SIZE))) {
+        if (ret_idle) {
+            if (x_pos > target_x_pos + TILE_SIZE) {
+                status_ = RUN_LEFT;
+                Enemy_in_type.left1 = 1;
+                Enemy_in_type.right1 = 0;
+                is_left = true;
+                found_player = false;
+            }
+            else if (x_pos < target_x_pos - TILE_SIZE) {
+                status_ = RUN_RIGHT;
+                Enemy_in_type.right1 = 1;
+                Enemy_in_type.left1 = 0;
+                is_left = false;
+                found_player = false;
+            }
+            else {
                 if (x_pos <= x_home) { 
                     status_ = IDLE_LEFT;
                     Enemy_in_type.right1 = 0;
@@ -309,15 +289,32 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
                     Enemy_in_type.right1 = 0;
                     Enemy_in_type.left1 = 0;
                 }
+                found_player = true;
             }
-            found_player = true;
         }
+
+        if (ret_idle && atk_cd % (2*FRAME_PER_SECOND) == 0 && !is_hurting && y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + 2*TILE_SIZE && target_y_pos >= y_pos - 2*TILE_SIZE)) {
+            x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
+            Enemy_in_type.jump = 1;
+            found_player = false;
+            ret_idle = false;
+        }
+        if (is_hurting) found_player = true;
     }
-    if (ret_idle && atk_cd % (2*FRAME_PER_SECOND) == 0 && !is_hurting && y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + TILE_SIZE && target_y_pos >= y_pos -TILE_SIZE)) {
-        x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
-        Enemy_in_type.jump = 1;
+    else { 
+        if (x_pos <= x_home) { 
+            status_ = IDLE_LEFT;
+            Enemy_in_type.right1 = 0;
+            Enemy_in_type.left1 = 0;
+        }
+        else {
+            status_ = IDLE_RIGHT;
+            Enemy_in_type.right1 = 0;
+            Enemy_in_type.left1 = 0;
+        }
         found_player = false;
     }
+    
 
     atk_cd < 1000000 ? atk_cd++ : atk_cd = 1;
     if (!is_hurting && found_player) {

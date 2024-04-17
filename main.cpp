@@ -75,39 +75,46 @@ int Object_Collide(Character&  player, Enemy& enemy) {
     Hit_Box player_hitbox;
     Hit_Box enemy_hitbox;
     int ret = 0;
+
     player.get_hitbox_for_other_object(player_hitbox.x1, player_hitbox.x2, player_hitbox.y1, player_hitbox.y2);
     enemy.get_hitbox_for_other_object(enemy_hitbox.x1, enemy_hitbox.x2, enemy_hitbox.y1, enemy_hitbox.y2);
-    if (player.is_atk_left) {
+
+    bool check_hitbox = false;
+
+    if ((player_hitbox.x1 <= enemy_hitbox.x1 && player_hitbox.x2 >= enemy_hitbox.x1) || (player_hitbox.x1 >= enemy_hitbox.x1 && player_hitbox.x1 <= enemy_hitbox.x2)) {
+        if ((player_hitbox.y1 < enemy_hitbox.y1 && player_hitbox.y2 >= enemy_hitbox.y1) || (player_hitbox.y1 >= enemy_hitbox.y1 && player_hitbox.y1 <= enemy_hitbox.y2)) {
+            check_hitbox = true;
+        }
+    }
+
+    //if (check_hitbox) printf("Check Hitbox: %d\n",check_hitbox);
+    if (player.is_atk_left && check_hitbox) {
+        //if (player.is_atk_left) printf("Player: is_atk_left");
         int damage = player.get_dmg(player.get_status(), 0); // hien tai chua co ultimate nen mac dinh = 0
         damage >= 1000 ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, damage);
-        //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
-        //player.is_atk_left = false;
+        //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
         ret = 1;
     }
-    else if (player.is_atk_right) {
+    else if (player.is_atk_right && check_hitbox) {
+        //if (player.is_atk_right) printf("Player: is_atk_right");
         int damage = player.get_dmg(player.get_status(), 0);
         damage >= 1000 ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, damage);
-        //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
-        //player.is_atk_right = false;
+        //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
         ret = 2;
     }
     else {
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 0, player_hitbox, 0);
     }
 
-    if (enemy.is_atk_left) { 
+    if (enemy.is_atk_left && check_hitbox) { 
         player.atk_action(1, enemy_hitbox, enemy.get_dmg(enemy.get_status_()));
-        //std::cout<<" Object_Collide: enemy left true\n";
     }
-    else if (enemy.is_atk_right) {
+    else if (enemy.is_atk_right && check_hitbox) {
         player.atk_action(2, enemy_hitbox, enemy.get_dmg(enemy.get_status_()));
-        //std::cout<<" Object_Collide: enemy right true\n";
     }
-    // //std::cout<<"Object_Collide: false\n";
     return ret;
-    // //std::cout<<"Object_collide: success";
 }
 
 /*
@@ -177,6 +184,62 @@ int PauseMenu() {
 }
 
 /*
+Return 1: Restart
+Return 2: MainMenu
+Return 3: Exit Window
+*/
+int DefeatMenu() {
+
+    TTF_CloseFont(g_font);
+    g_font= TTF_OpenFont("text/calibri.ttf", 64);
+    
+    BaseObject Defeat;
+    //Defeat.LoadImg("", g_renderer);
+    Defeat.SetRect((SCREEN_WIDTH - Defeat.GetRect().w) / 2, TILE_SIZE);
+
+    Button Restart;
+    Restart.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 5*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
+    Restart.tile.SetText("Restart");
+    Restart.SetForTile(g_font);
+    Restart.tile.SetColor(255, 255, 255, 255);
+
+    Button MainMenu;
+    MainMenu.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 7*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
+    MainMenu.tile.SetText("Leave");
+    MainMenu.SetForTile(g_font);
+    MainMenu.tile.SetColor(255, 255, 255, 255);
+    
+    int ret = -1;
+    bool is_quit = false;
+    while(!is_quit) {
+        while (SDL_PollEvent(&g_event) != 0) {
+            if (g_event.type == SDL_QUIT) {
+                return 3;
+            }
+            Restart.Events(g_renderer, g_event);
+            MainMenu.Events(g_renderer, g_event);
+        }
+        Restart.Fill(g_renderer);
+        MainMenu.Fill(g_renderer);
+
+        Restart.RenderTile(g_renderer, g_font);
+        MainMenu.RenderTile(g_renderer, g_font);
+
+        SDL_RenderPresent(g_renderer);
+
+        if (Restart.is_click) {
+            ret = 1;
+            break;
+        }
+        if (MainMenu.is_click) {
+            ret = 2;
+            break;
+        }
+    }
+    return ret;
+}
+
+/*
 Return 0: Win
 Return 1: Restart
 Return 2: Defeat
@@ -200,7 +263,7 @@ int MainGamePlay(int level) {
     Game_map Map1;
     std::string map_path = "texture_src/map" + std::to_string(level) + ".txt";
     Map1.LoadMap(map_path.c_str());
-    Map1.LoadTile(g_renderer);
+    Map1.LoadTile(g_renderer, level);
 
     Character player_main_character; // Samurai
     player_main_character.Load_Character_Img("character_src/idle.png", g_renderer, FRAME_MOVE);
@@ -290,7 +353,16 @@ int MainGamePlay(int level) {
 
         if (player_main_character.Heal.is_negative) {
             if (player_main_character.dead(g_renderer)) {
-                return 2;
+                int def = DefeatMenu();
+                if (def == 1) {
+                    return 1;
+                }
+                else if (def == 2) {
+                    return 2;
+                }
+                else if (def == 3) {
+                    return 3;
+                }
             }
         }
 

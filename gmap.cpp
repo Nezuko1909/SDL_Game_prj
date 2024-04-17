@@ -34,9 +34,14 @@ void Game_map::LoadMap(const char name[]) {
     game_map_.file_name = name;
 }
 
-void Game_map::LoadTile(SDL_Renderer*& screen) {
-    std::vector<std::string> tile_path = {"texture_src/0.png", "texture_src/1.png", "texture_src/2.png", "texture_src/3.png", "texture_src/4.png", "texture_src/5.png", "texture_src/6.png", "texture_src/7.png", "texture_src/8.png", "texture_src/9.png"}; //all resourcepack path
-    for (int i = 0; i<MAX_TILES; i++) {
+void Game_map::LoadTile(SDL_Renderer*& screen, int maps) {
+    std::vector<std::string> tile_path;
+    for (int i = 0; i < MAX_TILES; i++) {
+        std::string pth = "texture_src/map" + std::to_string(maps) + "/" + std::to_string(i) + ".png";
+        tile_path.push_back(pth);
+    }
+
+    for (int i = 0; i < MAX_TILES; i++) {
         if (!tile_mat[i].LoadImg(tile_path[i], screen)) {
             std::cout<<"Unable to load: "<<tile_path[i]<<"\n";
         }
