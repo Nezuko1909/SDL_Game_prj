@@ -4,6 +4,23 @@
 #include "baseFunc.h"
 #include "BaseObject.h"
 
+class Skill : public BaseObject {
+public:
+    Skill();
+    ~Skill();
+    virtual bool LoadSkill(std::string path, SDL_Renderer* screen, int frame_count);
+    void Show(SDL_Renderer* des, bool is_left, int frame);
+    void set_clips(int frame);
+    void SetPath(std::string path) { SkillPath = path; }
+    SDL_Rect frame_clip[20];
+    int wframe;
+    float x_pos;
+    float y_pos;
+    int width_frame;
+    int height_frame;
+private:
+    std::string SkillPath;
+};
 
 class Character : public BaseObject {
 public: 
@@ -17,6 +34,7 @@ public:
         ATK_1_LEFT, ATK_1_RIGHT, 
         ATK_2_LEFT, ATK_2_RIGHT, 
         ATK_3_LEFT, ATK_3_RIGHT,
+        ATK_U_LEFT, ATK_U_RIGHT,
         HURT_RIGHT_ATK, HURT_LEFT_ATK,
     };
 
@@ -67,6 +85,7 @@ private:
     bool on_ground;
     int map_x_;
     int map_y_;
+    Skill Ulti;
 };
 
 #endif //Character_H_

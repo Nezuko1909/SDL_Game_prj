@@ -34,6 +34,7 @@ Enemy::Enemy() {
     HP.showHP.SetText(std::to_string(HP.current_HP) + "/" + std::to_string(HP.max_HP));
     show_dmg.SetColor_(show_dmg.WHITE_COLOR);
     Enemy_name = "hell_dog"; //default
+    base_dmg = 500;
 }
 
 Enemy::~Enemy() {
@@ -259,23 +260,20 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
             show_dmg.SetText(std::to_string(dmg));
             show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
         }
+        found_player = true;
     }
-
-    bool is_left = false;
-    if ((target_x_pos >= x_home - (5*TILE_SIZE) && target_x_pos <= x_home + (5*TILE_SIZE))) {
+    else if ((target_x_pos >= x_home - (5*TILE_SIZE) && target_x_pos <= x_home + (5*TILE_SIZE))) {
         if (ret_idle) {
             if (x_pos > target_x_pos + TILE_SIZE) {
                 status_ = RUN_LEFT;
                 Enemy_in_type.left1 = 1;
                 Enemy_in_type.right1 = 0;
-                is_left = true;
                 found_player = false;
             }
             else if (x_pos < target_x_pos - TILE_SIZE) {
                 status_ = RUN_RIGHT;
                 Enemy_in_type.right1 = 1;
                 Enemy_in_type.left1 = 0;
-                is_left = false;
                 found_player = false;
             }
             else {
@@ -291,13 +289,10 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
                 }
                 found_player = true;
             }
-        }
-
-        if (ret_idle && atk_cd % (2*FRAME_PER_SECOND) == 0 && !is_hurting && y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + 2*TILE_SIZE && target_y_pos >= y_pos - 2*TILE_SIZE)) {
-            x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
-            Enemy_in_type.jump = 1;
-            found_player = false;
-            ret_idle = false;
+            if (atk_cd % FRAME_PER_SECOND == 0 && !is_hurting && y_pos + height_frame > target_y_pos && on_ground && (target_y_pos <= y_pos + 2*TILE_SIZE && target_y_pos >= y_pos - 2*TILE_SIZE)) {
+                x_pos > target_x_pos + 50 ? status_ = JUMP_LEFT : status_ = JUMP_RIGHT;
+                Enemy_in_type.jump = 1;
+            }
         }
         if (is_hurting) found_player = true;
     }
@@ -314,11 +309,10 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
         }
         found_player = false;
     }
-    
 
     atk_cd < 1000000 ? atk_cd++ : atk_cd = 1;
-    if (!is_hurting && found_player) {
-        if (atk_cd % (FRAME_PER_SECOND*5) == 0) {
+    if (found_player) {
+        if (atk_cd % (FRAME_PER_SECOND*3) == 0) {
             ret_idle = false;
             if (status_ == WALK_LEFT || status_ == IDLE_LEFT) {
                 status_ = ATK_1_LEFT;
@@ -331,7 +325,6 @@ int Enemy::Action(SDL_Renderer* screen, float target_x_pos, float target_y_pos, 
             atk_cd = 1;
         }
     }
-    //std::cout<<" atk cd: "<<atk_cd<<" ";
     return 0;
 }
 
@@ -427,8 +420,6 @@ void Enemy::Do_Play(Map& map_data) { /* 1 */
 }
 
 int Enemy::get_dmg(int status) {
-    int base_dmg;
-    base_dmg = rand()%700;
     if (base_dmg < 300) base_dmg = 500;
     //critical rate = 50%; critical dmg 150 ~ 200% 
     int is_crit = rand()%101;

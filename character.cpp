@@ -1,5 +1,52 @@
 #include "character.h"
 
+/*--------------------------Skill--------------------------*/
+
+Skill::Skill() {
+    wframe = 0;
+    x_pos = 0;
+    y_pos = 0;
+    width_frame = 0;
+    height_frame = 0;
+    SkillPath = "character_src/ulti.png";
+}
+
+Skill::~Skill() {
+    Free();
+}
+
+bool Skill::LoadSkill(std::string path, SDL_Renderer* screen, int frame_count) {
+    bool ret = BaseObject::LoadImg(path, screen);
+    if (ret) {
+        width_frame = rect_.w/frame_count;
+        height_frame = rect_.h;
+    }
+    else std::cout<<"Skill::LoadSkill -> Unable to load"<<path<<" SDL Error: "<<SDL_GetError()<<"\n";
+    return ret;
+}
+
+void Skill::Show(SDL_Renderer* des, bool is_left, int frame) {
+    SDL_Rect* current_clip = &frame_clip[frame];
+    SDL_Rect* renderquad = new SDL_Rect;
+    *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
+    if (is_left) {
+        SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+    }
+    else {
+        SDL_RenderCopyEx(des, p_Object, current_clip, &*renderquad, 0, NULL, SDL_FLIP_HORIZONTAL);
+    }
+}
+
+void Skill::set_clips(int frame) {
+    for (int i = 0; i < frame; i++) {
+        frame_clip[i].x = i*width_frame;
+        frame_clip[i].y = 0;
+        frame_clip[i].w = width_frame;
+        frame_clip[i].h = height_frame;
+    }
+}
+
+/*-----------------------Character-------------------------*/
 
 Character::Character() { //character == mainObject
     wframe = 0; //frame_
@@ -44,7 +91,7 @@ bool Character::Load_Character_Img(std::string path, SDL_Renderer* screen, int f
         width_frame = rect_.w/frame_count;
         height_frame = rect_.h;
     }
-    else std::cout<<"Unable to load"<<path<<" SDL Error: "<<SDL_GetError()<<"\n";
+    else std::cout<<"Character::Load_Character_Img -> Unable to load"<<path<<" SDL Error: "<<SDL_GetError()<<"\n";
     return ret;
 }
 
@@ -61,88 +108,102 @@ int get_stt = -1;
 int check_get_stt;
 void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     //if (!is_hurt) {
-        if (character_status == JUMP_LEFT) {
-            Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
-            set_clips(FRAME_JUMP);
-            get_stt = 4;
-        }
-        else if (character_status == JUMP_RIGHT) {
-            Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
-            set_clips(FRAME_JUMP);
-            get_stt = 5;
-        }
+    if (character_status == JUMP_LEFT) {
+        Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
+        set_clips(FRAME_JUMP);
+        get_stt = 4;
+    }
+    else if (character_status == JUMP_RIGHT) {
+        Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
+        set_clips(FRAME_JUMP);
+        get_stt = 5;
+    }
 
-        if (character_status == RUN_LEFT) {
-            Load_Character_Img("character_src/run.png", des, FRAME_MOVE); 
-            set_clips(FRAME_MOVE);
-            get_stt = 2;
-        }
-        else if (character_status == RUN_RIGHT) {
-            Load_Character_Img("character_src/run.png", des, FRAME_MOVE);
-            set_clips(FRAME_MOVE);
-            get_stt = 3;
-        }
-        else if (character_status == IDLE_LEFT) {
-            Load_Character_Img("character_src/idle.png", des, FRAME_MOVE);
-            set_clips(FRAME_MOVE);
-            get_stt = 0;
-        }
-        else if (character_status == IDLE_RIGHT) {
-            Load_Character_Img("character_src/idle.png", des, FRAME_MOVE);
-            set_clips(FRAME_MOVE);
-            get_stt = 1;
-        }
-        else if (character_status == HURT_LEFT_ATK) {
-            Load_Character_Img("character_src/hurt_atk.png", des, FRAME_HURT);
-            set_clips(FRAME_HURT);
-            get_stt = 12;
-        }
-        else if (character_status == HURT_RIGHT_ATK) {
-            Load_Character_Img("character_src/hurt_atk.png", des, FRAME_HURT);
-            set_clips(FRAME_HURT);
-            get_stt = 13;
-        }
+    if (character_status == RUN_LEFT) {
+        Load_Character_Img("character_src/run.png", des, FRAME_MOVE); 
+        set_clips(FRAME_MOVE);
+        get_stt = 2;
+    }
+    else if (character_status == RUN_RIGHT) {
+        Load_Character_Img("character_src/run.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
+        get_stt = 3;
+    }
+    else if (character_status == IDLE_LEFT) {
+        Load_Character_Img("character_src/idle.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
+        get_stt = 0;
+    }
+    else if (character_status == IDLE_RIGHT) {
+        Load_Character_Img("character_src/idle.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
+        get_stt = 1;
+    }
+    else if (character_status == HURT_LEFT_ATK) {
+        Load_Character_Img("character_src/hurt_atk.png", des, FRAME_HURT);
+        set_clips(FRAME_HURT);
+        get_stt = 12;
+    }
+    else if (character_status == HURT_RIGHT_ATK) {
+        Load_Character_Img("character_src/hurt_atk.png", des, FRAME_HURT);
+        set_clips(FRAME_HURT);
+        get_stt = 13;
+    }
 
-        // attack:
-        else if (character_status == ATK_1_RIGHT) {
-            Load_Character_Img("character_src/atk1.png", des, FRAME_ATK_1);
-            set_clips(FRAME_ATK_1);
-            get_stt = 7;
-        }
-        else if (character_status == ATK_1_LEFT) {
-            Load_Character_Img("character_src/atk1.png", des, FRAME_ATK_1);
-            set_clips(FRAME_ATK_1);
-            get_stt = 6;
-        }
-        else if (character_status == ATK_2_RIGHT) {
-            Load_Character_Img("character_src/atk2.png", des, FRAME_ATK_1);
-            set_clips(FRAME_ATK_1);
-            get_stt = 9;
-        }
-        else if (character_status == ATK_2_LEFT) {
-            Load_Character_Img("character_src/atk2.png", des, FRAME_ATK_1);
-            set_clips(FRAME_ATK_1);
-            get_stt = 8;
+    // attack:
+    else if (character_status == ATK_1_RIGHT) {
+        Load_Character_Img("character_src/atk1.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 7;
+    }
+    else if (character_status == ATK_1_LEFT) {
+        Load_Character_Img("character_src/atk1.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 6;
+    }
+    else if (character_status == ATK_2_RIGHT) {
+        Load_Character_Img("character_src/atk2.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 9;
+    }
+    else if (character_status == ATK_2_LEFT) {
+        Load_Character_Img("character_src/atk2.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 8;
 
-        }
-        else if (character_status == ATK_3_RIGHT) {
-            Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
-            set_clips(FRAME_ATK_1);
-            get_stt = 11;
+    }
+    else if (character_status == ATK_3_RIGHT) {
+        Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 11;
 
-        }
-        else if (character_status == ATK_3_LEFT) {
-            Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
-            set_clips(FRAME_ATK_1);
-            get_stt = 10;
-        }
+    }
+    else if (character_status == ATK_3_LEFT) {
+        Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 10;
+    }
+    else if (character_status == ATK_U_LEFT) {
+        Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
+        Ulti.LoadSkill("character_src/ulti.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        Ulti.set_clips(FRAME_ATK_1);
+        get_stt = 14;
+    }
+    else if (character_status == ATK_U_RIGHT) {
+        Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
+        Ulti.LoadSkill("character_src/ulti.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        Ulti.set_clips(FRAME_ATK_1);
+        get_stt = 15;
+    }
     if (check_get_stt != get_stt) {
         wframe = 0;
         check_get_stt = get_stt;
     }
     //std::cout<<" char status: "<<character_status<<"\n";
     //atk: 6 7 8 9 10 11
-    if (get_stt == 6 || get_stt == 7 || get_stt == 8 || get_stt == 9 || get_stt == 10 || get_stt == 11) {
+    if (get_stt == 6 || get_stt == 7 || get_stt == 8 || get_stt == 9 || get_stt == 10 || get_stt == 11 || get_stt == 14) {
         wframe++;
         is_atk_left = false;
         is_atk_right = false;
@@ -153,6 +214,8 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
             Char_input_type.atk1 = 0;
             Char_input_type.atk2 = 0;
             Char_input_type.atk3 = 0;
+            Char_input_type.ulti = 0;
+            Ulti.Free();
         }
     }
     //jump
@@ -170,6 +233,8 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
             }
         }
     }
+
+    if (character_status != ATK_U_LEFT || character_status != ATK_U_RIGHT) Ulti.Free();
     //move and idle
     else if (get_stt == 0 || get_stt == 1 || get_stt == 2 || get_stt == 3) {
         wframe++;
@@ -190,18 +255,24 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
             show_dmg.Free();
         }
     }
-    //std::cout<<" Character: delay frame: "<<delay_frame<<" is hurt: "<<is_hurt<<" get_stt: "<<get_stt<<"";
 
     rect_.x = x_pos - map_x_;
     rect_.y = y_pos - map_y_;
+    Ulti.SetRect(x_pos - map_x_, y_pos - map_y_);
 
     SDL_Rect* current_clip = &frame_clip[wframe];
 
     SDL_Rect* renderquad = new SDL_Rect;
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
 
-    if (get_stt == 5 || get_stt == 3 || get_stt == 1 || get_stt == 13 || get_stt == 7 || get_stt == 9 || get_stt == 11) SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
-    else SDL_RenderCopyEx(des, p_Object, current_clip, &*renderquad, 0, NULL, SDL_FLIP_HORIZONTAL);
+    if (get_stt == 5 || get_stt == 3 || get_stt == 1 || get_stt == 13 || get_stt == 7 || get_stt == 9 || get_stt == 11 || get_stt == 14) {
+        SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+        Ulti.Show(des, 1, wframe);
+    }
+    else {
+        SDL_RenderCopyEx(des, p_Object, current_clip, &*renderquad, 0, NULL, SDL_FLIP_HORIZONTAL);
+        Ulti.Show(des, 0, wframe);
+    }
 
     Heal.Show(des);
     Heal.showHP.SetText("HP: " + std::to_string(Heal.current_HP) + "/" + std::to_string(Heal.max_HP));
@@ -213,7 +284,7 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     show_dmg.RenderText(des, show_dmg.x_pos, show_dmg.y_pos);
 
     Show_Heal_bottle.LoadImg("character_src/heal_bottle.png", des);
-    Show_Heal_bottle.SetRect(0, SCREEN_HEIGHT - Show_Heal_bottle.GetRect().h);\
+    Show_Heal_bottle.SetRect(0, SCREEN_HEIGHT - Show_Heal_bottle.GetRect().h);
     Show_Heal_bottle.Render(des);
     show_heal_bottle_text.SetText(std::to_string(Heal_bottle));
     show_heal_bottle_text.LoadFromRenderText(heal_font, des);
@@ -304,6 +375,21 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                 }
             }
             break;
+            case SDLK_u: {
+                if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
+                    character_status = ATK_U_RIGHT;
+                    Char_input_type.ulti = 1;
+                    is_atk_right = true;
+                    is_atk_left = false;
+                }
+                else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                    character_status = ATK_U_LEFT;
+                    Char_input_type.ulti = 1;
+                    is_atk_right = false;
+                    is_atk_left = true;
+                }
+            }
+            break;
             case SDLK_h: {
                 if (Heal_bottle > 0 && Heal.current_HP < Heal.max_HP) {
                     Heal.increase_HP(500);
@@ -311,9 +397,9 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     show_dmg.SetText(std::to_string(500));
                     show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
                     Heal_bottle --;
-                    printf("Current Heal bottle: %d \n",Heal_bottle);
                 }
             }
+            break;
         }
     }
     else if (character_event.type == SDL_KEYUP) { 
@@ -445,7 +531,7 @@ void Character::DoPlayer(Map& map_data) {
     }
     CheckMapData(map_data);
     CenterOnMap(map_data);
-    show_dmg.SetPosition(show_dmg.x_pos - map_x_, show_dmg.y_pos - (TILE_SIZE / 4));
+    show_dmg.SetPosition(x_pos - map_x_, show_dmg.y_pos - (TILE_SIZE / 4));
 }
 
 //get hurt animations and take dmg

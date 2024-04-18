@@ -275,6 +275,8 @@ int MainGamePlay(int level) {
         Enemy hell_dog;  // enemy threats test
         int getr = rand() % 101;
         getr > 50 ? hell_dog.SetPath("hell_dog") : hell_dog.SetPath("wolf");
+        getr > 50 ? hell_dog.HP.Set_Heal_Point(10000 + (rand() % 101)) : hell_dog.HP.Set_Heal_Point(20000 + (rand() % 101));
+        getr > 50 ? hell_dog.SetBaseDamage(500 + (rand() % 101)) : hell_dog.SetBaseDamage(1000 + (rand() % 201));
         std::string enmp = "threats_src/" + hell_dog.get_path() + "/idle.png";
         hell_dog.Load_Enemy_Img("threats_src/hell_dog/idle.png", g_renderer, ENEMY_IDLE_FRAME);
         hell_dog.set_clips(ENEMY_IDLE_FRAME);
@@ -315,10 +317,10 @@ int MainGamePlay(int level) {
         }
 
         int px = player_main_character.get_pos_x() / (10*TILE_SIZE);
-        if (px >= num_of_enemy - 1) px = num_of_enemy - 2;
-        if (px <= 0) px = 1;
+        if (px >= num_of_enemy - 2) px = num_of_enemy - 3;
+        if (px <= 1) px = 2;
 
-        for (size_t i = px - 1; i <= px + 1; i++) {
+        for (size_t i = px - 2; i <= px + 2; i++) {
             if (!hed[i].HP.is_negative) {
                 Object_Collide(player_main_character, hed[i]);
             }
@@ -335,7 +337,7 @@ int MainGamePlay(int level) {
         if (!player_main_character.Heal.is_negative) player_main_character.SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
         if (!player_main_character.Heal.is_negative) player_main_character.DoPlayer(Get_play_map_data);
         
-        for (size_t i = px - 1; i <= px + 1; i++) {
+        for (size_t i = px - 2; i <= px + 2; i++) {
             if (!hed[i].HP.is_negative) { 
                 hed[i].SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
                 hed[i].Do_Play(Get_play_map_data);
@@ -344,7 +346,7 @@ int MainGamePlay(int level) {
 
         Map1.DrawMap(g_renderer);
 
-        for (size_t i = px - 1; i <= px + 1; i++) {
+        for (size_t i = px - 2; i <= px + 2; i++) {
             if (!hed[i].HP.is_negative) {
                 hed[i].Show_Enemy(g_renderer, g_font);
             }
@@ -366,7 +368,7 @@ int MainGamePlay(int level) {
             }
         }
 
-        for (size_t i = px - 1; i <= px + 1; i++) {
+        for (size_t i = px - 2; i <= px + 2; i++) {
             if (hed[i].HP.is_negative && !Check_enemy_is_dead[i]) {
                 hed[i].SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
                 if (hed[i].Dead(g_renderer)) {

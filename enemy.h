@@ -46,13 +46,12 @@ public:
     void SetHome(int x, int y) { x_home = x; y_home = y; }; 
     float get_x_pos() const { return x_pos; };
     float get_y_pos() const { return y_pos; };
-    
+    void SetBaseDamage(int val) { base_dmg = val; };
     int get_status_() const { return status_; };
 
-    //use in Enemy::Show_Enemy()
     bool is_hurting;
     bool found_player;
-    //use in Enemy::Show_Enemy()
+    
     int get_status;
     bool is_atk_left;
     bool is_atk_right;
@@ -81,6 +80,7 @@ private:
     int map_x_;
     int map_y_;
     int atk_cd;
+    int base_dmg;
     std::string Enemy_name;
 
 };

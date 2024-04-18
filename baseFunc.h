@@ -103,6 +103,7 @@ struct Input
     int atk1;
     int atk2;
     int atk3;
+    int ulti;
     int jump;
     int idle;
     int hurt_l;
