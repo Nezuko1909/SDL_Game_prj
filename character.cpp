@@ -72,13 +72,23 @@ Character::Character() { //character == mainObject
     map_x_ = 0;
     map_y_ = 0;
     Heal.set_HP_Rect(0, 0, TILE_SIZE * 5, TILE_SIZE / 2); 
-    Heal.Set_Heal_Point(5501); 
+    Heal.Set_Heal_Point(5501);
     Heal.HP_font = TTF_OpenFont("text/LSB.ttf", 28);
     Heal.showHP.SetPosition(Heal.get_rect_().x + TILE_SIZE / 4 , Heal.get_rect_().y + 2);
     Heal.showHP.SetText("HP: " + std::to_string(Heal.current_HP) + "/" + std::to_string(Heal.max_HP));
     show_dmg.SetColor_(show_dmg.RED_COLOR);
     Heal_bottle = 10;
     heal_font = TTF_OpenFont("text/calibri.ttf", 64);
+    skill_countdown[3] = 30*FRAME_PER_SECOND; //30 second
+    max_skill_coutdown[3] = 30*FRAME_PER_SECOND;
+    skill_countdown[2] = FRAME_PER_SECOND; //1 second
+    max_skill_coutdown[2] = FRAME_PER_SECOND;
+    skill_countdown[1] = FRAME_PER_SECOND / 2;
+    max_skill_coutdown[1] = FRAME_PER_SECOND / 2;
+    skill_countdown[0] = FRAME_PER_SECOND / 2;
+    max_skill_coutdown[0] = FRAME_PER_SECOND / 2;
+    Show_CD_Skill.resize(4);
+    is_ultimate = 0;
 }
 
 Character::~Character() {
@@ -107,29 +117,7 @@ void Character::set_clips(int frame) {
 int get_stt = -1;
 int check_get_stt;
 void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
-    //if (!is_hurt) {
-    if (character_status == JUMP_LEFT) {
-        Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
-        set_clips(FRAME_JUMP);
-        get_stt = 4;
-    }
-    else if (character_status == JUMP_RIGHT) {
-        Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
-        set_clips(FRAME_JUMP);
-        get_stt = 5;
-    }
-
-    if (character_status == RUN_LEFT) {
-        Load_Character_Img("character_src/run.png", des, FRAME_MOVE); 
-        set_clips(FRAME_MOVE);
-        get_stt = 2;
-    }
-    else if (character_status == RUN_RIGHT) {
-        Load_Character_Img("character_src/run.png", des, FRAME_MOVE);
-        set_clips(FRAME_MOVE);
-        get_stt = 3;
-    }
-    else if (character_status == IDLE_LEFT) {
+    if (character_status == IDLE_LEFT) {
         Load_Character_Img("character_src/idle.png", des, FRAME_MOVE);
         set_clips(FRAME_MOVE);
         get_stt = 0;
@@ -139,83 +127,93 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
         set_clips(FRAME_MOVE);
         get_stt = 1;
     }
-    else if (character_status == HURT_LEFT_ATK) {
-        Load_Character_Img("character_src/hurt_atk.png", des, FRAME_HURT);
-        set_clips(FRAME_HURT);
-        get_stt = 12;
+    else if (character_status == RUN_LEFT) {
+        Load_Character_Img("character_src/run.png", des, FRAME_MOVE); 
+        set_clips(FRAME_MOVE);
+        get_stt = 2;
     }
-    else if (character_status == HURT_RIGHT_ATK) {
-        Load_Character_Img("character_src/hurt_atk.png", des, FRAME_HURT);
-        set_clips(FRAME_HURT);
-        get_stt = 13;
+    else if (character_status == RUN_RIGHT) {
+        Load_Character_Img("character_src/run.png", des, FRAME_MOVE);
+        set_clips(FRAME_MOVE);
+        get_stt = 3;
     }
-
-    // attack:
-    else if (character_status == ATK_1_RIGHT) {
-        Load_Character_Img("character_src/atk1.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        get_stt = 7;
+    else if (character_status == JUMP_LEFT) {
+        Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
+        set_clips(FRAME_JUMP);
+        get_stt = 4;
+    }
+    else if (character_status == JUMP_RIGHT) {
+        Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
+        set_clips(FRAME_JUMP);
+        get_stt = 5;
     }
     else if (character_status == ATK_1_LEFT) {
-        Load_Character_Img("character_src/atk1.png", des, FRAME_ATK_1);
+        Load_Character_Img(is_ultimate <= 0 ? "character_src/atk1.png" : "character_src/uatk1.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         get_stt = 6;
     }
+    else if (character_status == ATK_1_RIGHT) {
+        Load_Character_Img(is_ultimate <= 0 ? "character_src/atk1.png" : "character_src/uatk1.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 7;
+    }
+    else if (character_status == ATK_2_LEFT) {
+        Load_Character_Img(is_ultimate <= 0 ? "character_src/atk2.png" : "character_src/uatk2.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 8;
+    }
     else if (character_status == ATK_2_RIGHT) {
-        Load_Character_Img("character_src/atk2.png", des, FRAME_ATK_1);
+        Load_Character_Img(is_ultimate <= 0 ? "character_src/atk2.png" : "character_src/uatk2.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         get_stt = 9;
     }
-    else if (character_status == ATK_2_LEFT) {
-        Load_Character_Img("character_src/atk2.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        get_stt = 8;
-
-    }
-    else if (character_status == ATK_3_RIGHT) {
-        Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
-        set_clips(FRAME_ATK_1);
-        get_stt = 11;
-
-    }
     else if (character_status == ATK_3_LEFT) {
-        Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
+        Load_Character_Img(is_ultimate <= 0 ? "character_src/atk3.png" : "character_src/uatk3.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         get_stt = 10;
+    }
+    else if (character_status == ATK_3_RIGHT) {
+        Load_Character_Img(is_ultimate <= 0 ? "character_src/atk3.png" : "character_src/uatk3.png", des, FRAME_ATK_1);
+        set_clips(FRAME_ATK_1);
+        get_stt = 11;
     }
     else if (character_status == ATK_U_LEFT) {
         Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
         Ulti.LoadSkill("character_src/ulti.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         Ulti.set_clips(FRAME_ATK_1);
-        get_stt = 14;
+        get_stt = 12;
     }
     else if (character_status == ATK_U_RIGHT) {
         Load_Character_Img("character_src/atk3.png", des, FRAME_ATK_1);
         Ulti.LoadSkill("character_src/ulti.png", des, FRAME_ATK_1);
         set_clips(FRAME_ATK_1);
         Ulti.set_clips(FRAME_ATK_1);
+        get_stt = 13;
+    }
+    else if (character_status == HURT_LEFT_ATK) {
+        Load_Character_Img("character_src/hurt_atk.png", des, FRAME_HURT);
+        set_clips(FRAME_HURT);
+        get_stt = 14;
+    }
+    else if (character_status == HURT_RIGHT_ATK) {
+        Load_Character_Img("character_src/hurt_atk.png", des, FRAME_HURT);
+        set_clips(FRAME_HURT);
         get_stt = 15;
     }
+
     if (check_get_stt != get_stt) {
         wframe = 0;
         check_get_stt = get_stt;
     }
-    //std::cout<<" char status: "<<character_status<<"\n";
-    //atk: 6 7 8 9 10 11
-    if (get_stt == 6 || get_stt == 7 || get_stt == 8 || get_stt == 9 || get_stt == 10 || get_stt == 11 || get_stt == 14) {
+
+    //printf("Get_stt: %d\twframe: %d\tdelay_frame: %d\n", get_stt, wframe, delay_frame);
+    
+    //move and idle
+    if (get_stt == 0 || get_stt == 1 || get_stt == 2 || get_stt == 3) {
         wframe++;
-        is_atk_left = false;
-        is_atk_right = false;
-        if (wframe >= FRAME_ATK_1) {
-            wframe = 0;  
-            if (get_stt == 7 || get_stt == 9 || get_stt == 11) character_status = IDLE_RIGHT; 
-            else character_status = IDLE_LEFT;
-            Char_input_type.atk1 = 0;
-            Char_input_type.atk2 = 0;
-            Char_input_type.atk3 = 0;
-            Char_input_type.ulti = 0;
-            Ulti.Free();
+        if (wframe >= FRAME_MOVE) {
+            wframe = 0;
         }
     }
     //jump
@@ -233,21 +231,28 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
             }
         }
     }
-
-    if (character_status != ATK_U_LEFT || character_status != ATK_U_RIGHT) Ulti.Free();
-    //move and idle
-    else if (get_stt == 0 || get_stt == 1 || get_stt == 2 || get_stt == 3) {
+    //atk: 6 7 8 9 10 11 12 13
+    else if (get_stt == 6 || get_stt == 7 || get_stt == 8 || get_stt == 9 || get_stt == 10 || get_stt == 11 || get_stt == 12 || get_stt == 13) {
         wframe++;
-        if (wframe >= FRAME_MOVE) {
-            wframe = 0;
+        is_atk_left = false;
+        is_atk_right = false;
+        if (wframe >= FRAME_ATK_1) {
+            wframe = 0;  
+            if (get_stt == 7 || get_stt == 9 || get_stt == 11 || get_stt == 13) character_status = IDLE_RIGHT; 
+            else character_status = IDLE_LEFT;
+            Char_input_type.atk1 = 0;
+            Char_input_type.atk2 = 0;
+            Char_input_type.atk3 = 0;
+            Char_input_type.ulti = 0;
+            Ulti.Free();
         }
     }
     //hurt
-    else if (get_stt == 12 || get_stt == 13) {
+    else if (get_stt == 14 || get_stt == 15) {
         wframe = 0;
         delay_frame++; 
         if (delay_frame > 6) {
-            if (get_stt == 13) character_status = IDLE_LEFT;
+            if (get_stt == 15) character_status = IDLE_LEFT;
             else character_status = IDLE_RIGHT;
             delay_frame = 0;
             is_hurt = false;
@@ -258,20 +263,25 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
 
     rect_.x = x_pos - map_x_;
     rect_.y = y_pos - map_y_;
-    Ulti.SetRect(x_pos - map_x_, y_pos - map_y_);
 
     SDL_Rect* current_clip = &frame_clip[wframe];
 
     SDL_Rect* renderquad = new SDL_Rect;
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
 
-    if (get_stt == 5 || get_stt == 3 || get_stt == 1 || get_stt == 13 || get_stt == 7 || get_stt == 9 || get_stt == 11 || get_stt == 14) {
+    if (get_stt == 1 || get_stt == 3 || get_stt == 5 || get_stt == 7 || get_stt == 9 || get_stt == 11 || get_stt == 13 || get_stt == 15) {
         SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
-        Ulti.Show(des, 1, wframe);
+        if (get_stt == 13) {
+            Ulti.SetRect(x_pos - map_x_, y_pos - map_y_);
+            Ulti.Show(des, 1, wframe);
+        }
     }
     else {
         SDL_RenderCopyEx(des, p_Object, current_clip, &*renderquad, 0, NULL, SDL_FLIP_HORIZONTAL);
-        Ulti.Show(des, 0, wframe);
+        if (get_stt == 12) {
+            Ulti.SetRect(x_pos - map_x_ - width_frame, y_pos - map_y_);
+            Ulti.Show(des, 0, wframe);
+        }
     }
 
     Heal.Show(des);
@@ -290,9 +300,28 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
     show_heal_bottle_text.LoadFromRenderText(heal_font, des);
     show_heal_bottle_text.SetPosition(Show_Heal_bottle.GetRect().x + Show_Heal_bottle.GetRect().w, Show_Heal_bottle.GetRect().y);
     show_heal_bottle_text.RenderText(des, show_heal_bottle_text.x_pos, show_heal_bottle_text.y_pos);
+
+    UpParameter(des);
 }
 
-void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) {  
+void Character::UpParameter(SDL_Renderer* des) {
+    for (size_t i = 0; i < Show_CD_Skill.size(); i++) {
+        std::string crp = "character_src/skills/" + std::to_string(i + 1) + ".png";
+        Show_CD_Skill[i].LoadImg(crp, des);
+        Show_CD_Skill[i].SetRect(SCREEN_WIDTH - ((5-i)*TILE_SIZE + 10), SCREEN_HEIGHT - Show_CD_Skill[i].GetRect().h - 10);
+        Show_CD_Skill[i].Render(des);
+        SDL_Rect* cd_rect = new SDL_Rect;
+        int x = Show_CD_Skill[i].GetRect().x;
+        int y = Show_CD_Skill[i].GetRect().y;
+        int w = Show_CD_Skill[i].GetRect().w;
+        int h = double(Show_CD_Skill[i].GetRect().h)*(double(skill_countdown[i]) / double(max_skill_coutdown[i]));
+        *cd_rect = { x, y, w, h };
+        SDL_SetRenderDrawColor(des, 0, 0, 0, 0);
+        SDL_RenderFillRect(des, cd_rect);
+    }
+}
+
+void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* screen) { 
     if (character_event.type == SDL_KEYDOWN) {
         switch (character_event.key.keysym.sym) {
             case SDLK_d: { 
@@ -331,62 +360,75 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
             }
             break;
             case SDLK_j: {  
-                if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT) {
-                    character_status = ATK_1_RIGHT;
-                    Char_input_type.atk1 = 1;
-                    is_atk_right = true;
-                    is_atk_left = false;
-                }
-                else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
-                    character_status = ATK_1_LEFT;
-                    Char_input_type.atk1 = 1;
-                    is_atk_right = false;
-                    is_atk_left = true;
+                if (skill_countdown[0] <= 1) {
+                    if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT) {
+                        character_status = ATK_1_RIGHT;
+                        Char_input_type.atk1 = 1;
+                        is_atk_right = true;
+                        is_atk_left = false;
+                    }
+                    else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                        character_status = ATK_1_LEFT;
+                        Char_input_type.atk1 = 1;
+                        is_atk_right = false;
+                        is_atk_left = true;
+                    }
+                    skill_countdown[0] = FRAME_PER_SECOND / 2;
                 }
             }
             break;
             case SDLK_k: {
-                if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
-                    character_status = ATK_2_RIGHT;
-                    Char_input_type.atk2 = 1;
-                    is_atk_right = true;
-                    is_atk_left = false;
-                }
-                else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
-                    character_status = ATK_2_LEFT;
-                    Char_input_type.atk2 = 1;
-                    is_atk_right = false;
-                    is_atk_left = true;
+                if (skill_countdown[1] <= 1) {
+                    if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
+                        character_status = ATK_2_RIGHT;
+                        Char_input_type.atk2 = 1;
+                        is_atk_right = true;
+                        is_atk_left = false;
+                    }
+                    else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                        character_status = ATK_2_LEFT;
+                        Char_input_type.atk2 = 1;
+                        is_atk_right = false;
+                        is_atk_left = true;
+                    }
+                    skill_countdown[1] = FRAME_PER_SECOND / 2;
                 }
             }
             break;
             case SDLK_l: {
-                if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
-                    character_status = ATK_3_RIGHT;
-                    Char_input_type.atk3 = 1;
-                    is_atk_right = true;
-                    is_atk_left = false;
-                }
-                else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
-                    character_status = ATK_3_LEFT;
-                    Char_input_type.atk3 = 1;
-                    is_atk_right = false;
-                    is_atk_left = true;
+                if (skill_countdown[2] <= 1) {
+                    if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
+                        character_status = ATK_3_RIGHT;
+                        Char_input_type.atk3 = 1;
+                        is_atk_right = true;
+                        is_atk_left = false;
+                    }
+                    else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                        character_status = ATK_3_LEFT;
+                        Char_input_type.atk3 = 1;
+                        is_atk_right = false;
+                        is_atk_left = true;
+                    }
+                    skill_countdown[2] = FRAME_PER_SECOND;
                 }
             }
             break;
             case SDLK_u: {
-                if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
-                    character_status = ATK_U_RIGHT;
-                    Char_input_type.ulti = 1;
-                    is_atk_right = true;
-                    is_atk_left = false;
-                }
-                else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
-                    character_status = ATK_U_LEFT;
-                    Char_input_type.ulti = 1;
-                    is_atk_right = false;
-                    is_atk_left = true;
+                if (skill_countdown[3] <= 1) {
+                    if (character_status == IDLE_RIGHT || character_status == RUN_RIGHT ) {
+                        character_status = ATK_U_RIGHT;
+                        Char_input_type.ulti = 1;
+                        is_atk_right = true;
+                        is_atk_left = false;
+                    }
+                    else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                        character_status = ATK_U_LEFT;
+                        Char_input_type.ulti = 1;
+                        is_atk_right = false;
+                        is_atk_left = true;
+                    }
+                    skill_countdown[3] = 30*FRAME_PER_SECOND;
+                    is_ultimate = 25*FRAME_PER_SECOND;
                 }
             }
             break;
@@ -396,7 +438,7 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     show_dmg.SetColor(0, 222, 0, 0);
                     show_dmg.SetText(std::to_string(500));
                     show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
-                    Heal_bottle --;
+                    Heal_bottle--;
                 }
             }
             break;
@@ -406,27 +448,14 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
         switch (character_event.key.keysym.sym) {
             case SDLK_d: { 
                 Char_input_type.right = 0;
-                //Char_input_type.idle = 1;
                 Char_input_type.left == 1 ? character_status = RUN_LEFT : character_status = IDLE_RIGHT;
             }
             break;
             case SDLK_a: {
                 Char_input_type.left = 0;
-                //Char_input_type.idle = 1;
                 Char_input_type.right == 1 ? character_status = RUN_RIGHT : character_status = IDLE_LEFT;
             }
             break;
-            /*
-            case SDLK_SPACE: {
-                if (Char_input_type.left == 1 || character_status == JUMP_LEFT || character_status == RUN_LEFT) {
-                    Char_input_type.left == 1 ? character_status = RUN_LEFT : character_status = IDLE_LEFT;
-                }
-                else {
-                    Char_input_type.right == 1 ? character_status = RUN_RIGHT : character_status = IDLE_RIGHT;
-                }
-            }
-            break; 
-            */
         }
     }
 }
@@ -532,6 +561,13 @@ void Character::DoPlayer(Map& map_data) {
     CheckMapData(map_data);
     CenterOnMap(map_data);
     show_dmg.SetPosition(x_pos - map_x_, show_dmg.y_pos - (TILE_SIZE / 4));
+    for (int i = 0; i < 4; i++) {
+        if (skill_countdown[i] > 0) {
+            skill_countdown[i]--;
+            //printf("Skill_countdown[%d]: %d\n",i, skill_countdown[i]);
+        }
+    }
+    if (is_ultimate > 0) is_ultimate--;
 }
 
 //get hurt animations and take dmg
@@ -558,20 +594,23 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
     }
 }
 
-int Character::get_dmg(int status, bool is_ultimate) {
+int Character::get_dmg(int status, int is_ultimaten, bool &crit) {
     int base_dmg;
     base_dmg = rand()%1000;
     if (base_dmg < 500) base_dmg = 500;
     if (status == ATK_2_LEFT || status == ATK_2_RIGHT) base_dmg -= rand()%101;
-    if (status == ATK_3_LEFT || status == ATK_3_RIGHT) base_dmg += rand()%101;
-    if (is_ultimate) base_dmg+=2000;
-    //critical rate = 50%; critical dmg 150 ~ 250% 
+    else if (status == ATK_3_LEFT || status == ATK_3_RIGHT) base_dmg += rand()%101;
+    else if (status == ATK_U_LEFT || status == ATK_U_RIGHT) base_dmg += (10000 + rand()%5000);
+    if (is_ultimate > 0) base_dmg+=2500;
+    //critical rate = 50%; critical dmg 150% ~ 300% 
     int is_crit = rand()%101;
-    if (is_ultimate ? is_crit < 50 : is_crit < 75) {
-        double val = (rand() % 101) + (is_ultimate ? 150 : 250);
+    if (is_ultimate > 0 ? is_crit < 50 : is_crit < 75) {
+        double val = (rand() % 101) + (is_ultimate ? 150 : 300);
         val /= 100.0;
+        crit = true;
         return int(base_dmg*val);
     }
+    crit = false;
     return base_dmg;
 }
 

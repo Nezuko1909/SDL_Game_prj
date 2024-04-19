@@ -78,6 +78,8 @@ int Object_Collide(Character&  player, Enemy& enemy) {
 
     player.get_hitbox_for_other_object(player_hitbox.x1, player_hitbox.x2, player_hitbox.y1, player_hitbox.y2);
     enemy.get_hitbox_for_other_object(enemy_hitbox.x1, enemy_hitbox.x2, enemy_hitbox.y1, enemy_hitbox.y2);
+    if (player.get_status() == player.ATK_U_LEFT) player_hitbox.x1 -= player.GetRect().w;
+    else if (player.get_status() == player.ATK_U_RIGHT) player_hitbox.x2 += player.GetRect().w;
 
     bool check_hitbox = false;
 
@@ -90,16 +92,18 @@ int Object_Collide(Character&  player, Enemy& enemy) {
     //if (check_hitbox) printf("Check Hitbox: %d\n",check_hitbox);
     if (player.is_atk_left && check_hitbox) {
         //if (player.is_atk_left) printf("Player: is_atk_left");
-        int damage = player.get_dmg(player.get_status(), 0); // hien tai chua co ultimate nen mac dinh = 0
-        damage >= 1000 ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
+        bool is_critical_damage;
+        int damage = player.get_dmg(player.get_status(), player.is_ultimate, is_critical_damage);
+        is_critical_damage == true ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, damage);
         //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
         ret = 1;
     }
     else if (player.is_atk_right && check_hitbox) {
         //if (player.is_atk_right) printf("Player: is_atk_right");
-        int damage = player.get_dmg(player.get_status(), 0);
-        damage >= 1000 ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
+        bool is_critical_damage;
+        int damage = player.get_dmg(player.get_status(), player.is_ultimate, is_critical_damage);
+        is_critical_damage == true ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, damage);
         //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
         ret = 2;
@@ -275,7 +279,7 @@ int MainGamePlay(int level) {
         Enemy hell_dog;  // enemy threats test
         int getr = rand() % 101;
         getr > 50 ? hell_dog.SetPath("hell_dog") : hell_dog.SetPath("wolf");
-        getr > 50 ? hell_dog.HP.Set_Heal_Point(10000 + (rand() % 101)) : hell_dog.HP.Set_Heal_Point(20000 + (rand() % 101));
+        getr > 50 ? hell_dog.HP.Set_Heal_Point(10000*level + (rand() % 10001)) : hell_dog.HP.Set_Heal_Point(20000*level + (rand() % 1001));
         getr > 50 ? hell_dog.SetBaseDamage(500 + (rand() % 101)) : hell_dog.SetBaseDamage(1000 + (rand() % 201));
         std::string enmp = "threats_src/" + hell_dog.get_path() + "/idle.png";
         hell_dog.Load_Enemy_Img("threats_src/hell_dog/idle.png", g_renderer, ENEMY_IDLE_FRAME);
