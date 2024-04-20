@@ -61,7 +61,8 @@ public:
     TextObject show_dmg;
     
     bool Dead(SDL_Renderer* des);
-
+    void Clear();
+    
 private:
     float x_val;
     float y_val;

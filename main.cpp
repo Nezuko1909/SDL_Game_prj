@@ -38,7 +38,7 @@ bool func_texture() {
 
 bool init_Data() { //create window
     bool success = true;
-    if (SDL_Init(SDL_INIT_VIDEO)<0) {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cout<<"SDL could not initialize, SDL Error:\n"<<SDL_GetError();
         success = false;
     }
@@ -57,6 +57,14 @@ bool init_Data() { //create window
             std::cout<<"TTF could not initialize, SDL_Error: "<<SDL_GetError();
             success = false;
         }
+        if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+            std::cerr<<"SDL could not initialize audio, SDL_Error: "<<SDL_GetError();
+            success = false;
+        }
+        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0){
+            std::cerr<<"Mix could not Open audio, SDL_Error: "<<SDL_GetError();
+            success = false;
+        }
     }
     return success;
 }
@@ -67,8 +75,12 @@ void close() {
     g_renderer = NULL;
     SDL_DestroyWindow(g_window);
     g_window = NULL;
+    Mix_FreeMusic(BgrMusic);
+    BgrMusic = NULL;
     IMG_Quit();
+    Mix_Quit();
     SDL_Quit();
+    TTF_Quit();
 }
 
 /*
@@ -189,6 +201,9 @@ int PauseMenu() {
             break;
         }
     }
+    Resume.Clear();
+    Restart.Clear();
+    MainMenu.Clear();
     return ret;
 }
 
@@ -243,6 +258,8 @@ int DefeatMenu() {
             break;
         }
     }
+    Restart.Clear();
+    MainMenu.Clear();
     return ret;
 }
 
@@ -258,13 +275,13 @@ int WinMenu() {
     Background.Render(g_renderer);
 
     Button Restart;
-    Restart.SetRectAll(5*TILE_SIZE, 9*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE);
+    Restart.SetRectAll(3*TILE_SIZE, 8.5*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE);
     Restart.tile.SetText("Retry");
     Restart.SetForTile(g_font);
     Restart.tile.SetColor(255, 255, 255, 255);
 
     Button MainMenu;
-    MainMenu.SetRectAll(11*TILE_SIZE, 9*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE);
+    MainMenu.SetRectAll(13*TILE_SIZE, 8.5*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE);
     MainMenu.tile.SetText("Level list");
     MainMenu.SetForTile(g_font);
     MainMenu.tile.SetColor(255, 255, 255, 255);
@@ -311,7 +328,7 @@ int WinMenu() {
 
         Restart.RenderTile(g_renderer, g_font);
         MainMenu.RenderTile(g_renderer, g_font);
-
+ 
         SDL_RenderPresent(g_renderer);
 
         if (Restart.is_click) {
@@ -323,6 +340,11 @@ int WinMenu() {
             break;
         }
     }
+    Restart.Clear();
+    MainMenu.Clear();
+    para1.Clear();
+    para2.Clear();
+    para3.Clear();
     return ret;
 }
 
@@ -368,7 +390,7 @@ int MainGamePlay(int level) {
         Enemy hell_dog;  // enemy threats test
         int getr = rand() % 101;
         getr > 50 ? hell_dog.SetPath("hell_dog") : hell_dog.SetPath("wolf");
-        getr > 50 ? hell_dog.HP.Set_Heal_Point(10000*level + (rand() % 10001)) : hell_dog.HP.Set_Heal_Point(20000*level + (rand() % 1001));
+        getr > 50 ? hell_dog.HP.Set_Heal_Point(20000*level + (rand() % 10001)) : hell_dog.HP.Set_Heal_Point(40000*level + (rand() % 10001));
         getr > 50 ? hell_dog.SetBaseDamage(500 + (rand() % 101)) : hell_dog.SetBaseDamage(1000 + (rand() % 201));
         std::string enmp = "threats_src/" + hell_dog.get_path() + "/idle.png";
         hell_dog.Load_Enemy_Img("threats_src/hell_dog/idle.png", g_renderer, ENEMY_IDLE_FRAME);
@@ -380,14 +402,14 @@ int MainGamePlay(int level) {
     std::vector<bool> Check_enemy_is_dead(num_of_enemy, false);
 
     printf("%d\n",level);
-
+    int ret = -1;
     bool is_quit = false;
     while (!is_quit) {
         fps_timer.start();
 
         TTF_CloseFont(g_font);
         g_font = TTF_OpenFont("text/LSB.ttf", 30);
-        
+        bool is_break = false;
         while(SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 return 3;
@@ -395,13 +417,19 @@ int MainGamePlay(int level) {
             if (g_event.key.keysym.sym == SDLK_ESCAPE) {
                 int pmr = PauseMenu();
                 if (pmr == 1) {
-                    return 1;
+                    ret = 1;
+                    is_break = true;
+                    break;
                 }
                 else if (pmr == 2) {
-                    return 4;
+                    ret = 4;
+                    is_break = true;
+                    break;
                 }
                 else if (pmr == 3) {
-                    return 3;
+                    ret = 3;
+                    is_break = true;
+                    break;
                 }
             }
             if (!player_main_character.Heal.is_negative) {
@@ -410,6 +438,7 @@ int MainGamePlay(int level) {
                 }
             }
         }
+        if (is_break) break;
 
         int px = player_main_character.get_pos_x() / (10*TILE_SIZE);
         if (px >= num_of_enemy - 2) px = num_of_enemy - 3;
@@ -451,13 +480,16 @@ int MainGamePlay(int level) {
             if (player_main_character.dead(g_renderer)) {
                 int def = DefeatMenu();
                 if (def == 1) {
-                    return 1;
+                    ret = 1;
+                    break;
                 }
                 else if (def == 2) {
-                    return 2;
+                    ret = 2;
+                    break;
                 }
                 else if (def == 3) {
-                    return 3;
+                    ret = 3;
+                    break;
                 }
             }
         }
@@ -480,13 +512,16 @@ int MainGamePlay(int level) {
         if (player_main_character.win == true) {
             int wmrx = WinMenu();
             if (wmrx == 1) {
-                return 1;
+                ret = 1;
+                break;
             }
             else if (wmrx == 2) {
-                return 0;
+                ret = 0;
+                break;
             }
             else if (wmrx == 3) {
-                return 3;
+                ret = 3;
+                break;
             }
         }
 
@@ -498,7 +533,13 @@ int MainGamePlay(int level) {
             SDL_Delay(delay_time); //milisecond
         }
     }
-    return 0;
+    Background.Free();
+    Map1.Free();
+    player_main_character.Clear();
+    for (size_t i = 0; i < hed.size(); i++) {
+        hed[i].Clear();
+    }
+    return ret;
 }
 
 /*
@@ -564,6 +605,7 @@ int Level_List() {
         }
         for (size_t i = 0; i < level.size(); i++) {
             if (level[i].is_click) {
+                Mix_PauseMusic();
                 int mgr = MainGamePlay(i + 1); 
                 while (mgr == 1) { 
                     mgr = MainGamePlay(i + 1);
@@ -581,6 +623,7 @@ int Level_List() {
                 if (mgr == 3) {
                     return 3;
                 }
+                if (Mix_PausedMusic()) Mix_ResumeMusic();
             }
             level[i].is_click = false;
         }
@@ -618,12 +661,18 @@ int UserInterface() {
     Quit_bt.RenderTile(g_renderer, g_font);
 
     SDL_RenderPresent(g_renderer);
+    Mix_VolumeMusic(10);
+
+    Mix_FreeMusic(BgrMusic);
+    BgrMusic = Mix_LoadMUS("Music/bgr.mp3");
 
     bool is_quit = false;
     while (!is_quit) {
+        if (!Mix_PlayingMusic()) Mix_PlayMusic(BgrMusic, 0);
         TTF_CloseFont(g_font);
         g_font = TTF_OpenFont("text/calibri.ttf", text_size);
         Background.LoadImg("img_source/BGR.png", g_renderer);
+
         while (SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;

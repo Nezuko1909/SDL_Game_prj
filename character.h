@@ -71,7 +71,8 @@ public:
 
     bool dead(SDL_Renderer* des);
     bool win;
-
+    void Clear();
+    
 private:
     float x_val;
     float y_val;

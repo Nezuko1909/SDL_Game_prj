@@ -41,6 +41,11 @@ Enemy::~Enemy() {
 
 }
 
+void Enemy::Clear() {
+    Free();
+    show_dmg.Free();
+}
+
 void Enemy::get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2) {
     x1 = x_pos;
     x2 = x_pos + width_frame;
@@ -455,6 +460,9 @@ bool Enemy::Dead(SDL_Renderer* des) {
     *renderquad = {rect_.x, rect_.y, width_frame, height_frame};
 
     SDL_RenderCopy(des, p_Object, current_clip, &*renderquad);
+    
+    show_dmg.RenderText(des, show_dmg.x_pos, show_dmg.y_pos);
+    show_dmg.y_pos-= TILE_SIZE / 4;
     return false;
 }
 

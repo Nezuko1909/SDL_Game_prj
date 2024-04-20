@@ -79,8 +79,8 @@ Character::Character() { //character == mainObject
     show_dmg.SetColor_(show_dmg.RED_COLOR);
     Heal_bottle = 5;
     heal_font = TTF_OpenFont("text/calibri.ttf", 64);
-    skill_countdown[3] = 30*FRAME_PER_SECOND; //30 second
-    max_skill_coutdown[3] = 30*FRAME_PER_SECOND;
+    skill_countdown[3] = FRAME_PER_SECOND; //30 second
+    max_skill_coutdown[3] = 12*FRAME_PER_SECOND;
     skill_countdown[2] = FRAME_PER_SECOND; //1 second
     max_skill_coutdown[2] = FRAME_PER_SECOND;
     skill_countdown[1] = FRAME_PER_SECOND / 2;
@@ -93,7 +93,18 @@ Character::Character() { //character == mainObject
 }
 
 Character::~Character() {
+    Clear();
+}
 
+void Character::Clear() {
+    Ulti.Free();
+    for (size_t i = 0; i < Show_CD_Skill.size(); i++) {
+        Show_CD_Skill[i].Free();
+    }
+    Show_Heal_bottle.Free();
+    show_heal_bottle_text.Free();
+    show_dmg.Free();
+    Free();
 }
 
 bool Character::Load_Character_Img(std::string path, SDL_Renderer* screen, int frame_count) {
@@ -428,8 +439,8 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                         is_atk_right = false;
                         is_atk_left = true;
                     }
-                    skill_countdown[3] = 30*FRAME_PER_SECOND;
-                    is_ultimate = 25*FRAME_PER_SECOND;
+                    skill_countdown[3] = 12*FRAME_PER_SECOND;
+                    is_ultimate = 10*FRAME_PER_SECOND;
                 }
             }
             break;
@@ -599,21 +610,21 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
 
 int Character::get_dmg(int status, int is_ultimaten, bool &crit, long long &TotalDamage, int &StrongestSingleStrike) {
     int base_dmg;
-    base_dmg = rand()%1000;
-    if (base_dmg < 500) base_dmg = 500;
+    base_dmg = rand()%2000;
+    if (base_dmg < 1000) base_dmg = 1000;
     if (status == ATK_2_LEFT || status == ATK_2_RIGHT) base_dmg -= rand()%101;
     else if (status == ATK_3_LEFT || status == ATK_3_RIGHT) base_dmg += rand()%101;
-    else if (status == ATK_U_LEFT || status == ATK_U_RIGHT) base_dmg += (10000 + rand()%5000);
-    if (is_ultimate > 0) base_dmg+=2500;
-    //critical rate = 50%; critical dmg 150% ~ 300% 
+    else if (status == ATK_U_LEFT || status == ATK_U_RIGHT) base_dmg += (20000 + rand()%5000);
+    if (is_ultimate > 0) base_dmg+=5000;
+    //critical rate = 50%; critical dmg 250% ~ 300% 
     int is_crit = rand()%101;
     if (is_ultimate > 0 ? is_crit < 50 : is_crit < 75) {
-        double val = (rand() % 101) + (is_ultimate ? 150 : 300);
+        double val = (rand() % 101) + (is_ultimate ? 250 : 300);
         val /= 100.0;
         crit = true;
-        TotalDamage += int(base_dmg*val);
-        StrongestSingleStrike = std::max(StrongestSingleStrike, int(base_dmg*val));
-        return int(base_dmg*val);
+        TotalDamage += int(base_dmg + base_dmg*val);
+        StrongestSingleStrike = std::max(StrongestSingleStrike, int(base_dmg + base_dmg*val));
+        return int(base_dmg + base_dmg*val);
     }
     crit = false;
     StrongestSingleStrike = std::max(StrongestSingleStrike, base_dmg);
