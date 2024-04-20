@@ -12,5 +12,3 @@ usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
 
 git pull = gp
 
-
-

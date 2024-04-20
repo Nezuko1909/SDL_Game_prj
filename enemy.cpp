@@ -419,15 +419,17 @@ void Enemy::Do_Play(Map& map_data) { /* 1 */
     show_dmg.SetPosition(show_dmg.x_pos, show_dmg.y_pos - (TILE_SIZE / 4));
 }
 
-int Enemy::get_dmg(int status) {
+int Enemy::get_dmg(int status, int &DamageTaken) {
     if (base_dmg < 300) base_dmg = 500;
     //critical rate = 50%; critical dmg 150 ~ 200% 
     int is_crit = rand()%101;
     if (is_crit < 50) {
         double val = (rand() % 101) + 100;
         val /= 100.0;
+        DamageTaken += int(base_dmg*val);
         return int(base_dmg*val);
     }
+    DamageTaken += base_dmg;
     return base_dmg;
 }
 

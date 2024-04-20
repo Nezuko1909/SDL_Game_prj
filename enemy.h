@@ -57,7 +57,7 @@ public:
     bool is_atk_right;
 
     Heal_Point HP;
-    int get_dmg(int status);
+    int get_dmg(int status, int &DamageTaken);
     TextObject show_dmg;
     
     bool Dead(SDL_Renderer* des);

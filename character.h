@@ -61,7 +61,7 @@ public:
     void UpParameter(SDL_Renderer* des);
     void get_hitbox_for_other_object(int& x1, int& x2, int& y1, int& y2);
     Heal_Point Heal;
-    int get_dmg(int status, int is_ultimate, bool &crit);
+    int get_dmg(int status, int is_ultimate, bool &crit, long long &TotalDamage, int &StrongestSingleStrike);
     TextObject show_dmg;
 
     int Heal_bottle;
@@ -70,6 +70,7 @@ public:
     TTF_Font* heal_font;
 
     bool dead(SDL_Renderer* des);
+    bool win;
 
 private:
     float x_val;

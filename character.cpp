@@ -77,7 +77,7 @@ Character::Character() { //character == mainObject
     Heal.showHP.SetPosition(Heal.get_rect_().x + TILE_SIZE / 4 , Heal.get_rect_().y + 2);
     Heal.showHP.SetText("HP: " + std::to_string(Heal.current_HP) + "/" + std::to_string(Heal.max_HP));
     show_dmg.SetColor_(show_dmg.RED_COLOR);
-    Heal_bottle = 10;
+    Heal_bottle = 5;
     heal_font = TTF_OpenFont("text/calibri.ttf", 64);
     skill_countdown[3] = 30*FRAME_PER_SECOND; //30 second
     max_skill_coutdown[3] = 30*FRAME_PER_SECOND;
@@ -89,6 +89,7 @@ Character::Character() { //character == mainObject
     max_skill_coutdown[0] = FRAME_PER_SECOND / 2;
     Show_CD_Skill.resize(4);
     is_ultimate = 0;
+    win = false;
 }
 
 Character::~Character() {
@@ -308,7 +309,7 @@ void Character::UpParameter(SDL_Renderer* des) {
     for (size_t i = 0; i < Show_CD_Skill.size(); i++) {
         std::string crp = "character_src/skills/" + std::to_string(i + 1) + ".png";
         Show_CD_Skill[i].LoadImg(crp, des);
-        Show_CD_Skill[i].SetRect(SCREEN_WIDTH - ((5-i)*TILE_SIZE + 10), SCREEN_HEIGHT - Show_CD_Skill[i].GetRect().h - 10);
+        Show_CD_Skill[i].SetRect(SCREEN_WIDTH - ((5-i)*(TILE_SIZE + 10) - 32), SCREEN_HEIGHT - Show_CD_Skill[i].GetRect().h - 10);
         Show_CD_Skill[i].Render(des);
         SDL_Rect* cd_rect = new SDL_Rect;
         int x = Show_CD_Skill[i].GetRect().x;
@@ -316,7 +317,7 @@ void Character::UpParameter(SDL_Renderer* des) {
         int w = Show_CD_Skill[i].GetRect().w;
         int h = double(Show_CD_Skill[i].GetRect().h)*(double(skill_countdown[i]) / double(max_skill_coutdown[i]));
         *cd_rect = { x, y, w, h };
-        SDL_SetRenderDrawColor(des, 0, 0, 0, 0);
+        SDL_SetRenderDrawColor(des, 0, 0, 0, 150);
         SDL_RenderFillRect(des, cd_rect);
     }
 }
@@ -325,38 +326,38 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
     if (character_event.type == SDL_KEYDOWN) {
         switch (character_event.key.keysym.sym) {
             case SDLK_d: { 
-                character_status = RUN_RIGHT;
-                Char_input_type.right = 1;
-                Char_input_type.atk1 = 0;
-                Char_input_type.atk2 = 0;
-                Char_input_type.atk3 = 0;
-                is_atk_left = false;
-                is_atk_right = false;
+                if (!is_atk_left && !is_atk_right) {
+                    character_status = RUN_RIGHT;
+                    Char_input_type.right = 1;
+                    Char_input_type.atk1 = 0;
+                    Char_input_type.atk2 = 0;
+                    Char_input_type.atk3 = 0;
+                }
             }
             break;
             case SDLK_a: {
-                character_status = RUN_LEFT; // char status -> load Img for status
-                Char_input_type.left = 1; // char input type -> move
-                Char_input_type.atk1 = 0;
-                Char_input_type.atk2 = 0;
-                Char_input_type.atk3 = 0;
-                is_atk_left = false;
-                is_atk_right = false;
+                if (!is_atk_left && !is_atk_right) {
+                    character_status = RUN_LEFT; // char status -> load Img for status
+                    Char_input_type.left = 1; // char input type -> move
+                    Char_input_type.atk1 = 0;
+                    Char_input_type.atk2 = 0;
+                    Char_input_type.atk3 = 0;
+                }
             }
             break;
             case SDLK_SPACE: {
-                if (Char_input_type.left == 1 || character_status == IDLE_LEFT || character_status == RUN_LEFT) {
-                    character_status = JUMP_LEFT;
+                if (!is_atk_left && !is_atk_right) {
+                    if (Char_input_type.left == 1 || character_status == IDLE_LEFT || character_status == RUN_LEFT) {
+                        character_status = JUMP_LEFT;
+                    }
+                    else { 
+                        character_status = JUMP_RIGHT;
+                    } 
+                    Char_input_type.jump = 1;
+                    Char_input_type.atk1 = 0;
+                    Char_input_type.atk2 = 0;
+                    Char_input_type.atk3 = 0;
                 }
-                else { 
-                    character_status = JUMP_RIGHT;
-                } 
-                Char_input_type.jump = 1;
-                Char_input_type.atk1 = 0;
-                Char_input_type.atk2 = 0;
-                Char_input_type.atk3 = 0;
-                is_atk_left = false;
-                is_atk_right = false;
             }
             break;
             case SDLK_j: {  
@@ -434,9 +435,10 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
             break;
             case SDLK_h: {
                 if (Heal_bottle > 0 && Heal.current_HP < Heal.max_HP) {
-                    Heal.increase_HP(500);
+                    int up_hp = 500 + rand()%2301;
+                    Heal.increase_HP(up_hp);
                     show_dmg.SetColor(0, 222, 0, 0);
-                    show_dmg.SetText(std::to_string(500));
+                    show_dmg.SetText(std::to_string(up_hp));
                     show_dmg.SetPosition(x_pos - map_x_, y_pos + (height_frame / 2));
                     Heal_bottle--;
                 }
@@ -478,6 +480,7 @@ void Character::CheckMapData(Map& map_data) {
 
     if ((x1 >= 0 && x2 <= MAX_MAP_X) && (y1 >= 0 && y2 < MAX_MAP_Y)) {
         if (x_val > 0) { //moving to right
+            if (map_data.tile[y1][x2] == 9|| map_data.tile[y2][x2] == 9) win = true;
             if ( map_data.tile[y1][x2] == TILE_3 || map_data.tile[y2][x2] == TILE_3 ) {
                 x_pos = x2*TILE_SIZE;
                 x_pos -= width_frame + 1;
@@ -594,7 +597,7 @@ void Character::atk_action(int get_inf, Hit_Box source_hitbox, int dmg) {
     }
 }
 
-int Character::get_dmg(int status, int is_ultimaten, bool &crit) {
+int Character::get_dmg(int status, int is_ultimaten, bool &crit, long long &TotalDamage, int &StrongestSingleStrike) {
     int base_dmg;
     base_dmg = rand()%1000;
     if (base_dmg < 500) base_dmg = 500;
@@ -608,9 +611,13 @@ int Character::get_dmg(int status, int is_ultimaten, bool &crit) {
         double val = (rand() % 101) + (is_ultimate ? 150 : 300);
         val /= 100.0;
         crit = true;
+        TotalDamage += int(base_dmg*val);
+        StrongestSingleStrike = std::max(StrongestSingleStrike, int(base_dmg*val));
         return int(base_dmg*val);
     }
     crit = false;
+    StrongestSingleStrike = std::max(StrongestSingleStrike, base_dmg);
+    TotalDamage += base_dmg;
     return base_dmg;
 }
 

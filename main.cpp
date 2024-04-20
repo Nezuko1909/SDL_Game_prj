@@ -9,6 +9,10 @@
 
 class BaseObject Background;
 
+long long TotalDamage;
+int StrongestSingleStrike;
+int DamageTaken;
+
 //Function
 bool func_texture() {
     if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
@@ -48,6 +52,7 @@ bool init_Data() { //create window
         if (!func_texture()) {
             success = false;
         }
+        SDL_SetRenderDrawBlendMode(g_renderer, SDL_BLENDMODE_BLEND);
         if (TTF_Init() == -1) {
             std::cout<<"TTF could not initialize, SDL_Error: "<<SDL_GetError();
             success = false;
@@ -93,7 +98,7 @@ int Object_Collide(Character&  player, Enemy& enemy) {
     if (player.is_atk_left && check_hitbox) {
         //if (player.is_atk_left) printf("Player: is_atk_left");
         bool is_critical_damage;
-        int damage = player.get_dmg(player.get_status(), player.is_ultimate, is_critical_damage);
+        int damage = player.get_dmg(player.get_status(), player.is_ultimate, is_critical_damage, TotalDamage, StrongestSingleStrike);
         is_critical_damage == true ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, damage);
         //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
@@ -102,7 +107,7 @@ int Object_Collide(Character&  player, Enemy& enemy) {
     else if (player.is_atk_right && check_hitbox) {
         //if (player.is_atk_right) printf("Player: is_atk_right");
         bool is_critical_damage;
-        int damage = player.get_dmg(player.get_status(), player.is_ultimate, is_critical_damage);
+        int damage = player.get_dmg(player.get_status(), player.is_ultimate, is_critical_damage, TotalDamage, StrongestSingleStrike);
         is_critical_damage == true ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, damage);
         //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
@@ -113,10 +118,10 @@ int Object_Collide(Character&  player, Enemy& enemy) {
     }
 
     if (enemy.is_atk_left && check_hitbox) { 
-        player.atk_action(1, enemy_hitbox, enemy.get_dmg(enemy.get_status_()));
+        player.atk_action(1, enemy_hitbox, enemy.get_dmg(enemy.get_status_(), DamageTaken));
     }
     else if (enemy.is_atk_right && check_hitbox) {
-        player.atk_action(2, enemy_hitbox, enemy.get_dmg(enemy.get_status_()));
+        player.atk_action(2, enemy_hitbox, enemy.get_dmg(enemy.get_status_(), DamageTaken));
     }
     return ret;
 }
@@ -196,10 +201,8 @@ int DefeatMenu() {
 
     TTF_CloseFont(g_font);
     g_font= TTF_OpenFont("text/calibri.ttf", 64);
-    
-    BaseObject Defeat;
-    //Defeat.LoadImg("", g_renderer);
-    Defeat.SetRect((SCREEN_WIDTH - Defeat.GetRect().w) / 2, TILE_SIZE);
+    Background.LoadImg("img_source/BGR_DEF.png", g_renderer);
+    Background.Render(g_renderer);
 
     Button Restart;
     Restart.SetRectAll(7*TILE_SIZE + (TILE_SIZE / 2), 5*TILE_SIZE, 5*TILE_SIZE, 1.5*TILE_SIZE);
@@ -212,7 +215,87 @@ int DefeatMenu() {
     MainMenu.tile.SetText("Leave");
     MainMenu.SetForTile(g_font);
     MainMenu.tile.SetColor(255, 255, 255, 255);
+
+    int ret = -1;
+    bool is_quit = false;
+    while(!is_quit) {
+        while (SDL_PollEvent(&g_event) != 0) {
+            if (g_event.type == SDL_QUIT) {
+                return 3;
+            }
+            Restart.Events(g_renderer, g_event);
+            MainMenu.Events(g_renderer, g_event);
+        }
+        Restart.Fill(g_renderer);
+        MainMenu.Fill(g_renderer);
+
+        Restart.RenderTile(g_renderer, g_font);
+        MainMenu.RenderTile(g_renderer, g_font);
+
+        SDL_RenderPresent(g_renderer);
+
+        if (Restart.is_click) {
+            ret = 1;
+            break;
+        }
+        if (MainMenu.is_click) {
+            ret = 2;
+            break;
+        }
+    }
+    return ret;
+}
+
+/*
+Return 1: Restart
+Return 2: MainMenu
+Return 3: Exit Window
+*/
+int WinMenu() {
+    TTF_CloseFont(g_font);
+    g_font= TTF_OpenFont("text/calibri.ttf", 55);
+    Background.LoadImg("img_source/BGR_WIN.png", g_renderer);
+    Background.Render(g_renderer);
+
+    Button Restart;
+    Restart.SetRectAll(5*TILE_SIZE, 9*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE);
+    Restart.tile.SetText("Retry");
+    Restart.SetForTile(g_font);
+    Restart.tile.SetColor(255, 255, 255, 255);
+
+    Button MainMenu;
+    MainMenu.SetRectAll(11*TILE_SIZE, 9*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE);
+    MainMenu.tile.SetText("Level list");
+    MainMenu.SetForTile(g_font);
+    MainMenu.tile.SetColor(255, 255, 255, 255);
     
+    Button para1;
+    para1.SetRectAll(3*TILE_SIZE, 5*TILE_SIZE, 14*TILE_SIZE, TILE_SIZE);
+    para1.tile.SetText("Total Damage: " + std::to_string(TotalDamage));
+    para1.SetForTile(g_font);
+    para1.tile.SetColor(255, 255, 255, 255);
+    para1.SetColor(0, 0, 0, 100);
+    para1.Fill(g_renderer);
+    para1.RenderTile(g_renderer, g_font);
+
+    Button para2;
+    para2.SetRectAll(3*TILE_SIZE, 6*TILE_SIZE, 14*TILE_SIZE, TILE_SIZE);
+    para2.tile.SetText("Strongest Single Strike: " + std::to_string(StrongestSingleStrike));
+    para2.SetForTile(g_font);
+    para2.tile.SetColor(255, 255, 255, 255);
+    para2.SetColor(0, 0, 0, 100);
+    para2.Fill(g_renderer);
+    para2.RenderTile(g_renderer, g_font);
+    
+    Button para3;
+    para3.SetRectAll(3*TILE_SIZE, 7*TILE_SIZE, 14*TILE_SIZE, TILE_SIZE);
+    para3.tile.SetText("Damage Taken: " + std::to_string(DamageTaken));
+    para3.SetForTile(g_font);
+    para3.tile.SetColor(255, 255, 255, 255);
+    para3.SetColor(0, 0, 0, 100);
+    para3.Fill(g_renderer);
+    para3.RenderTile(g_renderer, g_font);
+
     int ret = -1;
     bool is_quit = false;
     while(!is_quit) {
@@ -248,11 +331,17 @@ Return 0: Win
 Return 1: Restart
 Return 2: Defeat
 Return 3: Quit Window
+Return 4: Do nothing -> level list
 */
 int MainGamePlay(int level) {
     SDL_RenderClear(g_renderer);
 
-    if (!Background.LoadImg("img_source/BGR.png",g_renderer)) {
+    TotalDamage = 0; 
+    StrongestSingleStrike = 0;
+    DamageTaken = 0;
+    
+    std::string bgr_path = "img_source/bgr_level_"+ std::to_string(level) + ".png";
+    if (!Background.LoadImg(bgr_path, g_renderer)) {
         return -1;
     }
 
@@ -290,6 +379,8 @@ int MainGamePlay(int level) {
     }
     std::vector<bool> Check_enemy_is_dead(num_of_enemy, false);
 
+    printf("%d\n",level);
+
     bool is_quit = false;
     while (!is_quit) {
         fps_timer.start();
@@ -307,7 +398,7 @@ int MainGamePlay(int level) {
                     return 1;
                 }
                 else if (pmr == 2) {
-                    return 0;
+                    return 4;
                 }
                 else if (pmr == 3) {
                     return 3;
@@ -335,7 +426,6 @@ int MainGamePlay(int level) {
         Background.Render(g_renderer, NULL);
 
         Map1.DrawMap(g_renderer);
-        // > HandleInput > DoPlayer > Show
         Map Get_play_map_data = Map1.GetmapData();
 
         if (!player_main_character.Heal.is_negative) player_main_character.SetMapXY(Get_play_map_data.start_X_, Get_play_map_data.start_y_);
@@ -387,6 +477,19 @@ int MainGamePlay(int level) {
 
         SDL_RenderPresent(g_renderer);
 
+        if (player_main_character.win == true) {
+            int wmrx = WinMenu();
+            if (wmrx == 1) {
+                return 1;
+            }
+            else if (wmrx == 2) {
+                return 0;
+            }
+            else if (wmrx == 3) {
+                return 3;
+            }
+        }
+
         int real_imp_time = fps_timer.get_ticks();
         int time_one_frame = 1000/FRAME_PER_SECOND; //ms
         if (real_imp_time < time_one_frame) {
@@ -431,6 +534,8 @@ int Level_List() {
     while (!is_quit) {
         TTF_CloseFont(g_font);
         g_font = TTF_OpenFont("text/calibri.ttf", 50);
+        Background.LoadImg("img_source/BGR1.png", g_renderer);
+
         while (SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;
@@ -462,6 +567,16 @@ int Level_List() {
                 int mgr = MainGamePlay(i + 1); 
                 while (mgr == 1) { 
                     mgr = MainGamePlay(i + 1);
+                }
+                if (mgr == 0) {
+                    level[i].SetColor(2, 184, 50, 255);
+                    level[i].SetDefaultColor(2, 184, 50, 255);
+                    level[i].SetIsPointingColor(0, 237, 63, 255);
+                }
+                if (mgr == 2) {
+                    level[i].SetColor(143, 0, 0, 255);
+                    level[i].SetDefaultColor(143, 0, 0, 255);
+                    level[i].SetIsPointingColor(207, 0, 0, 255);
                 }
                 if (mgr == 3) {
                     return 3;
@@ -508,7 +623,7 @@ int UserInterface() {
     while (!is_quit) {
         TTF_CloseFont(g_font);
         g_font = TTF_OpenFont("text/calibri.ttf", text_size);
-
+        Background.LoadImg("img_source/BGR.png", g_renderer);
         while (SDL_PollEvent(&g_event) != 0) {
             if (g_event.type == SDL_QUIT) {
                 is_quit = true;
