@@ -68,7 +68,8 @@ public:
     BaseObject Show_Heal_bottle;
     TextObject show_heal_bottle_text;
     TTF_Font* heal_font;
-
+    CharacterSound sound;
+    
     bool dead(SDL_Renderer* des);
     bool win;
     void Clear();
@@ -92,6 +93,7 @@ private:
     std::vector<BaseObject> Show_CD_Skill;
     int skill_countdown[4];
     int max_skill_coutdown[4];
+    int s_delay;
 };
 
 #endif //Character_H_

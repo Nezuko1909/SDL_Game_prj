@@ -35,8 +35,8 @@ void Button::Events(SDL_Renderer* des, SDL_Event event) {
         //printf("Poiter: x = %d\t y = %d\n",mx, my);
         if (event.type == SDL_MOUSEBUTTONDOWN) {
             is_click = true;
-            std::cout<<tile.GetText();
-            printf(": is click down\tPos:\tx = %d\ty = %d\n", event.motion.x, event.motion.y);
+            //std::cout<<tile.GetText();
+            //printf(": is click down\tPos:\tx = %d\ty = %d\n", event.motion.x, event.motion.y);
         }
         else if (event.type == SDL_MOUSEBUTTONUP) {
             is_click = false;

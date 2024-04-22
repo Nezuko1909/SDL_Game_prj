@@ -4,6 +4,7 @@
 #include "baseFunc.h"
 #include "heal_point.h"
 #include "text.h"
+#include "sound.h"
 
 class BaseObject {
 public: 

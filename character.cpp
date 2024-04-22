@@ -90,10 +90,14 @@ Character::Character() { //character == mainObject
     Show_CD_Skill.resize(4);
     is_ultimate = 0;
     win = false;
+    sound.SetPath("character_src/sound/");
+    sound.LoadSound();
+    s_delay = 0;
 }
 
 Character::~Character() {
     Clear();
+    sound.Free();
 }
 
 void Character::Clear() {
@@ -241,6 +245,7 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
             else {
                 character_status == JUMP_LEFT ? character_status = RUN_LEFT : character_status = RUN_RIGHT;
             }
+            Mix_PlayChannel(2, sound.jump_down, 0);
         }
     }
     //atk: 6 7 8 9 10 11 12 13
@@ -343,6 +348,8 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     Char_input_type.atk1 = 0;
                     Char_input_type.atk2 = 0;
                     Char_input_type.atk3 = 0;
+                    if (s_delay % (FRAME_PER_SECOND / 4) == 0) Mix_PlayChannel(1, sound.move, 0);
+                    s_delay < 1000000 ? s_delay++ : s_delay = 1;
                 }
             }
             break;
@@ -353,6 +360,8 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     Char_input_type.atk1 = 0;
                     Char_input_type.atk2 = 0;
                     Char_input_type.atk3 = 0;
+                    if (s_delay % (FRAME_PER_SECOND / 4) == 0) Mix_PlayChannel(1, sound.move, 0);
+                    s_delay < 1000000 ? s_delay++ : s_delay = 0;
                 }
             }
             break;
@@ -368,6 +377,7 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     Char_input_type.atk1 = 0;
                     Char_input_type.atk2 = 0;
                     Char_input_type.atk3 = 0;
+                    if (on_ground) Mix_PlayChannel(2, sound.jump_up, 0);
                 }
             }
             break;
@@ -378,12 +388,14 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                         Char_input_type.atk1 = 1;
                         is_atk_right = true;
                         is_atk_left = false;
+                        Mix_PlayChannel(3, is_ultimate == true ? sound.uatk1 : sound.atk1 , 0);
                     }
                     else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
                         character_status = ATK_1_LEFT;
                         Char_input_type.atk1 = 1;
                         is_atk_right = false;
                         is_atk_left = true;
+                        Mix_PlayChannel(3, is_ultimate == true ? sound.uatk1 : sound.atk1 , 0);
                     }
                     skill_countdown[0] = FRAME_PER_SECOND / 2;
                 }
@@ -396,12 +408,14 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                         Char_input_type.atk2 = 1;
                         is_atk_right = true;
                         is_atk_left = false;
+                        Mix_PlayChannel(4, is_ultimate == true ? sound.uatk2 : sound.atk2 , 0);
                     }
                     else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
                         character_status = ATK_2_LEFT;
                         Char_input_type.atk2 = 1;
                         is_atk_right = false;
                         is_atk_left = true;
+                        Mix_PlayChannel(4, is_ultimate == true ? sound.uatk2 : sound.atk2 , 0);
                     }
                     skill_countdown[1] = FRAME_PER_SECOND / 2;
                 }
@@ -414,12 +428,14 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                         Char_input_type.atk3 = 1;
                         is_atk_right = true;
                         is_atk_left = false;
+                        Mix_PlayChannel(5, is_ultimate == true ? sound.uatk3 : sound.atk3 , 0);
                     }
                     else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
                         character_status = ATK_3_LEFT;
                         Char_input_type.atk3 = 1;
                         is_atk_right = false;
                         is_atk_left = true;
+                        Mix_PlayChannel(5, is_ultimate == true ? sound.uatk3 : sound.atk3 , 0);
                     }
                     skill_countdown[2] = FRAME_PER_SECOND;
                 }
@@ -432,12 +448,14 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                         Char_input_type.ulti = 1;
                         is_atk_right = true;
                         is_atk_left = false;
+                        Mix_PlayChannel(6, sound.ulti, 0);
                     }
                     else if (character_status == IDLE_LEFT || character_status == RUN_LEFT) {
                         character_status = ATK_U_LEFT;
                         Char_input_type.ulti = 1;
                         is_atk_right = false;
                         is_atk_left = true;
+                        Mix_PlayChannel(6, sound.ulti, 0);
                     }
                     skill_countdown[3] = 12*FRAME_PER_SECOND;
                     is_ultimate = 10*FRAME_PER_SECOND;
@@ -504,7 +522,7 @@ void Character::CheckMapData(Map& map_data) {
                 x_val = 0;
             } 
         }
-    } 
+    }
     //Vertial
     int width_min = width_frame < TILE_SIZE ? width_frame : TILE_SIZE;
     x1 = (x_pos)/TILE_SIZE;

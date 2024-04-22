@@ -53,6 +53,7 @@ bool init_Data() { //create window
             success = false;
         }
         SDL_SetRenderDrawBlendMode(g_renderer, SDL_BLENDMODE_BLEND);
+        
         if (TTF_Init() == -1) {
             std::cout<<"TTF could not initialize, SDL_Error: "<<SDL_GetError();
             success = false;
@@ -105,24 +106,18 @@ int Object_Collide(Character&  player, Enemy& enemy) {
             check_hitbox = true;
         }
     }
-
-    //if (check_hitbox) printf("Check Hitbox: %d\n",check_hitbox);
     if (player.is_atk_left && check_hitbox) {
-        //if (player.is_atk_left) printf("Player: is_atk_left");
         bool is_critical_damage;
         int damage = player.get_dmg(player.get_status(), player.is_ultimate, is_critical_damage, TotalDamage, StrongestSingleStrike);
         is_critical_damage == true ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 1, player_hitbox, damage);
-        //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
         ret = 1;
     }
     else if (player.is_atk_right && check_hitbox) {
-        //if (player.is_atk_right) printf("Player: is_atk_right");
         bool is_critical_damage;
         int damage = player.get_dmg(player.get_status(), player.is_ultimate, is_critical_damage, TotalDamage, StrongestSingleStrike);
         is_critical_damage == true ? enemy.show_dmg.SetColor(222, 222, 0, 255) : enemy.show_dmg.SetColor_(enemy.show_dmg.WHITE_COLOR);
         enemy.Action(g_renderer, player.get_pos_x(), player.get_pos_y(), 2, player_hitbox, damage);
-        //printf("Player Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\nEnemy Hitbox: x1 = %d\t y1 = %d\t x2 = %d\t y2 = %d\n\n",player_hitbox.x1, player_hitbox.y1, player_hitbox.x2, player_hitbox.y2, enemy_hitbox.x1, enemy_hitbox.y1, enemy_hitbox.x2, enemy_hitbox.y2);
         ret = 2;
     }
     else {
@@ -366,7 +361,12 @@ int MainGamePlay(int level) {
     if (!Background.LoadImg(bgr_path, g_renderer)) {
         return -1;
     }
-
+    Mix_Music* BgrM = NULL;
+    std::string BgrM_path = "Music/level" + std::to_string(level) + ".mp3";
+    BgrM = Mix_LoadMUS(BgrM_path.c_str());
+    if (Mix_PausedMusic()) Mix_ResumeMusic();
+    Mix_PlayMusic(BgrM, -1);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
     ImpTimer fps_timer;
     TTF_CloseFont(g_font);
     g_font = TTF_OpenFont("text/LSB.ttf", 30);
@@ -401,12 +401,11 @@ int MainGamePlay(int level) {
     }
     std::vector<bool> Check_enemy_is_dead(num_of_enemy, false);
 
-    printf("%d\n",level);
+    //printf("%d\n",level);
     int ret = -1;
     bool is_quit = false;
     while (!is_quit) {
         fps_timer.start();
-
         TTF_CloseFont(g_font);
         g_font = TTF_OpenFont("text/LSB.ttf", 30);
         bool is_break = false;
@@ -530,7 +529,7 @@ int MainGamePlay(int level) {
         if (real_imp_time < time_one_frame) {
             int delay_time = time_one_frame - real_imp_time;
             if (delay_time < 0) delay_time = 0;
-            SDL_Delay(delay_time); //milisecond
+            SDL_Delay(delay_time); 
         }
     }
     Background.Free();
@@ -539,9 +538,10 @@ int MainGamePlay(int level) {
     for (size_t i = 0; i < hed.size(); i++) {
         hed[i].Clear();
     }
+    Mix_FreeMusic(BgrM);
+    player_main_character.sound.Free();
     return ret;
 }
-
 /*
 Return 0: Success
 return 3: Quit window
@@ -624,6 +624,7 @@ int Level_List() {
                     return 3;
                 }
                 if (Mix_PausedMusic()) Mix_ResumeMusic();
+                if (Mix_PlayingMusic() == 0) Mix_PlayMusic(BgrMusic, 0);
             }
             level[i].is_click = false;
         }
@@ -640,7 +641,7 @@ int UserInterface() {
     TTF_CloseFont(g_font);
     g_font = TTF_OpenFont("text/calibri.ttf", text_size);
     if (g_font == NULL) {
-         std::cout<<" could not open: text/calibri.ttf with size 25 \n";
+        std::cout<<" could not open: text/calibri.ttf with size 25 \n";
         return -1;
     }
 
@@ -661,15 +662,16 @@ int UserInterface() {
     Quit_bt.RenderTile(g_renderer, g_font);
 
     SDL_RenderPresent(g_renderer);
-    Mix_VolumeMusic(10);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
 
     Mix_FreeMusic(BgrMusic);
     BgrMusic = Mix_LoadMUS("Music/bgr.mp3");
+    Mix_PlayMusic(BgrMusic, -1);
 
     bool is_quit = false;
     while (!is_quit) {
-        if (!Mix_PlayingMusic()) Mix_PlayMusic(BgrMusic, 0);
         TTF_CloseFont(g_font);
+        if (Mix_PlayingMusic() == 0) Mix_PlayMusic(BgrMusic, 0);
         g_font = TTF_OpenFont("text/calibri.ttf", text_size);
         Background.LoadImg("img_source/BGR.png", g_renderer);
 
@@ -708,7 +710,7 @@ int UserInterface() {
 int main(int argc, char* argv[]) {
     std::srand(time(NULL));
     if (!init_Data()) {
-        return -1; //error
+        return -1;
     }
     UserInterface();
     close();
