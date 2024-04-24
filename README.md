@@ -40,7 +40,9 @@
 2. Giải nén và chạy trò chơi: scb2d.exe
 
 <div style = "text-align: center;">
+
 ![run_g](demo/run_g.gif)
+
 </div>
 
 ## Hướng dẫn chơi
