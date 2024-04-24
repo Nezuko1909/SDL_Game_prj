@@ -147,11 +147,13 @@ void Character::Show_character(SDL_Renderer* des, TTF_Font* fonts) {
         Load_Character_Img("character_src/run.png", des, FRAME_MOVE); 
         set_clips(FRAME_MOVE);
         get_stt = 2;
+        if (Mix_Playing(1) != 1) Mix_PlayChannel(1, sound.move, 0);
     }
     else if (character_status == RUN_RIGHT) {
         Load_Character_Img("character_src/run.png", des, FRAME_MOVE);
         set_clips(FRAME_MOVE);
         get_stt = 3;
+        if (Mix_Playing(1) != 1) Mix_PlayChannel(1, sound.move, 0);
     }
     else if (character_status == JUMP_LEFT) {
         Load_Character_Img("character_src/jump.png", des, FRAME_JUMP);
@@ -348,8 +350,6 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     Char_input_type.atk1 = 0;
                     Char_input_type.atk2 = 0;
                     Char_input_type.atk3 = 0;
-                    if (s_delay % (FRAME_PER_SECOND / 4) == 0) Mix_PlayChannel(1, sound.move, 0);
-                    s_delay < 1000000 ? s_delay++ : s_delay = 1;
                 }
             }
             break;
@@ -360,8 +360,6 @@ void Character::HandelInputAction(SDL_Event character_event, SDL_Renderer* scree
                     Char_input_type.atk1 = 0;
                     Char_input_type.atk2 = 0;
                     Char_input_type.atk3 = 0;
-                    if (s_delay % (FRAME_PER_SECOND / 4) == 0) Mix_PlayChannel(1, sound.move, 0);
-                    s_delay < 1000000 ? s_delay++ : s_delay = 0;
                 }
             }
             break;
