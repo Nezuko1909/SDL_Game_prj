@@ -34,7 +34,7 @@ https://www.youtube.com/watch?v=v81oVOWdSM0
 
 ### Cài đặt
 
-1. Tải xuống theo: `https://github.com/Nezuko1909/SDL_Game_prj/archive/refs/heads/master.zip`
+1. Tải xuống theo: [link](https://github.com/Nezuko1909/SDL_Game_prj/archive/refs/heads/master.zip)
 2. Giải nén và chạy trò chơi: chạy scb2d.exe
 
 ## Hướng dẫn chơi
@@ -57,6 +57,7 @@ Sau đó bấm vào level bạn muốn chơi. Hiện tại có 3 level với đ�
     - SDL_Image: Hỗ trợ xử lý hình ảnh
     - SDL_Mixer: Hỗ trợ xử lý âm thanh
     - SDL_Ttf: Hỗ trợ xử lý fonts chữ
+- Lưu và quản lý code bằng [Git](https://github.com/)
 
 ### ***Các kỹ thuật lập trình:***
 - Gồm tất cả các kỹ thuật cơ bản:
@@ -84,15 +85,16 @@ Sau đó bấm vào level bạn muốn chơi. Hiện tại có 3 level với đ�
 - Các texture trong game được lấy từ:
     - Map [resourcepack](https://resourcepack.net/)
     - Nhân vật và Kẻ địch [crafpix](https://craftpix.net/)
-    - Hiệu ứng [NSO](http://ninjaschool.vn/) [crafpix](https://craftpix.net/)
+    - Hiệu ứng [NSO](http://ninjaschool.vn/) và [crafpix](https://craftpix.net/)
 - Bản đồ được xây dựng bằng [Tiled](https://www.mapeditor.org/)
+- Tất cả texture đều được chỉnh sửa và vẽ lại một phần để phù hợp với game
 
 ## Lời kết
-- Khung ban đầu của code được tham khảo từ [phattrienphanmem123az](https://www.youtube.com/@PhatTrienPhanMem123AZ)
+- Khung ban đầu được tham khảo từ [phattrienphanmem123az](https://www.youtube.com/@PhatTrienPhanMem123AZ)
 - Cách dùng hàm của SDL được tham khảo từ [lazyfoo](https://lazyfoo.net/tutorials/SDL/)
 - Toàn bộ source code sau đều được tôi tự lên ý tưởng lập trình dựa theo khung có sẵn trước đó.
 
 ## Nguồn tham khảo
-1. https://lazyfoo.net/tutorials/SDL
-2. Youtube: Phát Triển Phần Mềm 123A-Z
+1. [lazyfoo](https://lazyfoo.net/tutorials/SDL)
+2. Youtube: [Phát Triển Phần Mềm 123A-Z](https://www.youtube.com/@PhatTrienPhanMem123AZ)
 
