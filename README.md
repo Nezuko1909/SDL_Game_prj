@@ -22,7 +22,6 @@
     - [**Kỹ thuật lập trình**](#kỹ-thuật-lập-trình)
     - [**Ứng dụng**](#ứng-dụng)
     - [**Về đồ họa**](#về-đồ-họa)
-    - [**Lời kết**](#lời-kết)
     - [**Nguồn tham khảo**](#nguồn-tham-khảo)
     - [**Tác giả**](#tác-giả)
 
@@ -112,18 +111,17 @@ Sau đó bấm vào level bạn muốn chơi. Hiện tại có 3 level với đ�
 - Các texture trong game được lấy từ:
     - Map [resourcepack](https://resourcepack.net/)
     - Nhân vật và Kẻ địch [crafpix](https://craftpix.net/)
-    - Hiệu ứng được lấy từ [NSO](http://ninjaschool.vn/) và [crafpix](https://craftpix.net/)
+    - Hiệu ứng được lấy từ [NSO - 1 tựa game được phát triển bởi teamobi](http://ninjaschool.vn/) và [crafpix](https://craftpix.net/)
 - Bản đồ được xây dựng bằng [Tiled](https://www.mapeditor.org/)
 - Tất cả texture đều được chỉnh sửa và vẽ lại một phần để phù hợp với game.
-
-## Lời kết
-- Khung ban đầu được tham khảo từ [phattrienphanmem123az](https://www.youtube.com/@PhatTrienPhanMem123AZ)
-- Cách dùng hàm của SDL được tham khảo từ [lazyfoo](https://lazyfoo.net/tutorials/SDL/)
-- Toàn bộ code ngoại trừ tile map và fpstimer đều được lên ý tưởng lập trình phát triển dựa theo khung có sẵn trước đó.
 
 ## Nguồn tham khảo
 1. [lazyfoo](https://lazyfoo.net/tutorials/SDL)
 2. Youtube: [Phát Triển Phần Mềm 123A-Z](https://www.youtube.com/@PhatTrienPhanMem123AZ)
+
+- Khung ban đầu được tham khảo từ [phattrienphanmem123az](https://www.youtube.com/@PhatTrienPhanMem123AZ)
+- Cách dùng hàm của SDL được tham khảo từ [lazyfoo](https://lazyfoo.net/tutorials/SDL/)
+- Toàn bộ code ngoại trừ tile map và fpstimer đều được lên ý tưởng lập trình phát triển dựa theo khung có sẵn trước đó.
 
 # Tác giả
  - Tv.Quyên
