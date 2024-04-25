@@ -49,7 +49,7 @@
 
 <div style = "text-align: center;">
 
-![edit_e](demo/edit_e.mp4)
+![edit_e](demo/edit_e.gif)
 
 </div>
 
@@ -128,4 +128,3 @@ Sau đó bấm vào level bạn muốn chơi. Hiện tại có 3 level với đ�
 # Tác giả
  - Tv.Quyên
 
- 
