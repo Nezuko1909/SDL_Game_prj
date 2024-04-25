@@ -121,7 +121,6 @@ Sau đó bấm vào level bạn muốn chơi. Hiện tại có 3 level với đ�
 
 - Khung ban đầu được tham khảo từ [phattrienphanmem123az](https://www.youtube.com/@PhatTrienPhanMem123AZ)
 - Cách dùng hàm của SDL được tham khảo từ [lazyfoo](https://lazyfoo.net/tutorials/SDL/)
-- Toàn bộ code ngoại trừ tile map và fpstimer đều được lên ý tưởng lập trình phát triển dựa theo khung có sẵn trước đó.
 
 # Tác giả
  - Tv.Quyên
