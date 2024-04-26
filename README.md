@@ -8,8 +8,9 @@
 
 ## ***Video Demo:***
 
-- [Youtube](https://www.youtube.com/watch?v=v81oVOWdSM0)
-
+- [Giải thích và demo gameplay](https://www.youtube.com/watch?v=v81oVOWdSM0)
+- [Gameplay trên nền source code](https://youtu.be/5ahZ92ZXIkE)
+  
 ## ***Table of Contents***
 - [**Samurai Combat 2D**](#samurai-combat-2d)
     - [**Video Demo**](#video-demo)
