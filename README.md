@@ -42,7 +42,7 @@
 
 1. Để chạy game bạn cần cài đặt mingw, ở đây tôi dùng mingw urct của [msys2](https://www.msys2.org/)
 2. Làm theo hướng dẫn cài đặt trên web [link msys2](https://www.msys2.org/)
-3. Mở Setting và tìm kiếm `Edit the system envỉonment variables`
+3. Mở Setting và tìm kiếm `Edit the system environment variables`
 4. Chọn phần `path` -> edit -> new -> browse
 5. Tìm đường dẫn đến file cài đặt của MSYS2, Ví dụ: `C:\msys64\ucrt64\bin`
 6. Sau khi hoàn thành, bấm `OK` và khởi động lại hệ thống của bạn
